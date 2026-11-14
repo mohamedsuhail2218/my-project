@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: digital-twin-cyber-war
+    runtime: node
+    # Free plan: no persistent disk. The SQLite database is ephemeral and resets
+    # on every restart, spin-down or deploy. Use a paid instance + disk before
+    # storing real client, payment or telemetry records.
+    plan: free
+    region: singapore
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start:prod
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      # Render terminates TLS in front of the app. One trusted proxy hop keeps
+      # Secure cookies and client IP attribution correct without trusting
+      # arbitrary X-Forwarded-For values.
+      - key: TRUST_PROXY
+        value: "1"
+      # Ephemeral path on the free plan. On a paid plan, mount a disk at
+      # /var/data and set this to /var/data/dtcw.sqlite.
+      - key: DTCW_DB_PATH
+        value: server/data/dtcw.sqlite
+      # Do not seed the published demo accounts in production.
+      - key: SEED_DEMO_USERS
+        value: "false"
+      - key: ALLOW_SELF_SIGNUP
+        value: "false"
+      # Enter these in the Render dashboard when applying the Blueprint. The
+      # bootstrap only runs against an empty database.
+      - key: BOOTSTRAP_ADMIN_EMAIL
+        sync: false
+      - key: BOOTSTRAP_ADMIN_PASSWORD
+        sync: false
+      - key: BOOTSTRAP_ADMIN_NAME
+        value: Workspace Owner
+      - key: BOOTSTRAP_ADMIN_ORG
+        value: Northwind Systems
+      # Keyed audit hash chain. Render generates a strong value once.
+      - key: AUDIT_HMAC_KEY
+        generateValue: true

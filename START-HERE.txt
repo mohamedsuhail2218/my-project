@@ -1,0 +1,61 @@
+Digital Twin Cyber War - HUNTER AI
+==================================
+
+Contents
+- React UI source (src)
+- Node/Express API (server)
+- Built production UI (dist)
+- Demo SQLite database snapshot (server/data/dtcw.sqlite)
+- Unit/API and Playwright tests (tests)
+- README.md with architecture, API, live-capability and deployment notes
+
+Requirements
+- Node.js 24 or newer
+
+Quick preview (development)
+1. npm ci
+2. npm run dev
+3. Open http://localhost:5173
+
+Production-style run
+1. npm ci
+2. Copy .env.example to .env and set NODE_ENV=production plus either
+   SEED_DEMO_USERS=true with a strong DEMO_PASSWORD (not the default used below)
+   or BOOTSTRAP_ADMIN_EMAIL / BOOTSTRAP_ADMIN_PASSWORD. Strict startup validation
+   refuses to boot with unsafe production configuration.
+3. npm run build
+4. npm run start:prod
+5. Open https://your-host (or http://127.0.0.1:8787 for a local check)
+
+Demo logins
+- alex@northwind.io / TwinDemo!2026 (Super Admin)
+- priya@northwind.io / TwinDemo!2026 (Security Analyst)
+- maya@northwind.io / TwinDemo!2026 (Read Only)
+
+Live capabilities (server-side, not simulated)
+- Real-time ingestion: POST /api/telemetry/ingest. Create a workspace token in
+  Settings -> Security & access, or sign in with hunter:write.
+  GET /api/telemetry/stream delivers Server-Sent Events.
+- ML anomaly detection: per-workspace isolation forest over stored telemetry.
+  Scores and explanations are written back to each event.
+- Live threat intelligence: keyless RDAP lookups for IPs/domains; AbuseIPDB and
+  AlienVault OTX add reputation when ABUSEIPDB_API_KEY / OTX_API_KEY are set.
+- HUNTER assistant: any OpenAI-compatible endpoint via HUNTER_LLM_BASE_URL,
+  HUNTER_LLM_API_KEY and HUNTER_LLM_MODEL. Without it the API returns
+  assistant_not_configured instead of canned answers.
+- Approval-gated response: analysts propose block-ip, isolate-host,
+  revoke-sessions or disable-identity. Only a Super Admin approval executes a
+  playbook; automation only queues proposals. See .env.example.
+- Plan payment: a manual UPI transfer to the number shown on the signed-in
+  Subscription page. The app cannot verify transfers; a Super Admin applies the
+  plan after confirming the payment.
+
+Notes
+- node_modules is intentionally not included; npm ci restores it from package-lock.json.
+- The included database is a clean seeded snapshot with the demo workspace and
+  users, and no test telemetry. The browser demo corpus is separate.
+- The demo password above is for local demo use only. Production startup refuses
+  the published default password and unsafe configuration; see .env.example and
+  README.md.
+- To start with a fresh database, move or delete server/data/dtcw.sqlite; demo
+  users are seeded again outside production.
