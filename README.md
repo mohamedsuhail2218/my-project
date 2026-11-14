@@ -377,7 +377,8 @@ uploaded when a run fails.
      use `TRUST_PROXY=true` on a directly exposed server
    - `AUDIT_HMAC_KEY` with a long random value
    - `DTCW_DB_PATH` on the persistent volume
-3. `npm ci && npm run build && npm run start:prod`.
+3. `npm ci --include=dev && npm run build`, then start with
+   `NODE_ENV=production node server/index.js` (or `npm run start:prod`).
 4. Terminate TLS at a reverse proxy (nginx/Caddy/ALB). Forward to
    `127.0.0.1:8787`. Production startup enables Secure cookies and HSTS.
 5. Health check: `GET /api/health` (database liveness).

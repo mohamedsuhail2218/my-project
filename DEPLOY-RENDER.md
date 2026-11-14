@@ -19,7 +19,7 @@ spin-down, deploy or crash.
 - The repository must include `render.yaml`, `package.json`, `package-lock.json`
   and `.node-version`. Do **not** commit `node_modules/`, `dist/`, `.env` or
   `server/data/*.sqlite`; `.gitignore` already excludes them. Render runs
-  `npm ci && npm run build`, so it builds `dist/` itself.
+  `npm ci --include=dev && npm run build`, so it builds `dist/` itself.
 
 ## 1. Put the project in a GitHub repository
 
@@ -92,7 +92,9 @@ confirm:
 - `NODE_VERSION=24` is in effect;
 - `HOST=0.0.0.0` is set;
 - `DTCW_DB_PATH=server/data/dtcw.sqlite`;
-- the build ran `npm ci && npm run build` successfully.
+- the build ran `npm ci --include=dev && npm run build` successfully. The
+  `--include=dev` flag is required because `NODE_ENV=production` also applies
+  during the build and would otherwise skip Vite.
 
 ## 4. Set the canonical origin
 

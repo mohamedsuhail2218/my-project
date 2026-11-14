@@ -7,8 +7,11 @@ services:
     # storing real client, payment or telemetry records.
     plan: free
     region: singapore
-    buildCommand: npm ci && npm run build
-    startCommand: npm run start:prod
+    # NODE_ENV=production also applies during the build, and npm ci would then
+    # skip devDependencies such as Vite. Include them explicitly for the build.
+    buildCommand: npm ci --include=dev && npm run build
+    # NODE_ENV is already set below; avoid depending on cross-env at runtime.
+    startCommand: node server/index.js
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
