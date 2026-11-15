@@ -100,8 +100,11 @@ export default function App() {
       <ScrollToTop />
       <Suspense fallback={<RouteLoading />}>
         <Routes>
+          {/* The landing page is a full-bleed experience with its own header and
+              footer, so it renders outside the shared public chrome. */}
+          <Route index element={<Landing />} />
+
           <Route element={<PublicLayout />}>
-            <Route index element={<Landing />} />
             <Route path="product" element={<Product />} />
             <Route path="pricing" element={<Pricing />} />
           </Route>

@@ -392,6 +392,21 @@ Production startup fails closed when the configuration is unsafe. Warnings are
 printed for a missing `PUBLIC_ORIGIN`, unkeyed audit hashing, a cloud-synced
 database path, or `TRUST_PROXY=true`.
 
+### Deploy to Vercel
+
+`vercel.json` builds the Vite app and routes `/api/*` to a single Node.js
+Function (`api/index.js`) that mounts the existing Express app. SQLite runs at
+`/tmp/dtcw.sqlite` because Functions have no persistent disk, so every cold start
+recreates the schema and the bootstrap admin and loses all other data. Set
+`DTCW_DB_PATH=/tmp/dtcw.sqlite`, `TRUST_PROXY=1`, production bootstrap variables,
+`SEED_DEMO_USERS=false` and `PUBLIC_ORIGIN=https://<project>.vercel.app`. Full
+steps and serverless limitations are in [`DEPLOY-VERCEL.md`](DEPLOY-VERCEL.md).
+
+Vercel is suitable only for a disposable preview. Do not run it with multiple
+concurrent instances for real work, and do not treat the `/tmp` database as
+durable. Use the Render paid option below, or a managed database, when data must
+survive restarts.
+
 ### Deploy to Render
 
 `render.yaml` defines a Render Blueprint on the **Free** plan: no persistent
