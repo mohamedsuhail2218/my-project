@@ -107,7 +107,7 @@ export default function SignIn() {
           </div>
         </div>
         <div className="auth-row">
-          <label className="check" style={{ fontSize: 11.5 }}>
+          <label className="check">
             <input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} />
             Keep me signed in
           </label>
@@ -116,6 +116,11 @@ export default function SignIn() {
         <button type="submit" className="btn primary block" disabled={busy}>
           {busy ? <>Signing in… <Loader2 className="spin" /></> : <>Sign in <ArrowRight /></>}
         </button>
+        {import.meta.env.PROD && (
+          <p className="auth-login-hint">
+            Use the workspace admin credentials issued for this deployment. Demo accounts are disabled on this instance.
+          </p>
+        )}
       </form>
 
       {PREFILL_EMAIL && PREFILL_PASSWORD && (

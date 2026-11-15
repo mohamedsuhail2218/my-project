@@ -22,7 +22,7 @@
   --nx-cyan: #58e7ff;
   --nx-white: #f4f7ff;
   --nx-muted: #8b98b8;
-  --nx-faint: #64748b;
+  --nx-faint: #7f8fa6;
   --nx-line: rgba(118, 154, 255, 0.2);
   --nx-display: "Bebas Neue", "Arial Narrow", Impact, sans-serif;
   --nx-body: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
@@ -59,7 +59,7 @@
   background: var(--nx-lime);
   color: #05060f !important;
   font-family: var(--nx-mono);
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.08em;
   transition: top 120ms ease;
 }
@@ -135,7 +135,7 @@
 .nx-brand-text em {
   margin-top: 4px;
   font-family: var(--nx-mono);
-  font-size: 7.5px;
+  font-size: 11px;
   font-style: normal;
   letter-spacing: 0.32em;
   color: var(--nx-lime);
@@ -145,7 +145,7 @@
   flex: 1;
   text-align: center;
   font-family: var(--nx-mono);
-  font-size: 8px;
+  font-size: 11.5px;
   letter-spacing: 0.2em;
   color: var(--nx-muted);
   white-space: nowrap;
@@ -161,7 +161,7 @@
   align-items: center;
   gap: clamp(12px, 1.6vw, 24px);
   font-family: var(--nx-mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   letter-spacing: 0.17em;
   white-space: nowrap;
 }
@@ -196,7 +196,7 @@
   gap: 7px;
   flex-shrink: 0;
   font-family: var(--nx-mono);
-  font-size: 7.5px;
+  font-size: 11px;
   letter-spacing: 0.15em;
   color: var(--nx-muted);
   white-space: nowrap;
@@ -239,7 +239,7 @@
   padding: 13px 0;
   border-bottom: 1px solid var(--nx-line);
   font-family: var(--nx-mono);
-  font-size: 10px;
+  font-size: 12.5px;
   letter-spacing: 0.16em;
   color: #c7d4eb;
 }
@@ -298,7 +298,7 @@
   align-items: center;
   gap: 12px;
   font-family: var(--nx-mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   letter-spacing: 0.22em;
   color: var(--nx-muted);
   text-transform: uppercase;
@@ -361,7 +361,7 @@
   padding: 0 20px;
   border: 1px solid transparent;
   font-family: var(--nx-mono);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
@@ -396,7 +396,7 @@
   gap: 9px 22px;
   margin-top: 28px;
   font-family: var(--nx-mono);
-  font-size: 7.5px;
+  font-size: 11px;
   letter-spacing: 0.14em;
   color: var(--nx-faint);
 }
@@ -444,8 +444,8 @@
 .nx-orbit-badge text {
   fill: var(--nx-lime);
   font-family: var(--nx-mono);
-  font-size: 7px;
-  letter-spacing: 0.22em;
+  font-size: 10px;
+  letter-spacing: 0.12em;
 }
 
 .nx-orbit-badge > svg:last-child {
@@ -495,7 +495,7 @@
   align-items: flex-end;
   gap: 7px;
   font-family: var(--nx-mono);
-  font-size: 7px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   color: rgba(232, 241, 255, 0.68);
 }
@@ -576,14 +576,14 @@
 
 .nx-chip span {
   font-family: var(--nx-mono);
-  font-size: 6.5px;
+  font-size: 11px;
   letter-spacing: 0.18em;
   color: var(--nx-muted);
 }
 
 .nx-chip strong {
   font-family: var(--nx-mono);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 400;
   letter-spacing: 0.08em;
   color: var(--nx-lime);
@@ -591,7 +591,7 @@
 
 .nx-chip strong em {
   margin-left: 2px;
-  font-size: 7px;
+  font-size: 11px;
   font-style: normal;
   color: var(--nx-muted);
 }
@@ -627,7 +627,7 @@
   transform: translateY(-50%);
   writing-mode: vertical-rl;
   font-family: var(--nx-mono);
-  font-size: 7px;
+  font-size: 11px;
   letter-spacing: 0.3em;
   color: rgba(232, 241, 255, 0.64);
 }
@@ -644,7 +644,7 @@
   padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.16);
   font-family: var(--nx-mono);
-  font-size: 6.5px;
+  font-size: 11px;
   letter-spacing: 0.15em;
   color: rgba(232, 241, 255, 0.62);
 }
@@ -657,7 +657,7 @@
 
 .nx-eyebrow {
   font-family: var(--nx-mono);
-  font-size: 8px;
+  font-size: 11.5px;
   letter-spacing: 0.22em;
   color: var(--nx-muted);
   text-transform: uppercase;
@@ -692,7 +692,7 @@
   padding-top: 18px;
   border-top: 1px solid var(--nx-line);
   color: var(--nx-muted);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.62;
 }
 
@@ -762,7 +762,7 @@
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(110, 150, 255, 0.16);
   font-family: var(--nx-mono);
-  font-size: 7.5px;
+  font-size: 11px;
   letter-spacing: 0.18em;
 }
 
@@ -786,7 +786,7 @@
 .nx-work-card > p {
   min-height: 70px;
   color: #8f9db9;
-  font-size: 11.5px;
+  font-size: 13px;
   line-height: 1.55;
 }
 
@@ -799,7 +799,7 @@
   padding-top: 11px;
   border-top: 1px solid rgba(110, 150, 255, 0.14);
   font-family: var(--nx-mono);
-  font-size: 7.5px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   color: var(--nx-lime);
 }
@@ -837,7 +837,7 @@
   padding: 8px 10px;
   border-bottom: 1px solid rgba(110, 150, 255, 0.14);
   font-family: var(--nx-mono);
-  font-size: 6.5px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   color: var(--nx-muted);
 }
@@ -880,7 +880,7 @@
   padding: 2px 5px;
   border: 1px solid;
   font-family: var(--nx-mono);
-  font-size: 6px;
+  font-size: 11px;
   letter-spacing: 0.1em;
 }
 
@@ -899,7 +899,7 @@
 .nx-hunter-line strong {
   display: block;
   color: #dbe6fb;
-  font-size: 8px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.06em;
 }
@@ -909,7 +909,7 @@
   margin-top: 4px;
   color: #7486a8;
   font-family: var(--nx-mono);
-  font-size: 6px;
+  font-size: 11px;
 }
 
 .nx-hunter-answer {
@@ -921,7 +921,7 @@
   border-left: 2px solid var(--nx-lime);
   background: rgba(31, 77, 255, 0.12);
   color: #b9c8e8;
-  font-size: 8px;
+  font-size: 11.5px;
   line-height: 1.45;
 }
 
@@ -939,7 +939,7 @@
   border-bottom: 1px solid rgba(110, 150, 255, 0.1);
   color: #8fa0c0;
   font-family: var(--nx-mono);
-  font-size: 6.5px;
+  font-size: 11px;
 }
 
 .nx-response-step span {
@@ -973,7 +973,7 @@
   border: 1px solid rgba(200, 255, 0, 0.3);
   color: var(--nx-muted);
   font-family: var(--nx-mono);
-  font-size: 6.5px;
+  font-size: 11px;
 }
 
 .nx-risk-delta strong {
@@ -1042,7 +1042,7 @@
 .nx-stat > span:last-child {
   color: #dce6ff;
   font-family: var(--nx-mono);
-  font-size: 6.5px;
+  font-size: 11px;
   letter-spacing: 0.16em;
 }
 
@@ -1097,7 +1097,7 @@
   position: relative;
   z-index: 1;
   font-family: var(--nx-mono);
-  font-size: 7px;
+  font-size: 11px;
   letter-spacing: 0.22em;
 }
 
@@ -1164,7 +1164,7 @@
 .nx-tool strong {
   color: #dbe6fb;
   font-family: var(--nx-mono);
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.1em;
 }
@@ -1172,7 +1172,7 @@
 .nx-tool small {
   color: #7486a8;
   font-family: var(--nx-mono);
-  font-size: 5.5px;
+  font-size: 11px;
   letter-spacing: 0.1em;
 }
 
@@ -1225,7 +1225,7 @@
   max-width: 450px;
   margin-top: 18px;
   color: #a9b6d2;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.62;
 }
 
@@ -1245,7 +1245,7 @@
   border-bottom: 1px solid var(--nx-line);
   color: #c7d4eb;
   font-family: var(--nx-mono);
-  font-size: 7.5px;
+  font-size: 11px;
   letter-spacing: 0.13em;
   transition: color 160ms ease, padding-left 160ms ease;
 }
@@ -1292,7 +1292,7 @@
   margin-top: 4px;
   color: #8b9cbe;
   font-family: var(--nx-mono);
-  font-size: 6.5px;
+  font-size: 11px;
   letter-spacing: 0.16em;
 }
 
@@ -1323,7 +1323,7 @@
 .nx-qr-label {
   color: var(--nx-lime);
   font-family: var(--nx-mono);
-  font-size: 7px;
+  font-size: 11px;
   letter-spacing: 0.15em;
   text-align: center;
 }
@@ -1331,7 +1331,7 @@
 .nx-qr-sub {
   color: #7486a8;
   font-family: var(--nx-mono);
-  font-size: 5.5px;
+  font-size: 11px;
   letter-spacing: 0.12em;
 }
 
@@ -1361,14 +1361,14 @@
   padding: 12px 26px;
   color: var(--nx-lime);
   font-family: var(--nx-mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   letter-spacing: 0.18em;
   white-space: nowrap;
 }
 
 .nx-marquee i {
   color: #ffffff;
-  font-size: 11px;
+  font-size: 13px;
   font-style: normal;
 }
 
@@ -1381,9 +1381,9 @@
   padding: 18px clamp(20px, 5vw, 76px);
   background: #03040a;
   border-top: 1px solid rgba(110, 150, 255, 0.15);
-  color: #64748b;
+  color: #94a3b8;
   font-family: var(--nx-mono);
-  font-size: 7px;
+  font-size: 11px;
   letter-spacing: 0.15em;
 }
 
@@ -1556,7 +1556,7 @@
   }
 
   .nx-brand-text em {
-    font-size: 6px;
+    font-size: 11px;
   }
 
   .nx-header-status {
@@ -1586,7 +1586,7 @@
 
   .nx-proof {
     gap: 8px 14px;
-    font-size: 6.5px;
+    font-size: 11px;
   }
 
   .nx-hero-right {
@@ -1596,7 +1596,7 @@
   .nx-hero-meta {
     top: 16px;
     right: 16px;
-    font-size: 6px;
+    font-size: 11px;
   }
 
   .nx-vertical-label {
@@ -1612,11 +1612,11 @@
   }
 
   .nx-chip span {
-    font-size: 5.5px;
+    font-size: 11px;
   }
 
   .nx-chip strong {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .nx-chip-a {
@@ -1642,7 +1642,7 @@
   .nx-art-caption {
     right: 16px;
     left: 16px;
-    font-size: 5.5px;
+    font-size: 11px;
   }
 
   .nx-section {
@@ -1722,7 +1722,7 @@
 
   .nx-marquee span {
     padding: 10px 18px;
-    font-size: 7.5px;
+    font-size: 11px;
   }
 
   .nx-footer {

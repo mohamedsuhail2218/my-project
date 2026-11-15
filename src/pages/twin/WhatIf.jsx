@@ -339,7 +339,7 @@ export default function WhatIf() {
                     <tr key={scenario.id}>
                       <td>
                         <Link to={`/app/twin/attack-paths?scenario=${scenario.id}`} style={{ color: "var(--text-soft)" }}>
-                          <span className="strong" style={{ fontSize: 10.5 }}>{scenario.name}</span>
+                          <span className="strong" style={{ fontSize: 12.5 }}>{scenario.name}</span>
                         </Link>
                         <div className="small-meta mt-6">{scenario.entry} → {scenario.target}</div>
                       </td>

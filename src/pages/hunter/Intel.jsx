@@ -354,7 +354,7 @@ export default function Intel() {
                 {filtered.map((ioc) => (
                   <tr key={ioc.id} className="clickable" onClick={() => openDrawer(ioc)}>
                     <td>
-                      <div className="mono" style={{ fontSize: 9.5, color: "#7dd3fc", maxWidth: 270, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={ioc.value}>
+                      <div className="mono" style={{ fontSize: 12, color: "#7dd3fc", maxWidth: 270, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={ioc.value}>
                         {ioc.value}
                       </div>
                       <div className="small-meta mt-6">{ioc.id}</div>
@@ -541,7 +541,7 @@ export default function Intel() {
                     <Link to={`/app/hunter/logs?focus=${log.id}`} className="finding-item" key={log.id} style={{ display: "flex", padding: "10px 4px" }}>
                       <span className={`finding-sev-bar ${log.status === "alert" ? "high" : "medium"}`} />
                       <div className="finding-body">
-                        <div className="finding-title" style={{ fontSize: 10.5 }}>{log.message}</div>
+                        <div className="finding-title" style={{ fontSize: 12.5 }}>{log.message}</div>
                         <div className="finding-meta">
                           <span>{formatDateTime(log.timestamp)}</span>
                           <span>·</span>

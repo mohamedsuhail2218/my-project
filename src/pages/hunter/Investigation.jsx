@@ -430,7 +430,7 @@ export default function Investigation() {
                     >
                       <span className="tag violet" style={{ flexShrink: 0 }}>{source.ref}</span>
                       <div className="finding-body">
-                        <div className="finding-title" style={{ fontSize: 10.5 }}>{source.title}</div>
+                        <div className="finding-title" style={{ fontSize: 12.5 }}>{source.title}</div>
                         <div className="finding-meta">
                           <span>{source.kind}</span>
                           <span>·</span>
@@ -631,7 +631,7 @@ export default function Investigation() {
                       <tr key={log.id}>
                         <td className="small-meta" style={{ whiteSpace: "nowrap" }}>{formatDateTime(log.timestamp)}</td>
                         <td><Badge tone="neutral">{log.source}</Badge></td>
-                        <td className="mono" style={{ fontSize: 9 }}>{log.host}</td>
+                        <td className="mono" style={{ fontSize: 12 }}>{log.host}</td>
                         <td className="small">{log.event}</td>
                         <td><Badge tone={log.status === "alert" ? "high" : log.status === "deny" ? "medium" : "success"}>{log.status}</Badge></td>
                         <td className="small muted" style={{ maxWidth: 340, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={log.message}>{log.message}</td>
@@ -659,11 +659,11 @@ export default function Investigation() {
                       {results.detections.slice(0, 5).map((detection) => (
                         <tr key={detection.id}>
                           <td>
-                            <div className="strong" style={{ fontSize: 10.5 }}>{detection.title}</div>
+                            <div className="strong" style={{ fontSize: 12.5 }}>{detection.title}</div>
                             <div className="small-meta mt-6">{detection.id} · {detection.technique}</div>
                           </td>
                           <td><SeverityBadge severity={detection.severity} /></td>
-                          <td className="mono" style={{ fontSize: 9 }}>{detection.assetId}</td>
+                          <td className="mono" style={{ fontSize: 12 }}>{detection.assetId}</td>
                           <td><Link to={`/app/hunter/detections?focus=${detection.id}`} className="btn ghost sm">Open</Link></td>
                         </tr>
                       ))}
@@ -706,7 +706,7 @@ export default function Investigation() {
                     <tbody>
                       {results.intel.slice(0, 5).map((ioc) => (
                         <tr key={ioc.id}>
-                          <td className="mono" style={{ fontSize: 9, maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ioc.value}</td>
+                          <td className="mono" style={{ fontSize: 12, maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ioc.value}</td>
                           <td><Badge tone={ioc.verdict === "malicious" ? "critical" : ioc.verdict === "suspicious" ? "high" : "success"}>{ioc.verdict}</Badge></td>
                           <td className="mono">{ioc.confidence}%</td>
                         </tr>
@@ -727,7 +727,7 @@ export default function Investigation() {
                     <Link to={`/app/hunter/evidence?focus=${item.id}`} className="finding-item" key={item.id} style={{ display: "flex" }}>
                       <span className="feature-icon" style={{ width: 30, height: 30, flexShrink: 0 }}><Archive /></span>
                       <div className="finding-body">
-                        <div className="finding-title" style={{ fontFamily: "var(--mono)", fontSize: 10.5 }}>{item.name}</div>
+                        <div className="finding-title" style={{ fontFamily: "var(--mono)", fontSize: 12.5 }}>{item.name}</div>
                         <div className="finding-meta">
                           <span>{item.id}</span>
                           <span>·</span>
@@ -754,11 +754,11 @@ export default function Investigation() {
                     {results.assets.map((asset) => (
                       <tr key={asset.id}>
                         <td>
-                          <div className="strong" style={{ fontSize: 11 }}>{asset.name}</div>
+                          <div className="strong" style={{ fontSize: 13 }}>{asset.name}</div>
                           <div className="small-meta mt-6">{asset.id} · {asset.label}</div>
                         </td>
                         <td className="small">{ZONES[asset.zone]?.label || asset.zone}</td>
-                        <td className="mono" style={{ fontSize: 9 }}>{asset.ip}</td>
+                        <td className="mono" style={{ fontSize: 12 }}>{asset.ip}</td>
                         <td className="small">{asset.owner}</td>
                         <td><Badge tone={assetRisk(asset) >= 70 ? "critical" : assetRisk(asset) >= 50 ? "high" : "success"}>{assetRisk(asset)}</Badge></td>
                         <td><Link to={`/app/twin/builder?asset=${asset.id}`} className="btn ghost sm">Inspect</Link></td>

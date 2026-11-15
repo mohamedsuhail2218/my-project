@@ -181,7 +181,7 @@ export default function HunterDashboard() {
                 {openDetections.slice(0, 6).map((detection) => (
                   <tr key={detection.id}>
                     <td>
-                      <div className="strong" style={{ fontSize: 11 }}>{detection.title}</div>
+                      <div className="strong" style={{ fontSize: 13 }}>{detection.title}</div>
                       <div className="small-meta mt-6">{detection.id} · {detection.technique} · {detection.source}</div>
                     </td>
                     <td><SeverityBadge severity={detection.severity} /></td>
@@ -191,7 +191,7 @@ export default function HunterDashboard() {
                         <span>{Math.round(detection.confidence * 100)}%</span>
                       </div>
                     </td>
-                    <td className="mono" style={{ fontSize: 9 }}>{detection.assetId}</td>
+                    <td className="mono" style={{ fontSize: 12 }}>{detection.assetId}</td>
                     <td className="small">{detection.assignee}</td>
                     <td>
                       <Link to={`/app/hunter/detections?focus=${detection.id}`} className="btn ghost sm">
@@ -325,7 +325,7 @@ export default function HunterDashboard() {
               <tbody>
                 {state.intel.slice(0, 5).map((ioc) => (
                   <tr key={ioc.id}>
-                    <td className="mono" style={{ fontSize: 9.5, color: "#7dd3fc", maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis" }}>{ioc.value}</td>
+                    <td className="mono" style={{ fontSize: 12, color: "#7dd3fc", maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis" }}>{ioc.value}</td>
                     <td><Badge tone="neutral">{ioc.type}</Badge></td>
                     <td>
                       <Badge tone={ioc.verdict === "malicious" ? "critical" : ioc.verdict === "suspicious" ? "high" : "success"}>
@@ -381,7 +381,7 @@ export default function HunterDashboard() {
                 {state.evidence.slice(0, 4).map((item) => (
                   <tr key={item.id}>
                     <td>
-                      <div className="mono" style={{ fontSize: 9.5, color: "var(--text-soft)" }}>{item.name}</div>
+                      <div className="mono" style={{ fontSize: 12, color: "var(--text-soft)" }}>{item.name}</div>
                       <div className="small-meta mt-6">{item.id} · {item.size}</div>
                     </td>
                     <td className="small">{item.type}</td>

@@ -290,11 +290,11 @@ export default function Subscription() {
                 {INVOICES.map((invoice) => (
                   <tr key={invoice.id}>
                     <td>
-                      <div className="strong" style={{ fontSize: 11 }}>{invoice.id}</div>
+                      <div className="strong" style={{ fontSize: 13 }}>{invoice.id}</div>
                       <div className="small-meta mt-6">{invoice.plan}</div>
                     </td>
                     <td className="small-meta">{invoice.date}</td>
-                    <td className="mono" style={{ fontSize: 10 }}>{invoice.amount}</td>
+                    <td className="mono" style={{ fontSize: 12.5 }}>{invoice.amount}</td>
                     <td><Badge tone="success">{invoice.status}</Badge></td>
                   </tr>
                 ))}

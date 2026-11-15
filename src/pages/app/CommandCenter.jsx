@@ -244,7 +244,7 @@ export default function CommandCenter() {
             onSelect={(asset) => setSelectedId(asset.id)}
           />
           <TopologyLegend>
-            <span className="mono" style={{ marginLeft: "auto", fontSize: 8.5 }}>
+            <span className="mono" style={{ marginLeft: "auto", fontSize: 11.5 }}>
               {state.assets.length} assets · {state.edges.length} approved links
             </span>
           </TopologyLegend>
@@ -299,7 +299,7 @@ export default function CommandCenter() {
             <div className="mini-stat"><div className="k">Asset risk</div><div className="v">{risk.assetRisk}</div></div>
             <div className="mini-stat"><div className="k">Scenario risk</div><div className="v">{risk.scenarioRisk}</div></div>
             <div className="mini-stat"><div className="k">Fix success</div><div className="v green">{successRate}%</div></div>
-            <div className="mini-stat"><div className="k">Latest run</div><div className="v" style={{ fontSize: 10 }}>{state.runs[0]?.id || "—"}</div></div>
+            <div className="mini-stat"><div className="k">Latest run</div><div className="v" style={{ fontSize: 12.5 }}>{state.runs[0]?.id || "—"}</div></div>
           </div>
           <div className="mt-16">
             <div className="row between mb-8">
@@ -424,11 +424,11 @@ export default function CommandCenter() {
                 {exposure.map(({ scenario, plan }) => (
                   <tr key={scenario.id}>
                     <td>
-                      <div className="strong" style={{ fontSize: 11.5 }}>{scenario.name}</div>
+                      <div className="strong" style={{ fontSize: 13 }}>{scenario.name}</div>
                       <div className="small-meta mt-6">{scenario.category} · {plan.totalSteps} hops</div>
                     </td>
                     <td><SeverityBadge severity={scenario.severity} /></td>
-                    <td className="mono" style={{ fontSize: 9.5, color: "var(--muted)" }}>
+                    <td className="mono" style={{ fontSize: 12, color: "var(--muted)" }}>
                       {scenario.entry} → {scenario.target}
                     </td>
                     <td>

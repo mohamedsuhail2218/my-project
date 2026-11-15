@@ -370,7 +370,7 @@ export default function RiskAnalysis() {
               {filteredAssets.map((asset) => (
                 <tr key={asset.id}>
                   <td>
-                    <div className="strong" style={{ fontSize: 11.5 }}>{asset.name}</div>
+                    <div className="strong" style={{ fontSize: 13 }}>{asset.name}</div>
                     <div className="small-meta mt-6">{ASSET_TYPES[asset.type]?.label} · {asset.ip}</div>
                   </td>
                   <td className="small">{ZONES[asset.zone]?.label || asset.zone}</td>
@@ -412,7 +412,7 @@ export default function RiskAnalysis() {
                 {scenarioRows.map(({ scenario, plan, score }) => (
                   <tr key={scenario.id}>
                     <td>
-                      <Link to={`/app/twin/attack-paths?scenario=${scenario.id}`} className="strong" style={{ fontSize: 10.5, color: "var(--text-soft)" }}>
+                      <Link to={`/app/twin/attack-paths?scenario=${scenario.id}`} className="strong" style={{ fontSize: 12.5, color: "var(--text-soft)" }}>
                         {scenario.name}
                       </Link>
                       <div className="small-meta mt-6">{scenario.category}</div>

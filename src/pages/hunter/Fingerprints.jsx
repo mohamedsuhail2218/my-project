@@ -310,7 +310,7 @@ export default function Fingerprints() {
                 ].map(([title, detail]) => (
                   <div className="link-row" key={title} style={{ alignItems: "flex-start" }}>
                     <div>
-                      <div className="strong" style={{ fontSize: 10.5 }}>{title}</div>
+                      <div className="strong" style={{ fontSize: 12.5 }}>{title}</div>
                       <div className="small-meta mt-6" style={{ lineHeight: 1.5 }}>{detail}</div>
                     </div>
                   </div>

@@ -322,7 +322,7 @@ export default function NetworkBuilder() {
             className="builder-graph"
           />
           <TopologyLegend>
-            <span className="mono" style={{ marginLeft: "auto", fontSize: 8.5 }}>
+            <span className="mono" style={{ marginLeft: "auto", fontSize: 11.5 }}>
               {state.assets.length} nodes · {incidentEdges.length} links
             </span>
           </TopologyLegend>

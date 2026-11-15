@@ -67,7 +67,7 @@
 
 .brand-sub {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 11.5px;
   letter-spacing: 0.19em;
   text-transform: uppercase;
   color: #a78bfa;
@@ -81,7 +81,7 @@
   display: flex;
   align-items: center;
   gap: 30px;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -182,7 +182,7 @@
   gap: 8px 22px;
   margin-top: 34px;
   font-family: var(--mono);
-  font-size: 9.5px;
+  font-size: 12px;
   letter-spacing: 0.11em;
   text-transform: uppercase;
   color: var(--faint);
@@ -252,7 +252,7 @@
 
 .hero-terminal-label {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--faint);
@@ -280,7 +280,7 @@
 
 .hero-stat-strip .k {
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 11.5px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--faint);
@@ -303,14 +303,14 @@
   border-radius: 8px;
   background: rgba(239, 68, 68, 0.06);
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.07em;
   color: #fca5a5;
 }
 
 .hero-status-rail .path {
   color: var(--muted);
-  font-size: 8.5px;
+  font-size: 11.5px;
   margin-left: auto;
   white-space: nowrap;
 }
@@ -333,7 +333,7 @@
 .hero-topology .zone-label {
   fill: #475569;
   font-family: var(--mono);
-  font-size: 7px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -364,13 +364,13 @@
 .hero-topology .node-label {
   fill: #cbd5e1;
   font-family: var(--mono);
-  font-size: 7.4px;
+  font-size: 11px;
 }
 
 .hero-topology .node-sub {
   fill: #64748b;
   font-family: var(--mono);
-  font-size: 5.6px;
+  font-size: 11px;
   letter-spacing: 0.06em;
 }
 
@@ -410,7 +410,7 @@
 
 .proof-label {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--faint);
@@ -422,7 +422,7 @@
   gap: 28px;
   color: var(--faint);
   font-family: var(--display);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.03em;
 }
@@ -538,7 +538,7 @@
 .system-kicker {
   margin-top: 22px;
   font-family: var(--mono);
-  font-size: 9.5px;
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -568,7 +568,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 9px 14px;
   margin-top: 23px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-soft);
 }
 
@@ -644,7 +644,7 @@
 .feature-card p {
   margin-top: 8px;
   color: var(--muted);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.65;
 }
 
@@ -669,7 +669,7 @@
 
 .step-cell .num {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--cyan);
 }
 
@@ -681,7 +681,7 @@
 .step-cell p {
   margin-top: 8px;
   color: var(--muted);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.65;
 }
 
@@ -722,13 +722,13 @@
 
 .sim-preview-copy .fine {
   margin-top: 18px;
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--faint);
 }
 
 .execution-panel {
   font-family: var(--mono);
-  font-size: 11.5px;
+  font-size: 13px;
 }
 
 .execution-head {
@@ -738,7 +738,7 @@
   padding: 11px 16px;
   border-bottom: 1px solid var(--border);
   color: var(--faint);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
@@ -773,12 +773,12 @@
 .execution-row .technique {
   margin-top: 2px;
   color: var(--faint);
-  font-size: 10px;
+  font-size: 12.5px;
 }
 
 .execution-row .factor {
   margin-top: 4px;
-  font-size: 9.5px;
+  font-size: 12px;
   color: #7b8ca3;
 }
 
@@ -788,7 +788,7 @@
   border: 1px solid rgba(52, 211, 153, 0.35);
   border-radius: 4px;
   color: #6ee7b7;
-  font-size: 8.5px;
+  font-size: 11.5px;
   letter-spacing: 0.07em;
   text-transform: uppercase;
 }
@@ -825,7 +825,7 @@
 .arch-card p {
   margin-top: 6px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.65;
 }
 
@@ -841,7 +841,7 @@
   border-radius: 7px;
   background: rgba(3, 9, 18, 0.55);
   font-family: var(--mono);
-  font-size: 9.5px;
+  font-size: 12px;
   color: #94a3b8;
 }
 
@@ -878,7 +878,7 @@
   background: var(--cyan);
   color: #04141a;
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -894,7 +894,7 @@
   min-height: 44px;
   margin-top: 6px;
   color: var(--muted);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.6;
 }
 
@@ -914,7 +914,7 @@
 
 .price-value span {
   color: var(--faint);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .price-limits {
@@ -923,7 +923,7 @@
   gap: 8px;
   margin-top: 18px;
   font-family: var(--mono);
-  font-size: 9.5px;
+  font-size: 12px;
   color: var(--muted);
 }
 
@@ -937,7 +937,7 @@
   flex-direction: column;
   gap: 9px;
   margin: 22px 0;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-soft);
 }
 
@@ -961,7 +961,7 @@
 .pricing-note {
   margin-top: 22px;
   text-align: center;
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--faint);
 }
 
@@ -1011,7 +1011,7 @@
   background: transparent;
   padding: 8px 15px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
 }
 
@@ -1052,7 +1052,7 @@
   display: grid;
   gap: 10px;
   margin-top: 24px;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--text-soft);
 }
 
@@ -1096,7 +1096,7 @@
 
 .mini-tile .k {
   font-family: var(--mono);
-  font-size: 7.5px;
+  font-size: 11px;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--faint);
@@ -1132,7 +1132,7 @@
   border: 1px solid var(--border-soft);
   border-radius: 5px;
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 11.5px;
   color: var(--muted);
 }
 
@@ -1189,13 +1189,13 @@
   max-width: 360px;
   margin-top: 15px;
   color: var(--faint);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.75;
 }
 
 .footer-col .eyebrow {
   margin-bottom: 14px;
-  font-size: 9px;
+  font-size: 12px;
   color: var(--faint);
 }
 
@@ -1207,7 +1207,7 @@
   display: flex;
   flex-direction: column;
   gap: 9px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -1220,7 +1220,7 @@
   border-top: 1px solid var(--border-soft);
   text-align: center;
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.06em;
   color: var(--faint);
 }
@@ -1277,7 +1277,7 @@
   display: grid;
   gap: 9px;
   margin-top: 24px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-soft);
 }
 
@@ -1297,7 +1297,7 @@
   position: relative;
   z-index: 2;
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.08em;
   color: var(--faint);
 }
@@ -1310,7 +1310,21 @@
 }
 
 .auth-card {
-  width: min(410px, 100%);
+  width: min(430px, 100%);
+  padding: 30px 32px;
+  border: 1px solid rgba(96, 140, 205, 0.24);
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(34, 211, 238, 0.07), transparent 62%),
+    linear-gradient(180deg, rgba(13, 24, 43, 0.94), rgba(6, 13, 25, 0.96));
+  box-shadow:
+    0 34px 90px -52px rgba(0, 0, 0, 0.95),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.auth-mobile-brand {
+  display: none;
+  margin-bottom: 26px;
 }
 
 .auth-card h1 {
@@ -1321,21 +1335,39 @@
 .auth-card > p {
   margin-top: 7px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   margin-top: 26px;
+}
+
+/* Auth fields are deliberately larger than the dense product UI: they are the
+   first screen a user sees and must stay readable and easy to tap. 16px on
+   mobile also stops iOS Safari from zooming when an input receives focus. */
+.auth-form .input {
+  height: 44px;
+  font-size: 15px;
+}
+
+.auth-form .field > label {
+  font-size: 13px;
+}
+
+.auth-form .check {
+  font-size: 13px;
 }
 
 .auth-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 11.5px;
+  gap: 12px;
+  font-size: 13.5px;
 }
 
 .auth-divider {
@@ -1345,7 +1377,7 @@
   margin: 18px 0;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -1361,17 +1393,25 @@
 .auth-demo-note {
   margin-top: 18px;
   padding: 11px 12px;
-  border: 1px dashed var(--border);
+  border: 1px solid rgba(96, 140, 205, 0.3);
   border-radius: 8px;
-  color: var(--faint);
-  font-size: 10.5px;
+  background: rgba(15, 32, 56, 0.55);
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.auth-login-hint {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 13px;
   line-height: 1.55;
 }
 
 .auth-switch {
   margin-top: 22px;
   text-align: center;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -1393,6 +1433,20 @@
 }
 
 /* responsive */
+
+@media (max-width: 760px) {
+  .auth-form .input {
+    font-size: 16px;
+  }
+
+  .auth-card h1 {
+    font-size: 25px;
+  }
+
+  .auth-card > p {
+    font-size: 14.5px;
+  }
+}
 
 @media (max-width: 1024px) {
   .hero-inner {
@@ -1430,6 +1484,15 @@
 
   .auth-side {
     display: none;
+  }
+
+  .auth-main {
+    align-items: flex-start;
+    padding-top: 32px;
+  }
+
+  .auth-mobile-brand {
+    display: flex;
   }
 }
 
@@ -1511,7 +1574,7 @@
   .public-actions .btn.primary {
     height: 30px;
     padding: 0 11px;
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .hero-inner {
@@ -1529,7 +1592,7 @@
   .hero-actions .btn.lg {
     height: 40px;
     padding: 0 18px;
-    font-size: 12.5px;
+    font-size: 13px;
   }
 
   .section {
@@ -1585,6 +1648,11 @@
   }
 
   .auth-main {
-    padding: 28px 18px;
+    padding: 20px 14px 34px;
+  }
+
+  .auth-card {
+    padding: 22px 18px;
+    border-radius: 16px;
   }
 }

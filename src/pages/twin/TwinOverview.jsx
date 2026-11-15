@@ -178,7 +178,7 @@ export default function TwinOverview() {
             onSelect={selectAsset}
           />
           <TopologyLegend>
-            <span className="mono" style={{ marginLeft: "auto", fontSize: 8.5 }}>
+            <span className="mono" style={{ marginLeft: "auto", fontSize: 11.5 }}>
               {state.assets.length} nodes · {state.edges.length} links · SVG model
             </span>
           </TopologyLegend>
@@ -330,7 +330,7 @@ export default function TwinOverview() {
                 {zoneRows.map((zone) => (
                   <tr key={zone.id}>
                     <td>
-                      <div className="strong" style={{ fontSize: 11.5 }}>{zone.label}</div>
+                      <div className="strong" style={{ fontSize: 13 }}>{zone.label}</div>
                       <div className="small-meta mt-6">{zone.id.toUpperCase()}</div>
                     </td>
                     <td className="mono">{zone.assets.length}</td>
@@ -406,9 +406,9 @@ export default function TwinOverview() {
               <tbody>
                 {recentRuns.map((run) => (
                   <tr key={run.id}>
-                    <td className="mono" style={{ fontSize: 9 }}>{run.id}</td>
+                    <td className="mono" style={{ fontSize: 12 }}>{run.id}</td>
                     <td>
-                      <div className="strong" style={{ fontSize: 10.5 }}>
+                      <div className="strong" style={{ fontSize: 12.5 }}>
                         {state.scenarios.find((scenario) => scenario.id === run.scenarioId)?.name || run.scenarioId}
                       </div>
                       <div className="small-meta mt-6">{run.mode === "red-blue" ? "RED VS BLUE" : "SINGLE RUN"}</div>

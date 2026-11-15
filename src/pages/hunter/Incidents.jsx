@@ -263,10 +263,10 @@ export default function Incidents() {
                 {pendingActions.map((action) => (
                   <tr key={action.id}>
                     <td>
-                      <div className="strong" style={{ fontSize: 11 }}>{action.playbook?.label || action.playbookId}</div>
+                      <div className="strong" style={{ fontSize: 13 }}>{action.playbook?.label || action.playbookId}</div>
                       <div className="small-meta mt-6">{action.id} · {action.playbook?.impact || "impact unknown"}</div>
                     </td>
-                    <td className="mono" style={{ fontSize: 9.5 }}>{action.target}</td>
+                    <td className="mono" style={{ fontSize: 12 }}>{action.target}</td>
                     <td className="small">
                       {action.requestedBy}
                       <div className="small-meta mt-6">{timeAgo(action.requestedAt)}</div>

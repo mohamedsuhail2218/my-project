@@ -471,7 +471,7 @@ export default function Settings() {
                       <ShieldCheck />
                       <div>
                         <strong className="soft">Copy this token now — it will not be shown again.</strong>
-                        <div className="mono mt-8" style={{ fontSize: 10.5, wordBreak: "break-all" }}>{newToken.token}</div>
+                        <div className="mono mt-8" style={{ fontSize: 12.5, wordBreak: "break-all" }}>{newToken.token}</div>
                         <button type="button" className="btn outline sm mt-10" onClick={() => copyToken(newToken.token)}>
                           <Copy size={12} /> Copy token
                         </button>
@@ -482,7 +482,7 @@ export default function Settings() {
                     {ingestTokens.map((token) => (
                       <div className="kv-row" key={token.id}>
                         <span>
-                          <span className="strong" style={{ display: "block", fontSize: 11 }}>{token.label}</span>
+                          <span className="strong" style={{ display: "block", fontSize: 13 }}>{token.label}</span>
                           <span className="small-meta">
                             {token.prefix}… · created {timeAgo(token.created_at)}
                             {token.last_used_at ? ` · used ${timeAgo(token.last_used_at)}` : " · never used"}

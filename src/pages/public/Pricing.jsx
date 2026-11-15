@@ -176,13 +176,13 @@ export default function Pricing() {
         </div>
 
         <div className="row wrap mt-24" style={{ justifyContent: "center", gap: 18 }}>
-          <span className="status-dot" style={{ color: "var(--green)", fontSize: 10.5 }}>
+          <span className="status-dot" style={{ color: "var(--green)", fontSize: 12.5 }}>
             No production traffic
           </span>
-          <span className="status-dot" style={{ color: "var(--green)", fontSize: 10.5 }}>
+          <span className="status-dot" style={{ color: "var(--green)", fontSize: 12.5 }}>
             Cancel any time
           </span>
-          <span className="status-dot" style={{ color: "var(--green)", fontSize: 10.5 }}>
+          <span className="status-dot" style={{ color: "var(--green)", fontSize: 12.5 }}>
             14-day Professional trial
           </span>
         </div>

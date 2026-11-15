@@ -28,6 +28,9 @@ export default function AuthLayout({ children }) {
       </aside>
       <main className="auth-main">
         <div className="auth-card">
+          <div className="auth-mobile-brand">
+            <Brand />
+          </div>
           <div className="row" style={{ marginBottom: 24 }}>
             <Link to="/" className="btn ghost sm"><ArrowLeft /> Back to site</Link>
           </div>

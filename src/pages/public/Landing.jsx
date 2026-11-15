@@ -189,7 +189,7 @@ function TwinCoreArt() {
               x={node.x + 26}
               y={node.y + 3}
               fill="currentColor"
-              fontSize="8"
+              fontSize="10.5"
               letterSpacing="2.4"
               fontFamily="var(--nx-mono)"
             >
@@ -198,7 +198,7 @@ function TwinCoreArt() {
           </g>
         ))}
 
-        <g fill="#9db6e8" fontFamily="var(--nx-mono)" fontSize="7.5" letterSpacing="2.2" opacity=".62">
+        <g fill="#9db6e8" fontFamily="var(--nx-mono)" fontSize="10.5" letterSpacing="2.2" opacity=".62">
           <text x="34" y="46">SIMULATION LATTICE</text>
           <text x="368" y="620">HUNTER-CORE / v4.1</text>
         </g>
@@ -253,7 +253,7 @@ function TwinPreview() {
           <g key={name}>
             <circle cx={x} cy={y} r="13" fill="#071126" stroke="#58e7ff" strokeWidth="1" />
             <circle cx={x} cy={y} r="3" fill="#c8ff00" />
-            <text x={x} y={y + 25} textAnchor="middle" fill="#9db6e8" fontSize="6.5" fontFamily="var(--nx-mono)" letterSpacing="1">
+            <text x={x} y={y + 25} textAnchor="middle" fill="#9db6e8" fontSize="10" fontFamily="var(--nx-mono)" letterSpacing="1">
               {name.toUpperCase()}
             </text>
           </g>
@@ -261,7 +261,7 @@ function TwinPreview() {
         <g className="nx-risk-ring" transform="translate(282 128)">
           <circle r="19" fill="none" stroke="rgba(255,255,255,.14)" strokeWidth="3" />
           <circle r="19" fill="none" stroke="#f87171" strokeWidth="3" strokeDasharray="77 120" transform="rotate(-90)" />
-          <text y="3" textAnchor="middle" fill="#f87171" fontSize="9" fontFamily="var(--nx-mono)">74</text>
+          <text y="3" textAnchor="middle" fill="#f87171" fontSize="12" fontFamily="var(--nx-mono)">74</text>
         </g>
       </svg>
     </div>

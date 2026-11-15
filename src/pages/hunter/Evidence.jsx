@@ -381,7 +381,7 @@ export default function Evidence() {
                   })()}
                 </span>
                 <div style={{ minWidth: 0 }}>
-                  <div className="evidence-name" style={{ fontSize: 11.5 }}>{selected.name}</div>
+                  <div className="evidence-name" style={{ fontSize: 13 }}>{selected.name}</div>
                   <div className="small-meta mt-6">{selected.size} · UPLOADED {timeAgo(selected.uploadedAt).toUpperCase()}</div>
                 </div>
               </div>

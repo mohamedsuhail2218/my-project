@@ -288,9 +288,9 @@ export default function RedVsBlue() {
                 <tbody>
                   {redBlueRuns.map((run) => (
                     <tr key={run.id}>
-                      <td className="mono" style={{ fontSize: 9 }}>{run.id}</td>
+                      <td className="mono" style={{ fontSize: 12 }}>{run.id}</td>
                       <td>
-                        <div className="strong" style={{ fontSize: 10.5 }}>
+                        <div className="strong" style={{ fontSize: 12.5 }}>
                           {state.scenarios.find((item) => item.id === run.scenarioId)?.name || run.scenarioId}
                         </div>
                         <div className="small-meta mt-6">{run.mode === "red-blue" ? "RED / BLUE" : run.mode.toUpperCase()}</div>

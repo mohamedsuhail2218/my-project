@@ -437,16 +437,16 @@ export default function SimulationCenter() {
                   </div>
                 </div>
               </div>
-              <ul className="mt-12" style={{ paddingLeft: 18, color: "var(--muted)", fontSize: 10.5, lineHeight: 1.7 }}>
+              <ul className="mt-12" style={{ paddingLeft: 18, color: "var(--muted)", fontSize: 12.5, lineHeight: 1.7 }}>
                 {(latestRun.findings || []).map((finding, index) => (
                   <li key={index}>{finding}</li>
                 ))}
               </ul>
-              <div className="row between mt-16">
+              <div className="row wrap between mt-16">
                 <span className="small-meta">
                   COMPLETED {latestRun.completedAt ? formatDateTime(latestRun.completedAt) : "—"} · {latestRun.initiatedBy || "Analyst"}
                 </span>
-                <div className="row" style={{ gap: 6 }}>
+                <div className="row wrap" style={{ gap: 6 }}>
                   {latestRun.attackerSuccess && ["high", "critical"].includes(scenario.severity) && (
                     <Badge tone="critical">Validation incident opened</Badge>
                   )}

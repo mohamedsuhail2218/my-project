@@ -22,6 +22,26 @@ test.describe("public landing page", () => {
     expect(errors).toEqual([]);
   });
 
+  test("keeps every text label at a readable size", async ({ page }) => {
+    await page.goto("/#/");
+
+    const tiny = await page.evaluate(() => {
+      const found = [];
+      for (const element of document.querySelectorAll(".nx-page *")) {
+        if (element.children.length > 0) continue;
+        const text = element.textContent?.trim();
+        if (!text) continue;
+        const rect = element.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) continue;
+        const size = parseFloat(getComputedStyle(element).fontSize);
+        if (size < 10) found.push(`${size}px ${text.slice(0, 40)}`);
+      }
+      return found;
+    });
+
+    expect(tiny).toEqual([]);
+  });
+
   test("mobile menu opens, links and scrolls without overflow", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/#/");

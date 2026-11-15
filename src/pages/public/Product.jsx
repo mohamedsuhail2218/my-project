@@ -41,8 +41,8 @@ function MiniTwin() {
         ].map((node) => (
           <g key={node.label} className={`node${node.critical ? " critical" : ""}`} transform={`translate(${node.x}, ${node.y})`}>
             <rect className="node-body" x="-30" y="-14" width="60" height="28" rx="5" />
-            <text className="node-label" x="-24" y="-1" style={{ fontSize: 6 }}>{node.label}</text>
-            <text className="node-sub" x="-24" y="8" style={{ fontSize: 4.5 }}>{node.sub}</text>
+            <text className="node-label" x="-24" y="-2" style={{ fontSize: 10.5 }}>{node.label}</text>
+            <text className="node-sub" x="-24" y="9" style={{ fontSize: 10 }}>{node.sub}</text>
           </g>
         ))}
       </svg>
@@ -104,9 +104,9 @@ function MiniEvidence() {
           ["cloudtrail_archive.jsonl", "sha256:9a03bd…c2e8", "Cloud audit trail"],
         ].map(([name, hash, type]) => (
           <div key={name} style={{ padding: "9px 0", borderBottom: "1px solid var(--border-soft)" }}>
-            <div className="mono" style={{ fontSize: 9.5, color: "var(--text-soft)" }}>{name}</div>
+            <div className="mono" style={{ fontSize: 12, color: "var(--text-soft)" }}>{name}</div>
             <div className="tiny dim mt-6">{type}</div>
-            <div className="mono mt-6" style={{ fontSize: 8, color: "#7dd3fc" }}>{hash}</div>
+            <div className="mono mt-6" style={{ fontSize: 10.5, color: "#7dd3fc" }}>{hash}</div>
           </div>
         ))}
       </div>

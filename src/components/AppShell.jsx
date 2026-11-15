@@ -195,7 +195,7 @@ export default function AppShell() {
         <div className="sidebar-top">
           <Brand to="/app" />
           <div className="row" style={{ marginTop: 9, paddingLeft: 2 }}>
-            <span className="status-dot" style={{ color: "var(--green)", fontSize: 9 }}>Twin synced · {timeAgo(state.lastSyncedAt)}</span>
+            <span className="status-dot" style={{ color: "var(--green)", fontSize: 12 }}>Twin synced · {timeAgo(state.lastSyncedAt)}</span>
           </div>
         </div>
         <nav className="sidebar-nav" aria-label="Workspace navigation">

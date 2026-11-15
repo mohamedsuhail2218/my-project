@@ -229,7 +229,7 @@ export default function Detections() {
                       <div className="detection-title-cell">
                         <span className={`sev-marker ${detection.severity}`} />
                         <div>
-                          <div className="strong" style={{ fontSize: 11 }}>{detection.title}</div>
+                          <div className="strong" style={{ fontSize: 13 }}>{detection.title}</div>
                           <div className="small-meta mt-6">
                             {detection.id} · {detection.technique} · {detection.techniqueName}
                           </div>
@@ -244,7 +244,7 @@ export default function Detections() {
                         <span>{Math.round(detection.confidence * 100)}%</span>
                       </div>
                     </td>
-                    <td className="mono" style={{ fontSize: 9 }}>{detection.assetId}</td>
+                    <td className="mono" style={{ fontSize: 12 }}>{detection.assetId}</td>
                     <td className="small">{detection.assignee}</td>
                     <td className="small-meta">{timeAgo(detection.lastSeen)}</td>
                   </tr>

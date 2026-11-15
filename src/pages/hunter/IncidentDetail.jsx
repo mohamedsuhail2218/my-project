@@ -571,12 +571,12 @@ export default function IncidentDetail() {
                   {linkedDetections.map((detection) => (
                     <tr key={detection.id}>
                       <td>
-                        <div className="strong" style={{ fontSize: 11 }}>{detection.title}</div>
+                        <div className="strong" style={{ fontSize: 13 }}>{detection.title}</div>
                         <div className="small-meta mt-6">{detection.id} · {detection.technique}</div>
                       </td>
                       <td><SeverityBadge severity={detection.severity} /></td>
                       <td><StatusBadge status={detection.status} /></td>
-                      <td className="mono" style={{ fontSize: 9 }}>{detection.assetId}</td>
+                      <td className="mono" style={{ fontSize: 12 }}>{detection.assetId}</td>
                       <td className="small-meta">{timeAgo(detection.lastSeen)}</td>
                       <td>
                         <Link to={`/app/hunter/detections?focus=${detection.id}`} className="btn ghost sm">
@@ -609,7 +609,7 @@ export default function IncidentDetail() {
                   <div className="finding-item" key={item.id} style={{ alignItems: "flex-start" }}>
                     <span className="feature-icon" style={{ width: 32, height: 32, flexShrink: 0 }}><Archive /></span>
                     <div className="finding-body">
-                      <div className="finding-title" style={{ fontFamily: "var(--mono)", fontSize: 10.5 }}>{item.name}</div>
+                      <div className="finding-title" style={{ fontFamily: "var(--mono)", fontSize: 12.5 }}>{item.name}</div>
                       <div className="finding-meta">
                         <span>{item.id}</span>
                         <span>·</span>
@@ -638,7 +638,7 @@ export default function IncidentDetail() {
                   {relatedLogs.map((log) => (
                     <tr key={log.id}>
                       <td className="small-meta" style={{ whiteSpace: "nowrap" }}>{formatDateTime(log.timestamp)}</td>
-                      <td className="mono" style={{ fontSize: 9 }}>{log.host}</td>
+                      <td className="mono" style={{ fontSize: 12 }}>{log.host}</td>
                       <td className="small">{log.event}</td>
                       <td><Badge tone={log.status === "alert" ? "high" : "medium"}>{log.status}</Badge></td>
                       <td><Link to={`/app/hunter/logs?focus=${log.id}`} className="btn ghost sm">Inspect</Link></td>
@@ -785,7 +785,7 @@ export default function IncidentDetail() {
                   {responseActions.slice(0, 6).map((action) => (
                     <div className="kv-row" key={action.id} style={{ alignItems: "flex-start" }}>
                       <span>
-                        <span className="strong" style={{ fontSize: 10.5, display: "block" }}>{action.playbook?.label || action.playbookId}</span>
+                        <span className="strong" style={{ fontSize: 12.5, display: "block" }}>{action.playbook?.label || action.playbookId}</span>
                         <span className="small-meta">{action.target} · {timeAgo(action.requestedAt)}</span>
                       </span>
                       <span className="row" style={{ gap: 5 }}>
@@ -869,7 +869,7 @@ export default function IncidentDetail() {
                 {affectedAssets.map((asset) => (
                   <Link to={`/app/twin/builder?asset=${asset.id}`} className="link-row" key={asset.id} style={{ textDecoration: "none" }}>
                     <span>
-                      <span className="mono" style={{ fontSize: 9, color: "var(--text-soft)" }}>{asset.name}</span>
+                      <span className="mono" style={{ fontSize: 12, color: "var(--text-soft)" }}>{asset.name}</span>
                       <span className="small-meta" style={{ display: "block", marginTop: 3 }}>{asset.label} · {asset.ip}</span>
                     </span>
                     <span className="v">risk {assetRisk(asset)} <ChevronRight size={10} /></span>

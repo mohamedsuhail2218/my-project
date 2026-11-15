@@ -45,7 +45,7 @@
   padding: 0 10px;
   margin-bottom: 6px;
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -76,7 +76,7 @@
   margin: 1px 0;
   border-radius: 7px;
   color: #8595aa;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.35;
   transition: color 140ms ease, background 140ms ease;
 }
@@ -139,7 +139,7 @@
   background: rgba(239, 68, 68, 0.12);
   color: #fca5a5;
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   text-align: center;
   line-height: 14px;
 }
@@ -161,7 +161,7 @@
   align-items: center;
   justify-content: space-between;
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--faint);
@@ -175,7 +175,7 @@
   display: flex;
   justify-content: space-between;
   margin-top: 5px;
-  font-size: 9.5px;
+  font-size: 12px;
   color: var(--faint);
 }
 
@@ -205,7 +205,7 @@
   background: linear-gradient(135deg, rgba(6, 182, 212, 0.16), rgba(139, 92, 246, 0.18));
   color: #cffafe;
   font-family: var(--display);
-  font-size: 10.5px;
+  font-size: 12.5px;
   font-weight: 600;
 }
 
@@ -213,7 +213,7 @@
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  font-size: 8.5px;
+  font-size: 11.5px;
 }
 
 .avatar.lg {
@@ -231,7 +231,7 @@
 .user-card-name {
   overflow: hidden;
   color: var(--text-soft);
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -241,7 +241,7 @@
   overflow: hidden;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 11.5px;
   letter-spacing: 0.04em;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -292,7 +292,7 @@
   align-items: center;
   gap: 7px;
   min-width: 0;
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--faint);
   white-space: nowrap;
 }
@@ -327,7 +327,7 @@
   border-radius: 8px;
   background: rgba(8, 15, 29, 0.5);
   color: var(--faint);
-  font-size: 11.5px;
+  font-size: 13px;
   text-align: left;
   transition: border-color 150ms ease;
 }
@@ -372,7 +372,7 @@
   background: rgba(16, 185, 129, 0.05);
   color: #6ee7b7;
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -403,7 +403,7 @@
 .page-eyebrow {
   margin-bottom: 8px;
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--cyan);
@@ -420,7 +420,7 @@
   max-width: 750px;
   margin-top: 7px;
   color: var(--muted);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.6;
 }
 
@@ -476,7 +476,7 @@
 
 .stat-label {
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--faint);
@@ -518,7 +518,7 @@
 .stat-unit {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .stat-foot {
@@ -526,7 +526,7 @@
   align-items: center;
   gap: 6px;
   margin-top: 10px;
-  font-size: 10.5px;
+  font-size: 12.5px;
   color: var(--faint);
 }
 
@@ -535,7 +535,7 @@
   align-items: center;
   gap: 3px;
   font-family: var(--mono);
-  font-size: 9.5px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--green);
 }
@@ -582,6 +582,7 @@
 
 .stack {
   display: flex;
+  min-width: 0;
   flex-direction: column;
   gap: 12px;
 }
@@ -648,7 +649,7 @@
 
 .risk-ring-center span {
   font-family: var(--mono);
-  font-size: 7.5px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--faint);
@@ -671,7 +672,7 @@
 .risk-meta p {
   margin-top: 6px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.55;
 }
 
@@ -687,7 +688,7 @@
   grid-template-columns: 86px 1fr 32px;
   align-items: center;
   gap: 10px;
-  font-size: 10.5px;
+  font-size: 12.5px;
 }
 
 .factor-row .k {
@@ -696,7 +697,7 @@
 
 .factor-row .v {
   font-family: var(--mono);
-  font-size: 9.5px;
+  font-size: 12px;
   color: var(--text-soft);
   text-align: right;
 }
@@ -735,7 +736,7 @@
   gap: 15px;
   padding: 11px 16px;
   border-top: 1px solid var(--border-soft);
-  font-size: 10px;
+  font-size: 12.5px;
   color: var(--faint);
 }
 
@@ -771,7 +772,7 @@
 .topo-zone-label {
   fill: #3c4c62;
   font-family: var(--mono);
-  font-size: 7.5px;
+  font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -829,21 +830,21 @@
 .topo-node .node-name {
   fill: #d6e1ee;
   font-family: var(--mono);
-  font-size: 8.6px;
+  font-size: 11.5px;
   font-weight: 500;
 }
 
 .topo-node .node-type {
   fill: #5d6f86;
   font-family: var(--mono);
-  font-size: 6.4px;
+  font-size: 11px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .topo-node .node-badge {
   font-family: var(--mono);
-  font-size: 6px;
+  font-size: 11px;
 }
 
 .topo-node .pulse-ring {
@@ -876,7 +877,7 @@
 .topo-tooltip text {
   fill: #cbd5e1;
   font-family: var(--mono);
-  font-size: 7px;
+  font-size: 11px;
 }
 
 /* asset inspector */
@@ -888,7 +889,7 @@
   gap: 10px;
   padding: 40px 20px;
   color: var(--faint);
-  font-size: 11.5px;
+  font-size: 13px;
   text-align: center;
 }
 
@@ -933,7 +934,7 @@
 .inspector-sub {
   margin-top: 2px;
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 12px;
   color: var(--faint);
 }
 
@@ -961,7 +962,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .kv-row .k {
@@ -989,7 +990,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 10.5px;
+  font-size: 12.5px;
   color: var(--text-soft);
 }
 
@@ -1058,7 +1059,7 @@
 }
 
 .activity-text {
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--text-soft);
   line-height: 1.45;
 }
@@ -1069,7 +1070,7 @@
   gap: 5px;
   margin-top: 3px;
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   color: var(--faint);
 }
 
@@ -1143,7 +1144,7 @@
 }
 
 .finding-title {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text);
 }
@@ -1154,14 +1155,14 @@
   gap: 8px;
   margin-top: 4px;
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   color: var(--faint);
 }
 
 .finding-time {
   flex-shrink: 0;
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   color: var(--faint);
 }
 
@@ -1196,7 +1197,7 @@
   background: rgba(6, 182, 212, 0.06);
   color: var(--cyan);
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .action-body {
@@ -1205,7 +1206,7 @@
 }
 
 .action-title {
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-soft);
   line-height: 1.45;
@@ -1217,7 +1218,7 @@
   gap: 6px;
   margin-top: 5px;
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   color: var(--faint);
 }
 
@@ -1247,7 +1248,7 @@
   border: 0;
   background: transparent;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -1275,7 +1276,7 @@
 .tab .count {
   margin-left: 5px;
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 12px;
   opacity: 0.6;
 }
 
@@ -1414,7 +1415,7 @@
 .palette-group-label {
   padding: 8px 10px 4px;
   font-family: var(--mono);
-  font-size: 8.5px;
+  font-size: 11.5px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--faint);
@@ -1430,7 +1431,7 @@
   border-radius: 7px;
   background: transparent;
   color: var(--text-soft);
-  font-size: 12px;
+  font-size: 13px;
   text-align: left;
 }
 
@@ -1457,7 +1458,7 @@
   padding: 9px 16px;
   border-top: 1px solid var(--border-soft);
   color: var(--faint);
-  font-size: 9.5px;
+  font-size: 12px;
 }
 
 /* notifications popover */
@@ -1483,7 +1484,7 @@
   padding: 12px 15px;
   border-bottom: 1px solid var(--border-soft);
   font-family: var(--display);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -1525,14 +1526,14 @@
 }
 
 .notification-item .n-title {
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-soft);
 }
 
 .notification-item .n-detail {
   margin-top: 2px;
-  font-size: 10.5px;
+  font-size: 12.5px;
   color: var(--faint);
   line-height: 1.45;
 }
@@ -1540,7 +1541,7 @@
 .notification-item .n-time {
   margin-top: 4px;
   font-family: var(--mono);
-  font-size: 8px;
+  font-size: 11.5px;
   color: #43536b;
 }
 
@@ -1656,12 +1657,12 @@
   }
 
   .stat-label {
-    font-size: 7.5px;
+    font-size: 11px;
     letter-spacing: 0.05em;
   }
 
   .stat-foot {
-    font-size: 9.5px;
+    font-size: 12px;
   }
 
   .content-grid.cols-2 {
@@ -1696,7 +1697,7 @@
   }
 
   .page-actions .btn {
-    font-size: 11px;
+    font-size: 13px;
     padding: 0 10px;
   }
 
@@ -1706,6 +1707,6 @@
 
   .topology-legend {
     gap: 10px;
-    font-size: 9px;
+    font-size: 12px;
   }
 }

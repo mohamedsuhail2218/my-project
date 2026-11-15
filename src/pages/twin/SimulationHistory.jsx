@@ -210,9 +210,9 @@ export default function SimulationHistory() {
                         <td>
                           {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
                         </td>
-                        <td className="mono" style={{ fontSize: 9 }}>{run.id}</td>
+                        <td className="mono" style={{ fontSize: 12 }}>{run.id}</td>
                         <td>
-                          <div className="strong" style={{ fontSize: 10.5 }}>{scenario?.name || run.scenarioId}</div>
+                          <div className="strong" style={{ fontSize: 12.5 }}>{scenario?.name || run.scenarioId}</div>
                           <div className="small-meta mt-6">{scenario?.category || "—"}</div>
                         </td>
                         <td>
@@ -232,7 +232,7 @@ export default function SimulationHistory() {
                           )}
                         </td>
                         <td>
-                          <span className="mono" style={{ fontSize: 9 }}>
+                          <span className="mono" style={{ fontSize: 12 }}>
                             {run.riskBefore ?? "—"} → {run.riskAfter ?? "—"}
                           </span>
                         </td>
@@ -264,7 +264,7 @@ export default function SimulationHistory() {
                                       <Progress value={(run.cursor / Math.max(1, run.plan?.length || 1)) * 100} tone="amber" />
                                     </div>
                                   ) : (
-                                    <ul className="mt-12" style={{ paddingLeft: 18, color: "var(--muted)", fontSize: 10.5, lineHeight: 1.7 }}>
+                                    <ul className="mt-12" style={{ paddingLeft: 18, color: "var(--muted)", fontSize: 12.5, lineHeight: 1.7 }}>
                                       {(run.findings || []).length ? run.findings.map((finding, index) => (
                                         <li key={index}>{finding}</li>
                                       )) : <li>No findings were recorded for this run.</li>}

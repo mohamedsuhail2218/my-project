@@ -632,7 +632,7 @@ export default function LogAnalysis() {
                   >
                     <span className={`finding-sev-bar ${event.anomalySeverity || "medium"}`} />
                     <div className="finding-body">
-                      <div className="finding-title" style={{ fontSize: 10.5 }}>
+                      <div className="finding-title" style={{ fontSize: 12.5 }}>
                         {event.event} on {event.host}
                       </div>
                       <div className="finding-meta">
@@ -892,7 +892,7 @@ export default function LogAnalysis() {
           </div>
           <div className="field">
             <label>Destination</label>
-            <div className="input" style={{ display: "flex", alignItems: "center", color: "var(--muted)", fontSize: 11 }}>
+            <div className="input" style={{ display: "flex", alignItems: "center", color: "var(--muted)", fontSize: 13 }}>
               POST /api/telemetry/ingest · role-gated
             </div>
           </div>
@@ -905,7 +905,7 @@ export default function LogAnalysis() {
               value={ingestText}
               onChange={(event) => setIngestText(event.target.value)}
               spellCheck={false}
-              style={{ fontFamily: "var(--mono)", fontSize: 10.5, lineHeight: 1.6 }}
+              style={{ fontFamily: "var(--mono)", fontSize: 12.5, lineHeight: 1.6 }}
             />
           </div>
         </div>

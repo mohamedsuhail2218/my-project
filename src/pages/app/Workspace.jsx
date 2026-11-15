@@ -258,7 +258,7 @@ export default function Workspace() {
                     <td>
                       <select
                         className="select"
-                        style={{ height: 30, fontSize: 11, minWidth: 130 }}
+                        style={{ height: 30, fontSize: 13, minWidth: 130 }}
                         value={member.role}
                         onChange={(event) =>
                           dispatch({ type: "UPDATE_MEMBER", id: member.id, patch: { role: event.target.value } })

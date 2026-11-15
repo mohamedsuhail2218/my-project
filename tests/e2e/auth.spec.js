@@ -13,6 +13,44 @@ test.describe("authentication", () => {
     await expect(page).not.toHaveURL(/#\/app/);
   });
 
+  test("sign-in form stays readable and avoids mobile input zoom", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/#/signin");
+
+    const inputSize = await page
+      .locator("#signin-email")
+      .evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
+    const labelSize = await page
+      .locator('label[for="signin-email"]')
+      .evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth
+    );
+
+    expect(inputSize).toBeGreaterThanOrEqual(16);
+    expect(labelSize).toBeGreaterThanOrEqual(12);
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test("sign-in and sign-up forms sit in a clearly visible card", async ({ page }) => {
+    for (const route of ["signin", "signup"]) {
+      await page.goto(`/#/${route}`);
+      const card = page.locator(".auth-card");
+      await expect(card).toBeVisible();
+
+      const style = await card.evaluate((element) => {
+        const computed = getComputedStyle(element);
+        return {
+          borderWidth: computed.borderTopWidth,
+          backgroundImage: computed.backgroundImage,
+        };
+      });
+
+      expect(style.borderWidth).not.toBe("0px");
+      expect(style.backgroundImage).toContain("gradient");
+    }
+  });
+
   test("signs in, survives a reload and signs out", async ({ page }) => {
     await signIn(page);
     await expect(page.getByRole("heading", { level: 1, name: /Your twin is ready/ })).toBeVisible();

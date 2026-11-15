@@ -244,7 +244,7 @@ export default function AttackPaths() {
             </div>
             <TopologyGraph assets={state.assets} edges={state.edges} steps={steps} />
             <TopologyLegend>
-              <span className="mono" style={{ marginLeft: "auto", fontSize: 8.5 }}>
+              <span className="mono" style={{ marginLeft: "auto", fontSize: 11.5 }}>
                 {selectedRun ? `CAPTURED ${formatDateTime(selectedRun.completedAt)}` : "MODEL EVALUATION · LIVE"}
               </span>
             </TopologyLegend>
@@ -340,7 +340,7 @@ export default function AttackPaths() {
                   <tr key={step.index}>
                     <td className="mono">{String(step.index + 1).padStart(2, "0")}</td>
                     <td>
-                      <div className="strong" style={{ fontSize: 10.5 }}>
+                      <div className="strong" style={{ fontSize: 12.5 }}>
                         {state.assets.find((asset) => asset.id === step.from)?.name || step.from} →{" "}
                         {state.assets.find((asset) => asset.id === step.to)?.name || step.to}
                       </div>
@@ -421,7 +421,7 @@ export default function AttackPaths() {
 
 function MicroTag({ label, value, tone }) {
   return (
-    <span className={`tag ${tone || ""}`} style={{ fontSize: 8.5 }}>
+    <span className={`tag ${tone || ""}`} style={{ fontSize: 11.5 }}>
       {label}: {value}
     </span>
   );

@@ -414,7 +414,7 @@ export default function Admin() {
                     <td>
                       <select
                         className="select"
-                        style={{ width: 155, height: 30, fontSize: 11 }}
+                        style={{ width: 155, height: 30, fontSize: 13 }}
                         value={member.role}
                         onChange={(event) => dispatch({ type: "UPDATE_MEMBER", id: member.id, patch: { role: event.target.value } })}
                       >

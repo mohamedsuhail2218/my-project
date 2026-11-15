@@ -55,7 +55,7 @@ export default class ErrorBoundary extends React.Component {
             <pre
               className="mono mt-16"
               style={{
-                fontSize: 11,
+                fontSize: 13,
                 color: "var(--muted)",
                 background: "var(--surface-2)",
                 border: "1px solid var(--border)",
