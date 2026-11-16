@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Activity,
@@ -9,6 +9,7 @@ import {
   Clock,
   Fingerprint,
   Globe,
+  Loader2,
   Radio,
   ScrollText,
   Search,
@@ -32,11 +33,26 @@ import {
 } from "../../components/ui";
 import { severityRank } from "../../lib/engine";
 import { timeAgo } from "../../lib/format";
+import { api } from "../../lib/api";
+import { useLiveHunter } from "../../lib/useLiveHunter";
 
 const SEVERITIES = ["critical", "high", "medium", "low"];
 
+function toQueueRow(detection) {
+  return {
+    ...detection,
+    technique: detection.technique || "—",
+    source: "rule",
+    assetId: detection.entity || "—",
+    assignee: "Unassigned",
+    live: true,
+  };
+}
+
 export default function HunterDashboard() {
   const { state, dispatch } = useApp();
+  const live = useLiveHunter();
+  const [simulating, setSimulating] = useState("");
 
   const openDetections = useMemo(
     () =>
@@ -45,25 +61,79 @@ export default function HunterDashboard() {
         .sort((a, b) => severityRank(a.severity) - severityRank(b.severity)),
     [state.detections]
   );
+  const liveOpen = useMemo(
+    () =>
+      live.detections
+        .filter((detection) => detection.status === "open")
+        .sort((a, b) => severityRank(a.severity) - severityRank(b.severity)),
+    [live.detections]
+  );
+
+  const liveMode = live.loaded && !live.error;
+  const activeDetections = liveMode ? live.detections : state.detections;
+  const activeOpen = liveMode ? liveOpen : openDetections;
+  const queueRows = liveMode ? activeOpen.map(toQueueRow) : activeOpen;
   const activeIncidents = state.incidents.filter((incident) => incident.status !== "closed");
   const unassigned = state.detections.filter(
     (detection) => detection.assignee === "Unassigned" && detection.status !== "closed"
   );
+  const unassignedCount = liveMode ? activeOpen.length : unassigned.length;
   const anomalousLogs = state.logs.filter((log) => log.status !== "allow");
+  const canSimulate = Boolean(
+    state.user &&
+      (state.user.permissions?.includes("*") || state.user.permissions?.includes("hunter:write"))
+  );
+  const configuredConnectors = (live.connectors?.adapters || []).filter(
+    (adapter) => adapter.mode === "live"
+  ).length;
+  const totalConnectors = live.connectors?.adapters?.length || 0;
+
+  const runSimulation = async (scenario = "all") => {
+    setSimulating(scenario);
+    try {
+      const result = await api.simulateAttack(scenario);
+      await live.refresh();
+      dispatch({
+        type: "PUSH_TOAST",
+        toast: {
+          title: "Controlled attack simulated",
+          message: `${result.injected} synthetic event(s) produced ${result.detections.length} detection update(s). No packet left the server.`,
+          tone: "success",
+        },
+      });
+    } catch (error) {
+      dispatch({
+        type: "PUSH_TOAST",
+        toast: {
+          title: "Simulation failed",
+          message: error?.message || "The controlled attack could not be generated.",
+          tone: "warning",
+        },
+      });
+    } finally {
+      setSimulating("");
+    }
+  };
 
   const severityCounts = useMemo(
     () =>
       SEVERITIES.map((severity) => ({
         severity,
-        total: state.detections.filter((detection) => detection.severity === severity).length,
-        open: state.detections.filter(
+        total: activeDetections.filter((detection) => detection.severity === severity).length,
+        open: activeDetections.filter(
           (detection) => detection.severity === severity && detection.status !== "closed"
         ).length,
       })),
-    [state.detections]
+    [activeDetections]
   );
 
   const sourceCounts = useMemo(() => {
+    if (liveMode && live.stats?.sources?.length) {
+      return live.stats.sources
+        .map((source) => ({ source: source.source, count: source.count, alerts: 0 }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 6);
+    }
     const counts = {};
     state.logs.forEach((log) => {
       counts[log.source] = (counts[log.source] || 0) + 1;
@@ -76,17 +146,31 @@ export default function HunterDashboard() {
       }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 6);
-  }, [state.logs]);
+  }, [liveMode, live.stats, state.logs]);
 
   const detectionTrend = useMemo(() => {
-    const base = Math.max(1, openDetections.length + 2);
+    if (live.detectionStats?.trend?.length) {
+      return live.detectionStats.trend.map((point) => point.count);
+    }
+    const base = Math.max(1, activeOpen.length + 2);
     return [base + 4, base + 2, base + 3, base + 1, base + 5, base + 2, base + 4, base + 3, base + 1, base + 2, base + 3, base];
-  }, [openDetections.length]);
+  }, [live.detectionStats, activeOpen.length]);
 
-  const topDetection = openDetections[0] || null;
+  const topDetection = queueRows[0] || null;
   const topIncident = [...activeIncidents].sort(
     (a, b) => severityRank(a.severity) - severityRank(b.severity)
   )[0] || null;
+  const liveEventCount = live.stats?.total ?? state.logs.length;
+  const liveAlertCount = live.stats?.alerts ?? anomalousLogs.length;
+
+  const streamLabel =
+    live.streamState === "open"
+      ? "live"
+      : live.streamState === "connecting"
+        ? "connecting"
+        : live.streamState === "error"
+          ? "reconnecting"
+          : "idle";
 
   return (
     <div className="page">
@@ -96,20 +180,70 @@ export default function HunterDashboard() {
         subtitle="Detections, behavioural matches, threat intelligence and incident context — correlated into a single investigation surface."
         actions={
           <>
+            {canSimulate && (
+              <button
+                className="btn violet"
+                onClick={() => runSimulation("all")}
+                disabled={Boolean(simulating)}
+              >
+                {simulating ? <Loader2 /> : <Zap />}
+                {simulating ? "Simulating…" : "Run controlled attack"}
+              </button>
+            )}
             <Link to="/app/hunter/intel" className="btn outline">
               <Radio /> Live intel lookup
             </Link>
-            <Link to="/app/hunter/detections" className="btn violet">
+            <Link to="/app/hunter/detections" className="btn outline">
               <ShieldAlert /> Open detection queue
             </Link>
           </>
         }
       />
 
+      <div
+        className={`notice ${live.error ? "warning" : live.streamState === "open" ? "success" : "info"} mt-12`}
+        style={{ flexWrap: "wrap", alignItems: "center" }}
+      >
+        <Radio />
+        <div style={{ flex: "1 1 320px" }}>
+          <strong>
+            {live.error
+              ? "Live telemetry is unavailable."
+              : live.streamState === "open"
+                ? "Live telemetry stream connected."
+                : "Connecting to live telemetry…"}
+          </strong>{" "}
+          {liveMode
+            ? `${live.stats?.total ?? 0} event(s) stored · ${live.detections.length} rule detection(s) · ${activeOpen.length} open · ${live.network?.total ?? 0} network flow(s).`
+            : "The dashboard will show server detections as soon as the API responds."}
+          {totalConnectors > 0
+            ? ` ${configuredConnectors}/${totalConnectors} SIEM/EDR connectors configured.`
+            : ""}
+          {live.error ? ` ${live.error}` : ""}
+        </div>
+        <div className="chip-row" style={{ marginLeft: "auto" }}>
+          <Badge tone={live.streamState === "open" ? "success" : live.error ? "critical" : "neutral"} dot>
+            {streamLabel}
+          </Badge>
+          <Badge tone={activeOpen.length ? "high" : "success"}>{activeOpen.length} open</Badge>
+        </div>
+      </div>
       <div className="stat-grid">
-        <StatCard label="Open detections" value={openDetections.length} icon={<ShieldAlert />} tone="high" foot={`${unassigned.length} unassigned · ${state.detections.length} total this week`} />
+        <StatCard
+          label="Open detections"
+          value={activeOpen.length}
+          icon={<ShieldAlert />}
+          tone="high"
+          foot={`${unassignedCount} unassigned · ${activeDetections.length} total recorded`}
+        />
         <StatCard label="Active incidents" value={activeIncidents.length} icon={<Siren />} tone="critical" foot={`${state.incidents.filter((incident) => incident.status === "open").length} awaiting first response`} />
-        <StatCard label="Signals ingested" value={state.logs.length} icon={<ScrollText />} tone="info" foot={`${anomalousLogs.length} alert/deny events in view`} />
+        <StatCard
+          label="Signals ingested"
+          value={liveEventCount}
+          icon={<ScrollText />}
+          tone="info"
+          foot={`${liveAlertCount} alert/deny events${liveMode ? " · server store" : " · demo view"}`}
+        />
         <StatCard label="Evidence sealed" value={state.evidence.length} icon={<Archive />} tone="violet" foot="SHA-256 verified chain of custody" />
       </div>
 
@@ -122,36 +256,63 @@ export default function HunterDashboard() {
             <div className="eyebrow violet" style={{ marginBottom: 4 }}>HUNTER AI · Daily brief</div>
             <h2>
               {topDetection
-                ? `${topDetection.title} on ${topDetection.assetId}.`
-                : "No open detections. The model is quiet."}
+                ? liveMode
+                  ? `${topDetection.title}.`
+                  : `${topDetection.title} on ${topDetection.assetId}.`
+                : liveMode
+                  ? "No open rule detections. The live pipeline is quiet."
+                  : "No open detections. The model is quiet."}
             </h2>
             <p>
               {topDetection
-                ? `${topDetection.description} ${
-                    topIncident
-                      ? `${topIncident.id} is ${topIncident.status} with ${topIncident.detectionIds.length} linked detection(s).`
-                      : "No incident is linked yet."
+                ? `${topDetection.detail || topDetection.description || ""} ${
+                    liveMode
+                      ? `${topDetection.eventCount || 0} event(s) matched; last seen ${timeAgo(topDetection.lastSeen)}.`
+                      : topIncident
+                        ? `${topIncident.id} is ${topIncident.status} with ${topIncident.detectionIds.length} linked detection(s).`
+                        : "No incident is linked yet."
                   } HUNTER assigned ${Math.round(topDetection.confidence * 100)}% confidence to this pattern.`
-                : "HUNTER is listening. Ingest a log sample or run a simulation to exercise the detection pipeline."}
+                : liveMode
+                  ? "HUNTER is listening to the server telemetry stream. Ingest logs, forward Zeek/Suricata flows or run the controlled attack to exercise the detection rules."
+                  : "HUNTER is listening. Ingest a log sample or run a simulation to exercise the detection pipeline."}
             </p>
             <div className="chip-row mt-12">
-              <Link to={topDetection ? `/app/hunter/detections?focus=${topDetection.id}` : "/app/hunter/detections"} className="btn violet sm">
-                Review detection <ArrowRight />
+              <Link
+                to={
+                  liveMode && topDetection
+                    ? `/app/hunter/logs?q=${encodeURIComponent(topDetection.entity)}`
+                    : topDetection
+                      ? `/app/hunter/detections?focus=${topDetection.id}`
+                      : "/app/hunter/detections"
+                }
+                className="btn violet sm"
+              >
+                {liveMode && topDetection ? "Inspect source events" : "Review detection"} <ArrowRight />
               </Link>
               <Link to="/app/hunter/investigation" className="btn outline sm">
                 <Search size={14} /> Investigate a source
               </Link>
-              {topIncident && (
+              {!liveMode && topIncident && (
                 <Link to={`/app/hunter/incidents/${topIncident.id}`} className="btn ghost sm">
                   Open {topIncident.id}
                 </Link>
+              )}
+              {canSimulate && (
+                <button
+                  type="button"
+                  className="btn ghost sm"
+                  onClick={() => runSimulation("port_scan")}
+                  disabled={Boolean(simulating)}
+                >
+                  <Zap size={12} /> Simulate port scan
+                </button>
               )}
             </div>
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
           <div className="brief-number" style={{ color: "var(--violet)" }}>
-            {Math.round((openDetections.filter((detection) => detection.severity === "critical").length / Math.max(1, openDetections.length)) * 100)}%
+            {Math.round((activeOpen.filter((detection) => detection.severity === "critical").length / Math.max(1, activeOpen.length)) * 100)}%
           </div>
           <div className="small-meta">CRITICAL SHARE</div>
           <div className="small-meta mt-8">HUNTER-CORE v4.1</div>
@@ -178,11 +339,15 @@ export default function HunterDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {openDetections.slice(0, 6).map((detection) => (
+                {queueRows.slice(0, 6).map((detection) => (
                   <tr key={detection.id}>
                     <td>
                       <div className="strong" style={{ fontSize: 13 }}>{detection.title}</div>
-                      <div className="small-meta mt-6">{detection.id} · {detection.technique} · {detection.source}</div>
+                      <div className="small-meta mt-6">
+                        {detection.live ? detection.id.slice(0, 12) : detection.id} · {detection.technique} ·{" "}
+                        {detection.source}
+                        {detection.live ? ` · ${detection.eventCount} event(s)` : ""}
+                      </div>
                     </td>
                     <td><SeverityBadge severity={detection.severity} /></td>
                     <td>
@@ -194,14 +359,29 @@ export default function HunterDashboard() {
                     <td className="mono" style={{ fontSize: 12 }}>{detection.assetId}</td>
                     <td className="small">{detection.assignee}</td>
                     <td>
-                      <Link to={`/app/hunter/detections?focus=${detection.id}`} className="btn ghost sm">
-                        Open
+                      <Link
+                        to={
+                          detection.live
+                            ? `/app/hunter/logs?q=${encodeURIComponent(detection.entity)}`
+                            : `/app/hunter/detections?focus=${detection.id}`
+                        }
+                        className="btn ghost sm"
+                      >
+                        {detection.live ? "Events" : "Open"}
                       </Link>
                     </td>
                   </tr>
                 ))}
-                {openDetections.length === 0 && (
-                  <tr><td colSpan={6}><div className="empty-inline">No open detections. HUNTER is listening.</div></td></tr>
+                {queueRows.length === 0 && (
+                  <tr>
+                    <td colSpan={6}>
+                      <div className="empty-inline">
+                        {liveMode
+                          ? "No open rule detections. Send telemetry or run the controlled attack."
+                          : "No open detections. HUNTER is listening."}
+                      </div>
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
@@ -216,8 +396,8 @@ export default function HunterDashboard() {
 
         <Panel title="Detection volume" icon={<Activity size={15} />}>
           <div className="row between mb-8">
-            <span className="small-meta">ROLLING 12 HOURS</span>
-            <Badge tone="high">Elevated</Badge>
+            <span className="small-meta">ROLLING 12 HOURS · {liveMode ? "SERVER RULES" : "DEMO VIEW"}</span>
+            <Badge tone={liveMode ? "success" : "high"} dot={liveMode}>{liveMode ? "live" : "demo"}</Badge>
           </div>
           <Sparkline values={detectionTrend} color="#fb7185" height={72} />
           <div className="mt-16">
@@ -226,7 +406,7 @@ export default function HunterDashboard() {
                 <div className="source-row" key={item.severity}>
                   <span style={{ textTransform: "capitalize" }}>{item.severity}</span>
                   <Progress
-                    value={(item.open / Math.max(1, state.detections.length)) * 100}
+                    value={(item.open / Math.max(1, activeDetections.length)) * 100}
                     tone={item.severity === "critical" ? "red" : item.severity === "high" ? "amber" : item.severity === "medium" ? "cyan" : "green"}
                   />
                   <span className="v">{item.open} open</span>
@@ -235,10 +415,10 @@ export default function HunterDashboard() {
             </div>
           </div>
           <div className="mini-stat-row mt-16">
-            <div className="mini-stat"><div className="k">MTTD</div><div className="v">42s</div></div>
-            <div className="mini-stat"><div className="k">MTTA</div><div className="v">18m</div></div>
-            <div className="mini-stat"><div className="k">Auto-triaged</div><div className="v">{state.detections.filter((detection) => detection.status === "triaged").length}</div></div>
-            <div className="mini-stat"><div className="k">Coverage</div><div className="v">{Math.round((state.detections.length / Math.max(1, state.logs.length)) * 100)}%</div></div>
+            <div className="mini-stat"><div className="k">MTTD</div><div className="v">{liveMode ? "live" : "42s"}</div></div>
+            <div className="mini-stat"><div className="k">MTTA</div><div className="v">{liveMode ? `${live.detectionStats?.triaged ?? 0} triaged` : "18m"}</div></div>
+            <div className="mini-stat"><div className="k">Auto-triaged</div><div className="v">{live.detectionStats?.triaged ?? state.detections.filter((detection) => detection.status === "triaged").length}</div></div>
+            <div className="mini-stat"><div className="k">Scored events</div><div className="v">{live.stats?.scored ?? Math.round((activeDetections.length / Math.max(1, state.logs.length)) * 100)}</div></div>
           </div>
         </Panel>
       </div>
@@ -349,14 +529,19 @@ export default function HunterDashboard() {
             {sourceCounts.map((source) => (
               <div className="source-row" key={source.source}>
                 <span className="mono">{source.source}</span>
-                <Progress value={(source.count / Math.max(1, state.logs.length)) * 100} tone={source.alerts ? "amber" : "cyan"} />
+                <Progress value={(source.count / Math.max(1, liveEventCount)) * 100} tone={source.alerts ? "amber" : "cyan"} />
                 <span className="v">{source.count}</span>
               </div>
             ))}
+            {sourceCounts.length === 0 && <div className="empty-inline">No sources have reported yet.</div>}
           </div>
           <div className="notice mt-12">
             <Zap />
-            <div>HUNTER normalises every source before detection. Alerts are correlated across identity, endpoint, network and cloud.</div>
+            <div>
+              {liveMode
+                ? `Normalising live sources from the server store. ${live.stats?.last24h ?? 0} event(s) in the last 24h; ${live.network?.total ?? 0} network flow(s) from ${live.network?.sensor || "the authorised sensor"}.`
+                : "HUNTER normalises every source before detection. Alerts are correlated across identity, endpoint, network and cloud."}
+            </div>
           </div>
           <Link to="/app/hunter/logs" className="btn outline block mt-12">
             <ScrollText /> Open log explorer
@@ -399,22 +584,74 @@ export default function HunterDashboard() {
           </div>
         </Panel>
 
-        <Panel title="Workspace activity" icon={<Clock size={15} />} flush>
-          <div className="activity-list">
-            {state.activity.slice(0, 6).map((item) => (
-              <div className="activity-item" key={item.id}>
-                <span className={`activity-icon ${item.tone || ""}`}><Sparkles /></span>
-                <div style={{ minWidth: 0 }}>
-                  <div className="activity-text">{item.text}</div>
-                  <div className="activity-meta">
-                    <span>{item.actor}</span>
-                    <span>·</span>
-                    <span>{timeAgo(item.at)}</span>
+        <Panel
+          title={liveMode ? "Live event stream" : "Workspace activity"}
+          icon={liveMode ? <Radio size={15} /> : <Clock size={15} />}
+          action={
+            liveMode ? (
+              <Badge tone={live.streamState === "open" ? "success" : "high"} dot>
+                {streamLabel}
+              </Badge>
+            ) : null
+          }
+          flush
+        >
+          {liveMode ? (
+            <div className="activity-list">
+              {live.telemetry.slice(0, 6).map((event) => (
+                <div className="activity-item" key={event.id}>
+                  <span
+                    className={`activity-icon ${
+                      event.anomalySeverity === "critical"
+                        ? "danger"
+                        : event.status !== "allow"
+                          ? "warning"
+                          : ""
+                    }`}
+                  >
+                    <Activity />
+                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="activity-text">{event.message || event.event}</div>
+                    <div className="activity-meta">
+                      <span>{event.source}</span>
+                      <span>·</span>
+                      <span className="mono">{event.host}</span>
+                      {event.dstPort ? (
+                        <>
+                          <span>·</span>
+                          <span className="mono">{event.dstIp}:{event.dstPort}</span>
+                        </>
+                      ) : null}
+                      <span>·</span>
+                      <span>{timeAgo(event.timestamp)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+              {live.telemetry.length === 0 && (
+                <div className="empty-inline">
+                  No server telemetry yet. Send an event, forward a flow or run the controlled attack.
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="activity-list">
+              {state.activity.slice(0, 6).map((item) => (
+                <div className="activity-item" key={item.id}>
+                  <span className={`activity-icon ${item.tone || ""}`}><Sparkles /></span>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="activity-text">{item.text}</div>
+                    <div className="activity-meta">
+                      <span>{item.actor}</span>
+                      <span>·</span>
+                      <span>{timeAgo(item.at)}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Panel>
       </div>
 

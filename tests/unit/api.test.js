@@ -106,17 +106,27 @@ describe("API health and authentication", () => {
     expect(response.body.workspace.org.seats).toBe(10);
 
     const connectors = await adminAgent.get("/api/connectors").expect(200);
-    expect(connectors.body.mode).toBe("hybrid");
+    expect(connectors.body.mode).toBe("live");
     expect(connectors.body.adapters.map((adapter) => adapter.id)).toEqual([
-      "siem",
-      "edr",
-      "cloud",
-      "intel",
+      "splunk",
+      "elastic",
+      "sentinel",
+      "defender",
+      "crowdstrike",
+      "wazuh",
+      "generic-siem",
+      "generic-edr",
     ]);
-    // Vendor pull adapters remain explicitly mock; the live surface is separate
-    // and reports its real configuration state.
-    expect(connectors.body.adapters.every((adapter) => adapter.mode === "mock")).toBe(true);
+    // Connectors report their real configuration state. In a test environment
+    // without vendor credentials they are explicitly unconfigured, never mock.
+    expect(
+      connectors.body.adapters.every((adapter) =>
+        ["live", "unconfigured"].includes(adapter.mode)
+      )
+    ).toBe(true);
     expect(connectors.body.live.telemetry.mode).toBe("live");
+    expect(connectors.body.live.network.ingest).toBe("/api/network/flows");
+    expect(connectors.body.live.detections.rules).toBeGreaterThanOrEqual(6);
     expect(connectors.body.live.anomaly.mode).toBe("live");
     expect(connectors.body.live.anomaly.algorithm).toBe("isolation-forest");
     expect(connectors.body.live.assistant.mode).toBe("unconfigured");

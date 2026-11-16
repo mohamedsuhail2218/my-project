@@ -96,6 +96,25 @@ Optional live integrations:
 Without the LLM endpoint the assistant returns `503 assistant_not_configured`.
 Without the reputation keys, live intelligence is limited to keyless RDAP.
 
+Real SIEM/EDR connectors use the vendor variables documented in `.env.example`
+(`SPLUNK_*`, `ELASTIC_*`, `AZURE_*`/`SENTINEL_*`, `DEFENDER_*`,
+`CROWDSTRIKE_*`, `WAZUH_*`, `GENERIC_SIEM_URL`/`GENERIC_EDR_URL`). A connector is
+reported `live` only when its credentials exist; otherwise it stays
+`unconfigured`. The Function needs outbound HTTPS access to the vendor.
+
+For network monitoring, create a telemetry token after sign-in and run
+`collectors/flow-shipper.mjs` on the sensor host:
+
+```bash
+node collectors/flow-shipper.mjs --url https://<project>.vercel.app \
+  --token "dtcw_..." --format zeek-tsv --sensor zeek-edge-01 \
+  --file /opt/zeek/logs/current/conn.log
+```
+
+Raw packet capture cannot run inside a Vercel Function. The collector ships
+records from your own Zeek, Suricata or NetFlow sensor; detection, anomaly
+scoring and SSE all run through the same API.
+
 ## 3. Verify the deployment
 
 ```text
@@ -150,9 +169,10 @@ is SQLite (`node:sqlite`), so there are three realistic options:
   Functions are request-scoped and capped by `maxDuration` (60 s here), so the
   live tail will reconnect rather than staying open indefinitely. Historical
   telemetry and polling still work.
-- **In-memory state.** Rate-limit buckets and the login-failure backoff live in
-  process memory and reset on cold starts. This is unchanged from the single
-  Node deployment, but more visible on serverless.
+- **In-memory state.** Rate-limit buckets, the login-failure backoff, SSE
+  subscriber state and the isolation-forest model live in process memory and
+  reset on cold starts. Detection and connector status are persisted in SQLite,
+  but a new instance starts with a cold model and no live subscribers.
 - **SQLite on `/tmp`.** Do not point `DTCW_DB_PATH` at the project directory;
   Vercel's deployment filesystem is read-only.
 - **Payment number.** It is compiled into the signed-in Subscription page

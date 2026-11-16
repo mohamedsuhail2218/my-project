@@ -97,6 +97,40 @@ export const api = {
     request(`/telemetry/tokens/${encodeURIComponent(tokenId)}`, { method: "DELETE" }),
   streamUrl: (path) => `${API_BASE}${path}`,
 
+  /* Rule-based detection */
+  detections: ({ status, severity, category, q, limit = 50 } = {}) => {
+    const query = new URLSearchParams({ limit: String(limit) });
+    if (status) query.set("status", status);
+    if (severity) query.set("severity", severity);
+    if (category) query.set("category", category);
+    if (q) query.set("q", q);
+    return request(`/detections?${query.toString()}`);
+  },
+  detectionRules: () => request("/detections/rules"),
+  updateDetection: (detectionId, status) =>
+    request(`/detections/${encodeURIComponent(detectionId)}`, {
+      method: "PATCH",
+      body: { status },
+    }),
+  simulateAttack: (scenario = "all") =>
+    request("/detections/simulate", { method: "POST", body: { scenario } }),
+
+  /* Authorised network-flow monitoring */
+  ingestNetworkFlows: (payload) => request("/network/flows", { method: "POST", body: payload }),
+  networkStatus: () => request("/network/status"),
+
+  /* Real SIEM / EDR pull connectors */
+  connectorTest: (connectorId) =>
+    request(`/connectors/${encodeURIComponent(connectorId)}/test`, {
+      method: "POST",
+      body: {},
+    }),
+  connectorPull: (connectorId, { since, limit = 200 } = {}) =>
+    request(`/connectors/${encodeURIComponent(connectorId)}/pull`, {
+      method: "POST",
+      body: { since, limit },
+    }),
+
   /* Anomaly model */
   mlModel: () => request("/ml/model"),
   trainModel: () => request("/ml/train", { method: "POST", body: {} }),

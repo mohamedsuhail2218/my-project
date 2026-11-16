@@ -1,6 +1,7 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { config } from "./config.js";
 import { ensureModel, getModelMetadata, scoreBatch } from "./ml/anomaly.js";
+import { evaluateDetections } from "./detections.js";
 
 /**
  * Real-time telemetry ingestion and retrieval.
@@ -29,9 +30,17 @@ function clampTimestamp(value) {
   return parsed.toISOString();
 }
 
+function numberOrNull(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 function normalizeEvent(event, defaultSource) {
   const timestamp = clampTimestamp(event.timestamp);
   const receivedAt = new Date().toISOString();
+  const dstPort = numberOrNull(event.dstPort ?? event.dst_port ?? event.dest_port ?? event.dport);
+  const bytes = numberOrNull(event.bytes ?? event.orig_bytes ?? event.dOctets ?? event.out_bytes);
+  const durationMs = numberOrNull(event.durationMs ?? event.duration_ms ?? event.duration);
   return {
     eventUid: String(event.eventId || event.id || `evt_${randomUUID()}`).slice(0, 120),
     timestamp,
@@ -41,10 +50,17 @@ function normalizeEvent(event, defaultSource) {
     event: String(event.event || "custom_event").trim().slice(0, 120) || "custom_event",
     action: String(event.action || "").trim().slice(0, 120),
     status: ["allow", "deny", "alert"].includes(event.status) ? event.status : "allow",
-    ip: String(event.ip || "").trim().slice(0, 64),
+    ip: String(event.ip || event.src_ip || "").trim().slice(0, 64),
     user: String(event.user || event.username || "").trim().slice(0, 120),
     message: String(event.message || "").slice(0, 8000),
     raw: event.raw === undefined ? null : String(event.raw).slice(0, 16000),
+    dstIp: String(event.dstIp || event.dst_ip || event.dest_ip || "").trim().slice(0, 64),
+    dstPort: dstPort === null ? null : Math.max(0, Math.min(65535, Math.trunc(dstPort))),
+    proto: String(event.proto || event.protocol || "").trim().toLowerCase().slice(0, 20),
+    bytes: bytes === null ? null : Math.max(0, Math.trunc(bytes)),
+    durationMs: durationMs === null ? null : Math.max(0, Math.trunc(durationMs)),
+    direction: String(event.direction || "").trim().toLowerCase().slice(0, 20),
+    sensor: String(event.sensor || event.sensorName || "").trim().slice(0, 120),
   };
 }
 
@@ -87,8 +103,9 @@ export function ingestTelemetry(db, workspaceId, events, options = {}) {
   const insert = db.prepare(
     `INSERT INTO telemetry_events
        (workspace_id, event_uid, timestamp, received_at, source, host, event, action, status, ip, username,
-        message, raw, anomaly_score, anomaly_severity, anomaly_explanation, blocked, ingested_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        message, raw, anomaly_score, anomaly_severity, anomaly_explanation, blocked, ingested_by,
+        dst_ip, dst_port, proto, bytes, duration_ms, direction, sensor)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   );
 
   const ingestedBy = token ? `token:${token.prefix}` : actor || "session";
@@ -123,7 +140,14 @@ export function ingestTelemetry(db, workspaceId, events, options = {}) {
         score ? score.severity : null,
         score ? JSON.stringify(score.explanation) : null,
         blocked.length ? JSON.stringify(blocked) : null,
-        ingestedBy
+        ingestedBy,
+        event.dstIp,
+        event.dstPort,
+        event.proto,
+        event.bytes,
+        event.durationMs,
+        event.direction,
+        event.sensor
       );
       results.push({ id: Number(info.lastInsertRowid), ...stored });
     });
@@ -133,9 +157,19 @@ export function ingestTelemetry(db, workspaceId, events, options = {}) {
     throw error;
   }
 
+  let detections = [];
+  try {
+    detections = evaluateDetections(db, workspaceId);
+  } catch (error) {
+    // Detection must never drop an accepted event. The failure is logged and
+    // the raw events remain available for a later re-evaluation.
+    console.error("[detections] Evaluation failed:", error.message);
+  }
+
   maybePrune(db, workspaceId);
   return {
     events: results,
+    detections,
     model: getModelMetadata(db, workspaceId),
     blocked: results.filter((event) => event.blocked).length,
   };
@@ -237,6 +271,13 @@ export function serializeTelemetryRow(row) {
     anomalyExplanation: explanation,
     blocked,
     ingestedBy: row.ingested_by,
+    dstIp: row.dst_ip || "",
+    dstPort: row.dst_port ?? null,
+    proto: row.proto || "",
+    bytes: row.bytes ?? null,
+    durationMs: row.duration_ms ?? null,
+    direction: row.direction || "",
+    sensor: row.sensor || "",
   };
 }
 
@@ -420,6 +461,23 @@ export function publishTelemetry(workspaceId, events) {
     try {
       if (client.res.writableLength > 1_000_000) return;
       client.res.write(payload);
+      delivered += 1;
+    } catch {
+      listeners.delete(client);
+    }
+  });
+  return delivered;
+}
+
+export function publishDetections(workspaceId, payload) {
+  const listeners = streams.get(workspaceId);
+  if (!listeners?.size) return 0;
+  const frame = `event: detection\ndata: ${JSON.stringify(payload)}\n\n`;
+  let delivered = 0;
+  listeners.forEach((client) => {
+    try {
+      if (client.res.writableLength > 1_000_000) return;
+      client.res.write(frame);
       delivered += 1;
     } catch {
       listeners.delete(client);

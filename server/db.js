@@ -106,6 +106,13 @@ const SCHEMA = `
     username TEXT NOT NULL DEFAULT '',
     message TEXT NOT NULL DEFAULT '',
     raw TEXT,
+    dst_ip TEXT NOT NULL DEFAULT '',
+    dst_port INTEGER,
+    proto TEXT NOT NULL DEFAULT '',
+    bytes INTEGER,
+    duration_ms INTEGER,
+    direction TEXT NOT NULL DEFAULT '',
+    sensor TEXT NOT NULL DEFAULT '',
     anomaly_score REAL,
     anomaly_severity TEXT,
     anomaly_explanation TEXT,
@@ -118,6 +125,47 @@ const SCHEMA = `
     ON telemetry_events(workspace_id, anomaly_score DESC);
   CREATE INDEX IF NOT EXISTS idx_telemetry_workspace_host
     ON telemetry_events(workspace_id, host);
+
+  -- Rule-based detections. One row per rule/entity/time bucket so repeated
+  -- evaluations are idempotent while a new hour can raise a fresh detection.
+  CREATE TABLE IF NOT EXISTS detections (
+    id TEXT PRIMARY KEY,
+    workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+    rule_id TEXT NOT NULL,
+    category TEXT NOT NULL,
+    title TEXT NOT NULL,
+    severity TEXT NOT NULL,
+    confidence REAL NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','triaged','closed')),
+    entity TEXT NOT NULL,
+    detail TEXT NOT NULL,
+    technique TEXT NOT NULL DEFAULT '',
+    event_count INTEGER NOT NULL DEFAULT 0,
+    first_seen TEXT NOT NULL,
+    last_seen TEXT NOT NULL,
+    dedupe_key TEXT NOT NULL,
+    evidence TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE(workspace_id, dedupe_key)
+  );
+  CREATE INDEX IF NOT EXISTS idx_detections_workspace_status
+    ON detections(workspace_id, status, last_seen DESC);
+  CREATE INDEX IF NOT EXISTS idx_detections_workspace_severity
+    ON detections(workspace_id, severity, last_seen DESC);
+
+  -- Last connector test/pull outcome. Credentials live only in environment
+  -- variables; this table stores no secrets.
+  CREATE TABLE IF NOT EXISTS connector_state (
+    workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+    connector_id TEXT NOT NULL,
+    last_test_at TEXT,
+    last_test_ok INTEGER,
+    last_test_detail TEXT,
+    last_pull_at TEXT,
+    last_pull_count INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (workspace_id, connector_id)
+  );
 
   CREATE TABLE IF NOT EXISTS telemetry_tokens (
     id TEXT PRIMARY KEY,
@@ -372,6 +420,13 @@ export function createDatabase(filename = config.dbPath) {
   ensureColumn(db, "audit_log", "user_agent", "TEXT");
   ensureColumn(db, "audit_log", "prev_hash", "TEXT");
   ensureColumn(db, "audit_log", "entry_hash", "TEXT");
+  ensureColumn(db, "telemetry_events", "dst_ip", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn(db, "telemetry_events", "dst_port", "INTEGER");
+  ensureColumn(db, "telemetry_events", "proto", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn(db, "telemetry_events", "bytes", "INTEGER");
+  ensureColumn(db, "telemetry_events", "duration_ms", "INTEGER");
+  ensureColumn(db, "telemetry_events", "direction", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn(db, "telemetry_events", "sensor", "TEXT NOT NULL DEFAULT ''");
 
   db.exec("UPDATE sessions SET last_seen_at = created_at WHERE last_seen_at IS NULL");
   db.exec("CREATE INDEX IF NOT EXISTS idx_audit_workspace ON audit_log(workspace_id, created_at)");

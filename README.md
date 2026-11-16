@@ -93,7 +93,8 @@ disabled by default in production and requires `SIGNUP_INVITE_CODE` when enabled
 - `src/data/initialState.js` — `STATE_SCHEMA_VERSION`, seed factory, `migrateState`,
   cache read/write/clear.
 - `src/lib/engine.js` — deterministic risk and attack-path engine.
-- `src/lib/adapters/index.js` — explicit integration adapter abstraction.
+- `src/lib/api.js` — typed client for telemetry, detections, network flows and connectors.
+- `src/lib/useLiveHunter.js` — server telemetry/detection/connector state plus the SSE stream.
 - `src/lib/api.js` — typed-ish fetch wrapper with `ApiError`.
 - `src/components/ErrorBoundary.jsx` — top-level render recovery.
 - `src/components/RouteLoading.jsx` — lazy-route and session-loading surface.
@@ -110,6 +111,13 @@ disabled by default in production and requires `SIGNUP_INVITE_CODE` when enabled
 - `server/plans.js` — server-owned plan and seat catalogue.
 - `server/validation.js` — zod request schemas and payload limits.
 - `server/telemetry.js` — authenticated ingestion, SSE fan-out, retention, shipper tokens.
+- `server/network.js` — Zeek, Suricata, NetFlow and generic flow normalisation.
+- `server/detections.js` — stateful brute-force, port-scan, beaconing, fan-out,
+  known-bad and blocked-egress rules with rolling windows and deduplication.
+- `server/simulation.js` — controlled synthetic attacks that exercise the live pipeline.
+- `server/connectors/` — real Splunk, Elastic, Sentinel, Defender, CrowdStrike,
+  Wazuh and generic SIEM/EDR HTTP pull clients.
+- `collectors/flow-shipper.mjs` — Zeek TSV/JSON, Suricata and NetFlow log shipper.
 - `server/ml/anomaly.js` — per-workspace isolation forest, scoring and explanations.
 - `server/services/threatIntel.js` — keyless RDAP plus optional AbuseIPDB and OTX.
 - `server/services/assistant.js` — OpenAI-compatible chat client with explicit unavailability.
@@ -171,13 +179,21 @@ The UI additionally hides the Super Admin navigation and route for other roles.
 | POST | `/api/workspace/reset` | Super Admin | Re-seeds the caller’s workspace |
 | PATCH | `/api/workspace/plan` | Super Admin | Server-owned plan change |
 | PATCH | `/api/workspace/security` | Super Admin | Idle timeout and CIDR IP allowlist |
-| GET | `/api/connectors` | Session | Adapter metadata plus the live-feature surface; vendor pull adapters stay `mode: "mock"` |
+| GET | `/api/connectors` | Session | Real SIEM/EDR connector registry, network status and detection rule health |
+| POST | `/api/connectors/:id/test` | Session + `hunter:write` | Authenticated vendor health check; unconfigured vendors report honestly |
+| POST | `/api/connectors/:id/pull` | Session + `hunter:write` | Pull, normalise and ingest vendor events through the live pipeline |
 | GET | `/api/audit` | Super Admin | Paginated events plus hash-chain verification |
 | POST | `/api/telemetry/ingest` | Session + `hunter:write`, or bearer token | Validated batch; stored, scored and matched against blocks |
 | GET | `/api/telemetry` | Session | Search stored telemetry with cursor pagination |
 | GET | `/api/telemetry/stats` | Session | Counts, source mix, retention and model metadata |
-| GET | `/api/telemetry/stream` | Session | Server-Sent Events stream of new events |
+| GET | `/api/telemetry/stream` | Session | Server-Sent Events stream of new events and detections |
 | GET/POST/DELETE | `/api/telemetry/tokens` | Super Admin | List, create and revoke workspace-scoped ingestion tokens |
+| POST | `/api/network/flows` | Session + `hunter:write`, or bearer token | Normalise and ingest Zeek, Suricata, NetFlow or generic flows |
+| GET | `/api/network/status` | Session | Flow totals, source count, latest timestamp and formats |
+| GET | `/api/detections` | Session | Rule detections with filters plus severity/category statistics |
+| GET | `/api/detections/rules` | Session | Rule catalogue, thresholds and enabled state |
+| PATCH | `/api/detections/:id` | Session + `hunter:write` | Move a detection between open, triaged and closed |
+| POST | `/api/detections/simulate` | Session + `hunter:write` | Run a labelled synthetic attack; sends no packets |
 | GET | `/api/ml/model` | Session | Model status and feature catalogue |
 | POST | `/api/ml/train` | Session + `hunter:write` | Retrain the isolation forest on stored events |
 | GET | `/api/ml/anomalies` | Session | Highest-scoring events with explanations |
@@ -213,9 +229,17 @@ audit_log(id PK, workspace_id, user_id, action, detail, ip, user_agent,
 telemetry_events(id PK, workspace_id, event_uid, timestamp, received_at, source,
                  host, event, action, status, ip, username, message, raw,
                  anomaly_score, anomaly_severity, anomaly_explanation, blocked,
-                 ingested_by)
+                 ingested_by, dst_ip, dst_port, proto, bytes, duration_ms,
+                 direction, sensor)
 telemetry_tokens(id PK, workspace_id, label, prefix, token_hash, created_by,
                  created_at, last_used_at, revoked_at)
+detections(id PK, workspace_id, rule_id, category, title, severity, confidence,
+           status, entity, detail, technique, event_count, first_seen,
+           last_seen, dedupe_key UNIQUE(workspace_id, dedupe_key), evidence,
+           created_at, updated_at)
+connector_state(workspace_id, connector_id, last_test_at, last_test_ok,
+                last_test_detail, last_pull_at, last_pull_count,
+                PRIMARY KEY(workspace_id, connector_id))
 anomaly_models(workspace_id PK, version, trained_at, samples, threshold, metadata)
 intel_cache(workspace_id, indicator, payload, fetched_at, expires_at,
             PRIMARY KEY(workspace_id, indicator))
@@ -254,51 +278,80 @@ Current version: **2**.
 - `toasts` and `user` are never persisted. The local cache is a rendering hint;
   the API response is authoritative.
 
-### Integration adapters
+### SIEM and EDR connectors
 
-`src/lib/adapters/index.js` defines the shared contract and four adapters:
-SIEM / log pipeline, EDR / XDR, cloud audit logs and threat intelligence. Every
-shipped adapter is explicitly `mode: "mock"` and the API reports that mode to the
-client. No page calls a vendor API directly.
+`server/connectors/` contains real HTTP pull clients for Splunk, Elastic,
+Microsoft Sentinel, Microsoft Defender for Endpoint, CrowdStrike Falcon, Wazuh
+and a generic SIEM/EDR JSON API. Each connector reports `mode: "live"` only when
+all of its credentials are present in the server environment; otherwise it
+reports `mode: "unconfigured"` and a pull attempt returns `409
+connector_not_configured`. Mock events are never substituted.
 
-A production adapter implements:
+- `POST /api/connectors/:id/test` performs an authenticated health check.
+- `POST /api/connectors/:id/pull` fetches vendor events, normalises common field
+  names into the telemetry contract and runs them through anomaly scoring,
+  detection rules and SSE exactly like push ingestion.
+- Credentials stay in environment variables. The database stores only last
+  test/pull status, never a secret.
+- Vendor URLs are operator configuration, not request input. Non-HTTP schemes and
+  cloud metadata hosts are rejected.
 
-```js
-const myAdapter = {
-  id: "siem",
-  label: "Acme SIEM",
-  kind: "log",
-  mode: "live",
-  status: "connected",
-  async testConnection() {
-    return { ok: true, checkedAt: new Date().toISOString(), detail: "200 OK" };
-  },
-  async pullEvents({ since, limit }) {
-    // Fetch, normalise and return:
-    // { source, host, user, event, action, status, ip, message, timestamp, raw }
-    return [];
-  },
-};
-```
+See `.env.example` for the exact variables per vendor.
 
-Required environment variables are declared on each adapter (`SIEM_BASE_URL`,
-`EDR_CLIENT_ID`, `CLOUD_AUDIT_QUEUE_URL`, `INTEL_API_KEY`, and so on). The OAuth
-token exchange, pagination, retry/backoff and normalisation belong on the server;
-the browser should receive only normalised events.
+### Authorised network-flow monitoring
+
+Raw packet capture cannot run inside Vercel Functions, so the application accepts
+already-captured records from a sensor the operator controls:
+
+- `POST /api/network/flows` accepts `{ format, sensor, flows: [...] }` where
+  `format` is `auto`, `zeek`, `suricata`, `netflow` or `generic`.
+- Zeek JSON, Suricata `eve.json` and NetFlow-style field names are normalised to
+  `src/dst` address, port, protocol, bytes, duration, direction and sensor.
+- The shipped `collectors/flow-shipper.mjs` tails Zeek TSV/JSON and Suricata
+  NDJSON files, batches records and retries delivery. It supports `--stdin` for
+  pipelines such as `tail -F eve.json | ...`.
+- Flow ingestion uses the same session/bearer-token authentication, rate limit,
+  anomaly model, detection rules and SSE stream as every other event source.
+- `GET /api/network/status` reports flow totals and the latest sensor timestamp.
 
 ### Live security capabilities
 
-Five capabilities run on the server rather than being simulated in the browser.
-`GET /api/connectors` reports the live surface separately from the mock pull
-adapters.
+Eight capabilities run on the server rather than being simulated in the browser.
+`GET /api/connectors` reports connector, network and detection health.
 
 | Capability | Implementation | Honest limitation |
 | --- | --- | --- |
 | Anomaly detection | Per-workspace isolation forest (80 trees, 192-point subsample) over 20 behavioural features; scores written back to each event with a feature-level explanation | Trains from the workspace's own events and needs at least 12; it detects statistical deviation, not proof of compromise |
 | HUNTER assistant | Any OpenAI-compatible chat endpoint; deterministic server-side retrieval supplies incidents, detections, telemetry and intel with `[S1]` citations | Returns `503 assistant_not_configured` when no endpoint is set; it never falls back to canned answers |
 | Live threat intelligence | Keyless RDAP registration lookup for IPs and domains; AbuseIPDB reputation and AlienVault OTX pulses when keys exist; bounded workspace cache | Provider errors are returned per provider; no verdict is invented and no key is exposed to the browser |
-| Real-time ingestion | `POST /api/telemetry/ingest` with session RBAC or a hashed workspace bearer token; `GET /api/telemetry/stream` delivers SSE; retention and per-workspace caps apply | Vendor pull adapters remain `mode: "mock"`; ingestion is push-based and must be wired to a real shipper |
+| Real-time ingestion | `POST /api/telemetry/ingest` with session RBAC or a hashed workspace bearer token; `GET /api/telemetry/stream` delivers SSE; retention and per-workspace caps apply | Push-based; the operator must run a shipper or point a sensor at the API |
+| Network-flow monitoring | Zeek/Suricata/NetFlow normalisation plus the supplied flow shipper; source, destination, port, protocol and sensor are persisted | Packet capture must run on the operator's sensor, not in the serverless application |
+| Rule-based detection | Stateful rolling-window rules for brute force (T1110), port scan (T1046), beaconing (T1071.001), fan-out, known-bad destinations and blocked egress; deduplicated per rule/entity/hour with event evidence | Deterministic thresholds, not a full correlation engine; tune thresholds for your environment |
+| SIEM/EDR connectors | Authenticated Splunk, Elastic, Sentinel, Defender, CrowdStrike, Wazuh and generic pull clients with vendor-specific OAuth/token exchange | A vendor must be reachable from the API and configured with real credentials |
 | Incident response | Playbooks for `block-ip`, `isolate-host`, `revoke-sessions` and `disable-identity`; automation only creates pending proposals; approval executes, revert deactivates reversible blocks | Only a Super Admin can approve or revert. `revoke-sessions` cannot be undone |
+
+### Detection rules and controlled testing
+
+Thresholds are environment-tunable (`.env.example`): brute force, distinct ports
+for a scan, repeated connections to one destination, distinct destinations per
+host, and blocked-egress attempts. Each detection stores the matching event ids,
+hosts, users and addresses so an analyst can reproduce it.
+
+`POST /api/detections/simulate` injects **synthetic telemetry only** labelled
+`attack-simulation`; no packet is sent to any target. The HunterDashboard exposes
+**Run controlled attack** and **Simulate port scan** buttons for signed-in users
+with `hunter:write`. The same request can be made directly:
+
+```bash
+curl -X POST http://127.0.0.1:8787/api/detections/simulate \
+  -H "Cookie: dtcw_session=..." \
+  -H "Content-Type: application/json" \
+  -d '{"scenario":"all"}'
+```
+
+Use the simulation to prove the end-to-end path: ingest → store → score → rule
+evaluation → SSE `detection` event → dashboard queue. Every generated event
+contains `simulated: true` in its raw payload.
 
 Telemetry tokens are created in **Settings → Security & access** and shown once.
 Example shipper request:
@@ -326,18 +379,44 @@ The event is stored in SQLite, scored by the current model and published to ever
 SSE client in the workspace. If an approved `block-ip` action covers the source
 address, the event is tagged and raised to `alert` before storage.
 
+### Shipping network flows
+
+The collector handles Zeek TSV (the default `conn.log`), Zeek JSON, Suricata
+NDJSON and NetFlow-style JSON. Create a telemetry token, then run it beside the
+sensor:
+
+```bash
+# Zeek default TSV, following the current log
+node collectors/flow-shipper.mjs \
+  --token "dtcw_..." --format zeek-tsv --sensor zeek-edge-01 \
+  --file /opt/zeek/logs/current/conn.log
+
+# Suricata eve.json streamed through stdin
+tail -F /var/log/suricata/eve.json \
+  | node collectors/flow-shipper.mjs --stdin --format suricata \
+      --token "dtcw_..." --sensor suricata-edge-01
+
+# One-off NetFlow JSON-lines backfill
+node collectors/flow-shipper.mjs --once --format netflow \
+  --file ./netflow-export.ndjson --token "dtcw_..."
+```
+
+The shipper batches up to 500 flows, retries with exponential backoff and keeps
+a bounded in-memory buffer while the API is unavailable. It reads only records
+the sensor has already written; it does not capture packets.
+
 ---
 
 ## Tests and CI
 
 ```bash
-npm test          # Vitest: engine, state migration, API auth/RBAC, five live capabilities
+npm test          # Vitest: engine, migration, auth/RBAC, detections, connectors
 npm run test:e2e  # Playwright: build must exist; starts the production server
 npm run ci        # build + unit/API tests
 ```
 
-The suite currently contains **45 Vitest tests** across four files and **10 Playwright
-tests**. Coverage includes:
+The suite currently contains **59 Vitest tests** across seven files and **20
+Playwright tests**. Coverage includes:
 
 - deterministic control application, attack-path evaluation and risk bounds;
 - v1 → v2 migration, corrupt input recovery and cache round-trip;
@@ -351,9 +430,14 @@ tests**. Coverage includes:
 - telemetry ingestion with session RBAC and bearer tokens, malformed batch rejection,
   isolation-forest training/scoring, RDAP lookup and cache, assistant unavailability,
   and proposal → Super Admin approval → block enforcement → revert;
+- controlled attack simulation producing brute-force, port-scan, beaconing and
+  egress detections; Zeek flow normalisation; detection triage RBAC and audit;
+  connector registry honesty and unconfigured pull rejection; Zeek TSV and
+  JSON-lines flow-shipper parsing;
 - Playwright sign-in/persistence/sign-out, signup-then-sign-in, route smoke tests,
   read-only route denial, mobile overflow, keyboard skip-link, HUNTER live-tail
-  SSE ingestion, pause and resume, and UPI payment/manual-verification copy.
+  SSE ingestion, pause and resume, controlled attack → live queue → log search,
+  and UPI payment/manual-verification copy.
 
 `.github/workflows/ci.yml` installs, audits runtime dependencies, builds, runs
 Vitest, installs Chromium and runs Playwright on Node 24. The Playwright report is
@@ -387,6 +471,13 @@ uploaded when a run fails.
 7. Rotate `DEMO_PASSWORD` before first boot and delete seeded sessions for shared
    environments. Expired and idle sessions are pruned lazily and by a periodic
    housekeeping task.
+8. Configure only the connectors you need in `.env` (`SPLUNK_*`, `ELASTIC_*`,
+   `AZURE_*`/`SENTINEL_*`/`DEFENDER_*`, `CROWDSTRIKE_*`, `WAZUH_*` or
+   `GENERIC_SIEM_URL`/`GENERIC_EDR_URL`). The API needs outbound HTTPS access to
+   each vendor. Then run `collectors/flow-shipper.mjs` beside your Zeek,
+   Suricata or NetFlow sensor and create a workspace token for it. Tune the
+   `DETECTION_*` thresholds for your environment; defaults are documented in
+   `.env.example`.
 
 Production startup fails closed when the configuration is unsafe. Warnings are
 printed for a missing `PUBLIC_ORIGIN`, unkeyed audit hashing, a cloud-synced
@@ -401,6 +492,12 @@ recreates the schema and the bootstrap admin and loses all other data. Set
 `DTCW_DB_PATH=/tmp/dtcw.sqlite`, `TRUST_PROXY=1`, production bootstrap variables,
 `SEED_DEMO_USERS=false` and `PUBLIC_ORIGIN=https://<project>.vercel.app`. Full
 steps and serverless limitations are in [`DEPLOY-VERCEL.md`](DEPLOY-VERCEL.md).
+
+Connector credentials and a network-flow ingestion token can be added as Vercel
+environment variables, but the Function must be able to reach the vendor over
+outbound HTTPS. SSE subscriber state and the isolation-forest model live in
+process memory, so streaming is reliable on a single warm instance and may need
+reconnection when Vercel scales or suspends.
 
 Vercel is suitable only for a disposable preview. Do not run it with multiple
 concurrent instances for real work, and do not treat the `/tmp` database as
@@ -453,10 +550,19 @@ unchanged.
 
 ### Known limitations
 
-- Adapters are mock implementations, not live vendor connectors.
-- The simulation engine is deterministic sample logic, not a packet-level
-  emulator.
-- SQLite is single-writer and intended for one API instance.
+- Vendor connectors are real HTTP clients, but they only become live once real
+  credentials and outbound network access are configured. Unconfigured vendors
+  are reported honestly, never replaced with fixtures.
+- Raw packet capture is not performed by the application. Run Zeek, Suricata or a
+  NetFlow exporter on infrastructure you control and ship records with
+  `collectors/flow-shipper.mjs`.
+- Detection rules are deterministic thresholds over a rolling window. They are
+  explainable and reproducible, not a full correlation or ML detection platform.
+- Controlled attacks are synthetic telemetry only; they send no packets. The
+  simulation engine is not a packet-level emulator.
+- SQLite is single-writer and intended for one API instance. SSE subscriber state
+  and the anomaly model are in-process, so multi-instance deployments need a
+  shared transport (Redis/PostgreSQL) for live streaming.
 - Password reset and SSO are not implemented; the UI clearly labels them as
   unavailable instead of simulating success.
 - No email delivery, billing provider or malware sandbox is connected. Plan
@@ -471,6 +577,9 @@ unchanged.
 The project has moved from a polished front-end prototype to a coherent
 full-stack demo with real authentication, tenant-scoped persistence, RBAC,
 server-side validation, migration safety, route splitting, automated tests and a
-CI gate. It is deployable as a single-instance demonstration environment. It is
-not yet a multi-region SaaS: live adapters, PostgreSQL/Redis, SSO/password reset,
-and an external error/telemetry pipeline are the remaining production work.
+CI gate. It now also has real SIEM/EDR pull connectors, authorised network-flow
+ingestion, stateful attack detection, live dashboard streaming and a controlled
+end-to-end test path. It is deployable as a single-instance demonstration
+environment. It is not yet a multi-region SaaS: shared SSE/pub-sub state,
+PostgreSQL/Redis, SSO/password reset, and an external error pipeline remain the
+production work.

@@ -202,6 +202,39 @@ export const telemetryTokenSchema = z
   })
   .strict();
 
+export const networkFlowSchema = z
+  .object({
+    format: z.enum(["auto", "zeek", "suricata", "netflow", "generic"]).optional().default("auto"),
+    source: z.string().trim().max(60).optional(),
+    sensor: z.string().trim().max(120).optional(),
+    flows: z.array(z.record(z.string(), z.unknown())).min(1).max(config.network.maxBatch),
+  })
+  .strict();
+
+export const detectionStatusSchema = z
+  .object({
+    status: z.enum(["open", "triaged", "closed"]),
+    note: z.string().trim().max(500).optional().default(""),
+  })
+  .strict();
+
+export const detectionSimulationSchema = z
+  .object({
+    scenario: z
+      .enum(["brute_force", "port_scan", "suspicious_beacon", "suspicious_egress", "all"])
+      .optional()
+      .default("all"),
+  })
+  .strict();
+
+export const connectorPullSchema = z
+  .object({
+    since: z.string().trim().max(60).optional(),
+    limit: z.number().int().min(1).max(1000).optional().default(200),
+  })
+  .strict();
+
+
 export const assistantSchema = z
   .object({
     question: z.string().trim().min(3).max(2000),

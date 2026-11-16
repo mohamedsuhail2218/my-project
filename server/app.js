@@ -3,7 +3,6 @@ import path from "node:path";
 import express from "express";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
-import { adapterStatus } from "../src/lib/adapters/index.js";
 import { config } from "./config.js";
 import {
   createDatabase,
@@ -41,6 +40,10 @@ import {
   securityPolicySchema,
   telemetryIngestSchema,
   telemetryTokenSchema,
+  networkFlowSchema,
+  detectionStatusSchema,
+  detectionSimulationSchema,
+  connectorPullSchema,
   assistantSchema,
   responseProposalSchema,
   responseDecisionSchema,
@@ -54,6 +57,7 @@ import {
   createTelemetryToken,
   ingestTelemetry,
   listTelemetryTokens,
+  publishDetections,
   publishTelemetry,
   queryTelemetry,
   revokeTelemetryToken,
@@ -62,6 +66,20 @@ import {
   topAnomalies,
   verifyTelemetryToken,
 } from "./telemetry.js";
+import {
+  detectionRuleCatalog,
+  detectionStats,
+  listDetections,
+  updateDetectionStatus,
+} from "./detections.js";
+import { normalizeNetworkFlows } from "./network.js";
+import { buildAttackSimulation } from "./simulation.js";
+import {
+  ConnectorError,
+  connectorStatus,
+  pullConnector,
+  testConnector,
+} from "./connectors/index.js";
 import {
   anomalyFeatureCatalog,
   getModelMetadata,
@@ -184,6 +202,8 @@ export function createApp({ db = createDatabase(), limiterOverrides = {} } = {})
   app.use("/api/auth", authJson);
   app.use("/api/workspace", workspaceJson);
   app.use("/api/telemetry", telemetryJson);
+  app.use("/api/network", telemetryJson);
+  app.use("/api/detections", featureJson);
   app.use("/api/hunter", featureJson);
   app.use("/api/intel", featureJson);
   app.use("/api/ml", featureJson);
@@ -263,6 +283,25 @@ export function createApp({ db = createDatabase(), limiterOverrides = {} } = {})
       audit(db, event);
     } catch (error) {
       console.error("[audit]", error.message);
+    }
+  }
+
+  function publishIngest(workspaceId, result) {
+    publishTelemetry(workspaceId, result.events);
+    if (result.detections?.length) {
+      publishDetections(workspaceId, {
+        detections: result.detections,
+        stats: detectionStats(db, workspaceId),
+      });
+    }
+  }
+
+  function applyAutomationSafe(workspaceId, events) {
+    try {
+      return applyAutomation(db, workspaceId, events);
+    } catch (error) {
+      console.error("[response] Automation failed:", error.message);
+      return [];
     }
   }
 
@@ -604,8 +643,8 @@ export function createApp({ db = createDatabase(), limiterOverrides = {} } = {})
           token: req.telemetryToken || null,
         });
 
-        const proposals = applyAutomation(db, workspaceId, result.events);
-        publishTelemetry(workspaceId, result.events);
+        const proposals = applyAutomationSafe(workspaceId, result.events);
+        publishIngest(workspaceId, result);
 
         if (req.telemetryToken) {
           safeAudit({
@@ -630,6 +669,7 @@ export function createApp({ db = createDatabase(), limiterOverrides = {} } = {})
           accepted: result.events.length,
           blocked: result.blocked,
           events: result.events,
+          detections: result.detections,
           model: result.model,
           automation: proposals,
         });
@@ -722,6 +762,200 @@ export function createApp({ db = createDatabase(), limiterOverrides = {} } = {})
       res.json({ ok: true });
     }
   );
+
+  /* ---------------------------------------------------------------- */
+  /* Rule-based detection                                               */
+  /* ---------------------------------------------------------------- */
+
+  app.get("/api/detections", requireAuth, (req, res) => {
+    const detections = listDetections(db, req.auth.workspaceId, {
+      status: req.query.status,
+      severity: req.query.severity,
+      category: req.query.category,
+      q: req.query.q,
+      limit: req.query.limit,
+    });
+    res.json({
+      detections,
+      stats: detectionStats(db, req.auth.workspaceId),
+      rules: detectionRuleCatalog(),
+    });
+  });
+
+  app.get("/api/detections/rules", requireAuth, (_req, res) => {
+    res.json({ rules: detectionRuleCatalog(), enabled: config.detections.enabled });
+  });
+
+  app.patch(
+    "/api/detections/:id",
+    sensitiveLimiter,
+    requireAuth,
+    requirePermission("hunter:write"),
+    (req, res) => {
+      const parsed = detectionStatusSchema.safeParse(req.body || {});
+      if (!parsed.success) {
+        res.status(400).json({
+          message: "Choose a valid detection status.",
+          details: formatZodError(parsed.error),
+        });
+        return;
+      }
+      const detection = updateDetectionStatus(
+        db,
+        req.auth.workspaceId,
+        req.params.id,
+        parsed.data.status
+      );
+      if (!detection) {
+        res.status(404).json({ message: "Detection not found." });
+        return;
+      }
+      logAudit(db, req, "detection.status", `${detection.id} → ${parsed.data.status}`);
+      res.json({ detection });
+    }
+  );
+
+  app.post(
+    "/api/detections/simulate",
+    sensitiveLimiter,
+    requireAuth,
+    requirePermission("hunter:write"),
+    (req, res, next) => {
+      try {
+        const parsed = detectionSimulationSchema.safeParse(req.body || {});
+        if (!parsed.success) {
+          res.status(400).json({
+            message: "Choose a valid simulation scenario.",
+            details: formatZodError(parsed.error),
+          });
+          return;
+        }
+        const runId = `sim-${new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14)}-${Math.random()
+          .toString(36)
+          .slice(2, 6)}`;
+        const { events, scenarios } = buildAttackSimulation(parsed.data.scenario, { runId });
+        const result = ingestTelemetry(db, req.auth.workspaceId, events, {
+          defaultSource: "attack-simulation",
+          actor: req.auth.user.email,
+        });
+        const proposals = applyAutomationSafe(req.auth.workspaceId, result.events);
+        publishIngest(req.auth.workspaceId, result);
+        logAudit(
+          db,
+          req,
+          "detection.simulate",
+          `${scenarios.join(",")} · ${result.events.length} synthetic event(s) · ${result.detections.length} detection update(s)`
+        );
+        res.status(202).json({
+          ok: true,
+          simulated: true,
+          runId,
+          scenarios,
+          injected: result.events.length,
+          events: result.events,
+          detections: result.detections,
+          stats: detectionStats(db, req.auth.workspaceId),
+          automation: proposals,
+          note: "Synthetic telemetry only. No packet was sent to any target.",
+        });
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
+
+  /* ---------------------------------------------------------------- */
+  /* Authorised network-flow monitoring                                 */
+  /* ---------------------------------------------------------------- */
+
+  app.post(
+    "/api/network/flows",
+    requireTelemetryAuth,
+    ingestLimiter,
+    (req, res, next) => {
+      try {
+        const body = Array.isArray(req.body) ? { flows: req.body } : req.body;
+        const parsed = networkFlowSchema.safeParse(body);
+        if (!parsed.success) {
+          res.status(400).json({
+            message: "Network flow batch validation failed.",
+            details: formatZodError(parsed.error),
+          });
+          return;
+        }
+        const { events, formats } = normalizeNetworkFlows(parsed.data, {
+          sensor: parsed.data.sensor || config.network.sourceLabel,
+        });
+        if (!events.length) {
+          res.status(400).json({
+            message: "No usable flow records were found. Send Zeek, Suricata or NetFlow JSON objects.",
+          });
+          return;
+        }
+
+        const workspaceId = req.telemetryToken?.workspaceId || req.auth.workspaceId;
+        const result = ingestTelemetry(db, workspaceId, events, {
+          defaultSource: parsed.data.source || "network",
+          actor: req.auth?.user?.email || null,
+          token: req.telemetryToken || null,
+        });
+        const proposals = applyAutomationSafe(workspaceId, result.events);
+        publishIngest(workspaceId, result);
+
+        if (req.telemetryToken) {
+          safeAudit({
+            workspaceId,
+            userId: null,
+            action: "network.ingest_token",
+            detail: `${result.events.length} flow(s) via ${req.telemetryToken.prefix} · ${formats.join(",")}`,
+            ip: req.ip,
+            userAgent: req.get("user-agent"),
+          });
+        } else {
+          logAudit(
+            db,
+            req,
+            "network.ingest",
+            `${result.events.length} flow(s) · ${formats.join(",")}`
+          );
+        }
+
+        res.status(202).json({
+          ok: true,
+          accepted: result.events.length,
+          formats,
+          sensor: parsed.data.sensor || config.network.sourceLabel,
+          events: result.events,
+          detections: result.detections,
+          automation: proposals,
+        });
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
+
+  app.get("/api/network/status", requireAuth, (req, res) => {
+    const summary = db
+      .prepare(
+        `SELECT COUNT(*) AS total, MAX(timestamp) AS latest, COUNT(DISTINCT ip) AS sources
+         FROM telemetry_events
+         WHERE workspace_id = ?
+           AND (dst_ip <> '' OR lower(source) IN ('network','zeek','suricata','netflow','sflow','firewall'))`
+      )
+      .get(req.auth.workspaceId);
+    res.json({
+      mode: "live",
+      ingest: "/api/network/flows",
+      stream: "/api/telemetry/stream",
+      sensor: config.network.sourceLabel,
+      total: summary.total || 0,
+      sources: summary.sources || 0,
+      latest: summary.latest || null,
+      formats: ["zeek", "suricata", "netflow", "generic"],
+      note: "Bring your own authorised sensor. Raw packet capture is not performed by the serverless application.",
+    });
+  });
 
   /* ---------------------------------------------------------------- */
   /* Anomaly model                                                     */
@@ -1046,9 +1280,21 @@ export function createApp({ db = createDatabase(), limiterOverrides = {} } = {})
     const stats = telemetryStats(db, req.auth.workspaceId);
     const intel = intelProviderStatus();
     const assistant = assistantStatus();
+    const adapters = connectorStatus(db, req.auth.workspaceId);
+    const network = db
+      .prepare(
+        `SELECT COUNT(*) AS total, MAX(timestamp) AS latest
+         FROM telemetry_events
+         WHERE workspace_id = ?
+           AND (dst_ip <> '' OR lower(source) IN ('network','zeek','suricata','netflow','sflow','firewall'))`
+      )
+      .get(req.auth.workspaceId);
+    const detections = detectionStats(db, req.auth.workspaceId);
+
     res.json({
-      mode: "hybrid",
-      adapters: adapterStatus(),
+      mode: "live",
+      adapters,
+      connectors: adapters,
       live: {
         telemetry: {
           mode: "live",
@@ -1056,6 +1302,20 @@ export function createApp({ db = createDatabase(), limiterOverrides = {} } = {})
           stream: "/api/telemetry/stream",
           total: stats.total,
           last24h: stats.last24h,
+        },
+        network: {
+          mode: "live",
+          ingest: "/api/network/flows",
+          sensor: config.network.sourceLabel,
+          total: network.total || 0,
+          latest: network.latest || null,
+        },
+        detections: {
+          mode: config.detections.enabled ? "live" : "disabled",
+          total: detections.total,
+          open: detections.open,
+          rules: detectionRuleCatalog().length,
+          streamEvent: "detection",
         },
         anomaly: { mode: "live", ...model },
         intel: {
@@ -1066,9 +1326,86 @@ export function createApp({ db = createDatabase(), limiterOverrides = {} } = {})
         },
         assistant,
       },
-      note: "Vendor pull adapters remain mock implementations. Push ingestion, the anomaly model, live intel lookups and the approval workflow are server-side and real.",
+      note:
+        "Pull connectors perform real authenticated HTTP requests to the configured vendor API. Unconfigured connectors are reported honestly and never substituted with fixtures. Push ingestion, network-flow monitoring, detection rules, the anomaly model and live intel are server-side and real.",
     });
   });
+
+  app.post(
+    "/api/connectors/:id/test",
+    sensitiveLimiter,
+    requireAuth,
+    requirePermission("hunter:write"),
+    async (req, res, next) => {
+      try {
+        const result = await testConnector(db, req.auth.workspaceId, req.params.id);
+        logAudit(
+          db,
+          req,
+          "connector.test",
+          `${result.connector.id} · ${result.result.ok ? "ok" : result.result.unconfigured ? "unconfigured" : "failed"}`
+        );
+        res.json(result);
+      } catch (error) {
+        if (error instanceof ConnectorError && error.code === "connector_unknown") {
+          res.status(404).json({ message: error.message, code: error.code });
+          return;
+        }
+        next(error);
+      }
+    }
+  );
+
+  app.post(
+    "/api/connectors/:id/pull",
+    sensitiveLimiter,
+    requireAuth,
+    requirePermission("hunter:write"),
+    async (req, res, next) => {
+      try {
+        const parsed = connectorPullSchema.safeParse(req.body || {});
+        if (!parsed.success) {
+          res.status(400).json({
+            message: "Check the connector pull request.",
+            details: formatZodError(parsed.error),
+          });
+          return;
+        }
+        const pulled = await pullConnector(db, req.auth.workspaceId, req.params.id, parsed.data);
+        const result = ingestTelemetry(db, req.auth.workspaceId, pulled.events, {
+          defaultSource: pulled.connector.id,
+          actor: req.auth.user.email,
+        });
+        const proposals = applyAutomationSafe(req.auth.workspaceId, result.events);
+        publishIngest(req.auth.workspaceId, result);
+        logAudit(
+          db,
+          req,
+          "connector.pull",
+          `${pulled.connector.id} · ${pulled.events.length} event(s)`
+        );
+        res.json({
+          ok: true,
+          connector: pulled.connector,
+          pulled: pulled.events.length,
+          accepted: result.events.length,
+          durationMs: pulled.durationMs,
+          pulledAt: pulled.pulledAt,
+          events: result.events.slice(0, 100),
+          detections: result.detections,
+          model: result.model,
+          automation: proposals,
+        });
+      } catch (error) {
+        if (error instanceof ConnectorError) {
+          const status = error.code === "connector_unknown" ? 404 : 409;
+          res.status(status).json({ message: error.message, code: error.code });
+          return;
+        }
+        next(error);
+      }
+    }
+  );
 
   app.get("/api/audit", requireAuth, requireRole("super_admin"), (req, res) => {
     const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50));

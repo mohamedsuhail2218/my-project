@@ -119,9 +119,29 @@ Add any of these in **Environment** and redeploy:
 | `HUNTER_LLM_MODEL` | Model name, default `gpt-4o-mini` |
 | `ABUSEIPDB_API_KEY` | IP reputation lookups |
 | `OTX_API_KEY` | AlienVault OTX pulse context |
+| `SPLUNK_BASE_URL`, `SPLUNK_API_TOKEN` | Splunk pull connector |
+| `ELASTIC_BASE_URL`, `ELASTIC_API_KEY` | Elastic pull connector |
+| `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `SENTINEL_WORKSPACE_ID` | Microsoft Sentinel connector |
+| `CROWDSTRIKE_CLIENT_ID`, `CROWDSTRIKE_CLIENT_SECRET` | CrowdStrike Falcon connector |
+| `WAZUH_BASE_URL`, `WAZUH_USERNAME`, `WAZUH_PASSWORD` | Wazuh connector |
+| `GENERIC_SIEM_URL`, `GENERIC_EDR_URL` | Generic pull APIs |
 
 Without the LLM endpoint the assistant returns `503 assistant_not_configured`.
 Without the reputation keys, live intelligence is limited to keyless RDAP.
+Unconfigured connectors report `mode: "unconfigured"` and never substitute mocks.
+
+For network monitoring, create a telemetry token in **Settings → Security &
+access** and run the flow shipper on the sensor host:
+
+```bash
+node collectors/flow-shipper.mjs --url https://<service-name>.onrender.com \
+  --token "dtcw_..." --format zeek-tsv --sensor zeek-edge-01 \
+  --file /opt/zeek/logs/current/conn.log
+```
+
+The shipper supports Zeek TSV/JSON, Suricata NDJSON and NetFlow-style JSON.
+Detection thresholds are controlled by the `DETECTION_*` variables in
+`.env.example`.
 
 ## Upgrade to persistent storage
 
@@ -148,7 +168,9 @@ files) first and encrypt backups because they contain password and session hashe
 ## Operational constraints
 
 - **One instance only.** SQLite is single-writer; do not scale the service
-  horizontally and do not enable multiple instances.
+  horizontally and do not enable multiple instances. SSE subscribers and the
+  anomaly model are in-process, so multiple instances would not share live
+  streams even if the database were moved.
 - **HTTPS.** Render terminates TLS. `TRUST_PROXY=1` is required so Express sees
   the forwarded protocol and sets Secure cookies. Do not set `TRUST_PROXY=true`.
 - **Payment number.** It is compiled into the signed-in Subscription page. To

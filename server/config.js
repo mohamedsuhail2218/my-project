@@ -180,6 +180,86 @@ export const config = Object.freeze({
   ingestRateLimit: envInt("INGEST_RATE_LIMIT", 240, { min: 1, max: 1_000_000 }),
   ingestRateWindowMs: envInt("INGEST_RATE_WINDOW_MS", 60_000, { min: 1000 }),
 
+  // Authorised network-flow monitoring. Sensors (Zeek, Suricata or a NetFlow
+  // exporter) post already-captured flows to the authenticated API. Raw packet
+  // capture is deliberately not performed inside the application process,
+  // because serverless platforms cannot host a promiscuous interface.
+  network: {
+    sourceLabel: envString("NETWORK_FLOW_SOURCE", "authorised-sensor"),
+    maxBatch: envInt("NETWORK_FLOW_MAX_BATCH", 500, { min: 1, max: 5000 }),
+  },
+
+  // Stateful detection rules evaluated on every telemetry batch. Thresholds are
+  // counts inside a rolling window, not lifetime counters.
+  detections: {
+    enabled: envBool("DETECTION_RULES_ENABLED", true),
+    windowSeconds: envInt("DETECTION_WINDOW_SECONDS", 300, { min: 30, max: 3600 }),
+    maxEvents: envInt("DETECTION_MAX_EVENTS", 5000, { min: 100, max: 100_000 }),
+    bruteForceThreshold: envInt("DETECTION_BRUTE_FORCE_THRESHOLD", 5, { min: 2, max: 1000 }),
+    portScanThreshold: envInt("DETECTION_PORT_SCAN_THRESHOLD", 8, { min: 3, max: 65535 }),
+    beaconThreshold: envInt("DETECTION_BEACON_THRESHOLD", 5, { min: 3, max: 100 }),
+    fanoutThreshold: envInt("DETECTION_FANOUT_THRESHOLD", 12, { min: 4, max: 1000 }),
+    egressThreshold: envInt("DETECTION_EGRESS_THRESHOLD", 5, { min: 2, max: 1000 }),
+  },
+
+  // Real SIEM/EDR pull connectors. Each provider is enabled only when its
+  // credentials are present; the API reports "unconfigured" rather than
+  // pretending a mock integration is live.
+  connectors: {
+    timeoutMs: envInt("CONNECTOR_TIMEOUT_MS", 15_000, { min: 1000, max: 120_000 }),
+    splunk: {
+      baseUrl: parseFeatureUrl(envString("SPLUNK_BASE_URL"), "SPLUNK_BASE_URL"),
+      token: envString("SPLUNK_API_TOKEN"),
+      username: envString("SPLUNK_USERNAME"),
+      password: envString("SPLUNK_PASSWORD"),
+      index: envString("SPLUNK_INDEX", "main"),
+      query: envString("SPLUNK_QUERY"),
+    },
+    elastic: {
+      baseUrl: parseFeatureUrl(envString("ELASTIC_BASE_URL"), "ELASTIC_BASE_URL"),
+      apiKey: envString("ELASTIC_API_KEY"),
+      username: envString("ELASTIC_USERNAME"),
+      password: envString("ELASTIC_PASSWORD"),
+      index: envString("ELASTIC_INDEX", "logs-*"),
+      query: envString("ELASTIC_QUERY"),
+    },
+    sentinel: {
+      tenantId: envString("AZURE_TENANT_ID"),
+      clientId: envString("AZURE_CLIENT_ID"),
+      clientSecret: envString("AZURE_CLIENT_SECRET"),
+      workspaceId: envString("SENTINEL_WORKSPACE_ID"),
+      query: envString("SENTINEL_QUERY"),
+    },
+    defender: {
+      tenantId: envString("DEFENDER_TENANT_ID") || envString("AZURE_TENANT_ID"),
+      clientId: envString("DEFENDER_CLIENT_ID") || envString("AZURE_CLIENT_ID"),
+      clientSecret: envString("DEFENDER_CLIENT_SECRET") || envString("AZURE_CLIENT_SECRET"),
+    },
+    crowdstrike: {
+      baseUrl: parseFeatureUrl(
+        envString("CROWDSTRIKE_BASE_URL", "https://api.crowdstrike.com"),
+        "CROWDSTRIKE_BASE_URL"
+      ),
+      clientId: envString("CROWDSTRIKE_CLIENT_ID"),
+      clientSecret: envString("CROWDSTRIKE_CLIENT_SECRET"),
+    },
+    wazuh: {
+      baseUrl: parseFeatureUrl(envString("WAZUH_BASE_URL"), "WAZUH_BASE_URL"),
+      username: envString("WAZUH_USERNAME"),
+      password: envString("WAZUH_PASSWORD"),
+    },
+    genericSiem: {
+      url: parseFeatureUrl(envString("GENERIC_SIEM_URL"), "GENERIC_SIEM_URL"),
+      token: envString("GENERIC_SIEM_TOKEN"),
+      label: envString("GENERIC_SIEM_LABEL", "Generic SIEM pull API"),
+    },
+    genericEdr: {
+      url: parseFeatureUrl(envString("GENERIC_EDR_URL"), "GENERIC_EDR_URL"),
+      token: envString("GENERIC_EDR_TOKEN"),
+      label: envString("GENERIC_EDR_LABEL", "Generic EDR pull API"),
+    },
+  },
+
   // LLM assistant. The server supports any OpenAI-compatible chat completion
   // endpoint (OpenAI, Azure-compatible gateways, vLLM, Ollama). An API key is
   // optional so a local model can be used without a cloud account.
