@@ -59,6 +59,13 @@ describe("rule-based attack detection", () => {
     expect(titles).toMatch(/Port scan from/);
     expect(titles).toMatch(/beaconing/i);
 
+    // A denied inbound SYN probe must not also be classified as blocked egress.
+    const egressEntities = response.body.detections
+      .filter((detection) => detection.ruleId === "suspicious_egress")
+      .map((detection) => detection.entity);
+    expect(egressEntities).toContain("ws-sim-egress");
+    expect(egressEntities).not.toContain("edge-fw-sim");
+
     const listed = await admin.get("/api/detections?status=open&limit=100").expect(200);
     expect(listed.body.detections.length).toBeGreaterThanOrEqual(4);
     expect(listed.body.stats.open).toBeGreaterThanOrEqual(4);

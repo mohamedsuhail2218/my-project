@@ -17,7 +17,7 @@ const HOUR_MS = 60 * 60 * 1000;
 const AUTH_RE = /(auth|login|logon|signin|sign-in|password|credential|ssh|rdp|vpn|sudo)/i;
 const FAIL_RE = /(fail|failure|invalid|incorrect|denied|lockout|unable to authenticate|not authorized)/i;
 const SCAN_RE = /(port[\s_-]?scan|scan(ned|ning)?|syn probe|nmap|masscan|zmap|probe)/i;
-const EGRESS_RE = /(egress|outbound|blocked|denied|firewall|exfil|beacon|command.and.control|c2)/i;
+const EGRESS_RE = /(egress|outbound|exfiltrat|exfil|command.and.control|\bc2\b)/i;
 const AUTH_SOURCES = new Set(["vpn", "identity", "auth", "ssh", "rdp", "iam", "windows", "okta", "azure-ad"]);
 const NETWORK_SOURCES = new Set(["network", "zeek", "suricata", "netflow", "sflow", "firewall", "ids", "ips"]);
 
@@ -408,9 +408,17 @@ function knownBadCandidates(db, workspaceId, rows, nowIso) {
   return candidates;
 }
 
+function isEgressAttempt(row) {
+  if (row.status !== "deny") return false;
+  // A denied inbound probe is a scan/blocked-inbound event, not egress. Only
+  // count outbound direction or an explicitly outbound/egress event.
+  if (String(row.direction || "").toLowerCase() === "outbound") return true;
+  return !isScanSignature(row) && EGRESS_RE.test(`${row.event} ${row.action} ${row.message}`);
+}
+
 function egressCandidates(rows) {
   const candidates = [];
-  groupByEntity(rows.filter((row) => row.status === "deny" && EGRESS_RE.test(`${row.event} ${row.message}`))).forEach(
+  groupByEntity(rows.filter(isEgressAttempt)).forEach(
     (group, entity) => {
       const threshold = config.detections.egressThreshold;
       if (group.length < threshold) return;
