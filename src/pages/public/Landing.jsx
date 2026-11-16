@@ -73,10 +73,10 @@ const SIGNALS = [
 function NexusMark({ size = 34 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <path d="M7 29 20 7" stroke="var(--nx-lime)" strokeWidth="3.4" strokeLinecap="square" />
-      <path d="M15 33 28 11" stroke="var(--nx-lime)" strokeWidth="3.4" strokeLinecap="square" />
-      <path d="M23 37 36 15" stroke="var(--nx-blue-bright)" strokeWidth="3.4" strokeLinecap="square" />
-      <path d="M6 6h7M6 6v7" stroke="var(--nx-lime)" strokeWidth="1.1" opacity=".8" />
+      <path d="M7 29 20 7" stroke="var(--nx-accent)" strokeWidth="3.4" strokeLinecap="square" />
+      <path d="M15 33 28 11" stroke="var(--nx-accent)" strokeWidth="3.4" strokeLinecap="square" />
+      <path d="M23 37 36 15" stroke="var(--nx-accent-bright)" strokeWidth="3.4" strokeLinecap="square" />
+      <path d="M6 6h7M6 6v7" stroke="var(--nx-accent)" strokeWidth="1.1" opacity=".8" />
     </svg>
   );
 }
@@ -94,18 +94,18 @@ function TwinCoreArt() {
       >
         <defs>
           <radialGradient id="nxCore" cx="50%" cy="42%" r="62%">
-            <stop offset="0%" stopColor="#e8fbff" stopOpacity=".95" />
-            <stop offset="24%" stopColor="#66e5ff" stopOpacity=".62" />
-            <stop offset="56%" stopColor="#1f4dff" stopOpacity=".22" />
-            <stop offset="100%" stopColor="#1f4dff" stopOpacity="0" />
+            <stop offset="0%" stopColor="#fff0f2" stopOpacity=".95" />
+            <stop offset="24%" stopColor="#ff5c70" stopOpacity=".62" />
+            <stop offset="56%" stopColor="#e11d33" stopOpacity=".22" />
+            <stop offset="100%" stopColor="#e11d33" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="nxRing" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#c8ff00" />
-            <stop offset="52%" stopColor="#58e7ff" />
-            <stop offset="100%" stopColor="#1f4dff" />
+            <stop offset="0%" stopColor="#ff3355" />
+            <stop offset="52%" stopColor="#ff5c70" />
+            <stop offset="100%" stopColor="#e11d33" />
           </linearGradient>
           <pattern id="nxHeroGrid" width="34" height="34" patternUnits="userSpaceOnUse">
-            <path d="M34 0H0V34" fill="none" stroke="rgba(132,186,255,.24)" strokeWidth=".55" />
+            <path d="M34 0H0V34" fill="none" stroke="rgba(255, 140, 155, .24)" strokeWidth=".55" />
           </pattern>
           <filter id="nxGlow" x="-60%" y="-60%" width="220%" height="220%">
             <feGaussianBlur stdDeviation="5" result="blur" />
@@ -129,17 +129,17 @@ function TwinCoreArt() {
         </g>
 
         <g clipPath="url(#nxGlobeClip)">
-          <circle cx="280" cy="330" r="148" fill="#06122f" fillOpacity=".55" stroke="#64e6ff" strokeOpacity=".55" />
-          <ellipse cx="280" cy="330" rx="148" ry="42" fill="none" stroke="#64e6ff" strokeOpacity=".25" />
-          <ellipse cx="280" cy="330" rx="148" ry="86" fill="none" stroke="#64e6ff" strokeOpacity=".18" />
-          <ellipse cx="280" cy="330" rx="148" ry="124" fill="none" stroke="#64e6ff" strokeOpacity=".12" />
-          <ellipse cx="280" cy="330" rx="42" ry="148" fill="none" stroke="#64e6ff" strokeOpacity=".22" />
-          <ellipse cx="280" cy="330" rx="86" ry="148" fill="none" stroke="#64e6ff" strokeOpacity=".16" />
-          <ellipse cx="280" cy="330" rx="124" ry="148" fill="none" stroke="#64e6ff" strokeOpacity=".1" />
+          <circle cx="280" cy="330" r="148" fill="#1a060c" fillOpacity=".55" stroke="#ff5c70" strokeOpacity=".55" />
+          <ellipse cx="280" cy="330" rx="148" ry="42" fill="none" stroke="#ff5c70" strokeOpacity=".25" />
+          <ellipse cx="280" cy="330" rx="148" ry="86" fill="none" stroke="#ff5c70" strokeOpacity=".18" />
+          <ellipse cx="280" cy="330" rx="148" ry="124" fill="none" stroke="#ff5c70" strokeOpacity=".12" />
+          <ellipse cx="280" cy="330" rx="42" ry="148" fill="none" stroke="#ff5c70" strokeOpacity=".22" />
+          <ellipse cx="280" cy="330" rx="86" ry="148" fill="none" stroke="#ff5c70" strokeOpacity=".16" />
+          <ellipse cx="280" cy="330" rx="124" ry="148" fill="none" stroke="#ff5c70" strokeOpacity=".1" />
           <path
             className="nx-scan-line"
             d="M120 300 H440"
-            stroke="#c8ff00"
+            stroke="#ff3355"
             strokeWidth="1.4"
             opacity=".55"
           />
@@ -148,24 +148,24 @@ function TwinCoreArt() {
         <g filter="url(#nxGlow)">
           <polygon
             points="280,255 344,292 344,366 280,403 216,366 216,292"
-            fill="#1f4dff"
+            fill="#e11d33"
             fillOpacity=".14"
-            stroke="#c8ff00"
+            stroke="#ff3355"
             strokeWidth="1.45"
           />
           <polygon
             points="280,285 318,307 318,351 280,373 242,351 242,307"
-            fill="#58e7ff"
+            fill="#ff5c70"
             fillOpacity=".1"
-            stroke="#58e7ff"
+            stroke="#ff5c70"
             strokeWidth="1"
           />
-          <circle cx="280" cy="329" r="9" fill="#c8ff00" />
-          <circle cx="280" cy="329" r="21" fill="none" stroke="#c8ff00" strokeOpacity=".5" />
-          <circle cx="280" cy="329" r="34" fill="none" stroke="#c8ff00" strokeOpacity=".16" />
+          <circle cx="280" cy="329" r="9" fill="#ff3355" />
+          <circle cx="280" cy="329" r="21" fill="none" stroke="#ff3355" strokeOpacity=".5" />
+          <circle cx="280" cy="329" r="34" fill="none" stroke="#ff3355" strokeOpacity=".16" />
         </g>
 
-        <g className="nx-nodes" stroke="#58e7ff" strokeOpacity=".5" fill="none">
+        <g className="nx-nodes" stroke="#ff5c70" strokeOpacity=".5" fill="none">
           <path d="M280 329 120 218" strokeDasharray="2 6" />
           <path d="M280 329 438 194" strokeDasharray="2 6" />
           <path d="M280 329 470 442" strokeDasharray="2 6" />
@@ -183,7 +183,7 @@ function TwinCoreArt() {
           { x: 386, y: 546, label: "EVIDENCE", tone: "lime" },
         ].map((node) => (
           <g key={node.label} className={`nx-node nx-node-${node.tone}`}>
-            <circle cx={node.x} cy={node.y} r="18" fill="#071126" fillOpacity=".85" stroke="currentColor" />
+            <circle cx={node.x} cy={node.y} r="18" fill="#1a060c" fillOpacity=".85" stroke="currentColor" />
             <circle cx={node.x} cy={node.y} r="4" fill="currentColor" />
             <text
               x={node.x + 26}
@@ -198,11 +198,11 @@ function TwinCoreArt() {
           </g>
         ))}
 
-        <g fill="#9db6e8" fontFamily="var(--nx-mono)" fontSize="10.5" letterSpacing="2.2" opacity=".62">
+        <g fill="#e2bcc4" fontFamily="var(--nx-mono)" fontSize="10.5" letterSpacing="2.2" opacity=".62">
           <text x="34" y="46">SIMULATION LATTICE</text>
           <text x="368" y="620">HUNTER-CORE / v4.1</text>
         </g>
-        <g stroke="#c8ff00" strokeWidth="1">
+        <g stroke="#ff3355" strokeWidth="1">
           <path d="M22 22h14M22 22v14" />
           <path d="M538 638h-14M538 638v-14" />
         </g>
@@ -236,7 +236,7 @@ function TwinPreview() {
         <span>LIVE</span>
       </div>
       <svg viewBox="0 0 320 160" className="nx-preview-svg" aria-hidden="true">
-        <g stroke="rgba(120,180,255,.35)" strokeWidth="1" fill="none">
+        <g stroke="rgba(255, 140, 155, .35)" strokeWidth="1" fill="none">
           <path d="M48 86 112 48 182 78 260 44" />
           <path d="M48 86 124 124 206 108 260 44" />
           <path d="M112 48 124 124" />
@@ -251,9 +251,9 @@ function TwinPreview() {
           [206, 108, "s3"],
         ].map(([x, y, name]) => (
           <g key={name}>
-            <circle cx={x} cy={y} r="13" fill="#071126" stroke="#58e7ff" strokeWidth="1" />
-            <circle cx={x} cy={y} r="3" fill="#c8ff00" />
-            <text x={x} y={y + 25} textAnchor="middle" fill="#9db6e8" fontSize="10" fontFamily="var(--nx-mono)" letterSpacing="1">
+            <circle cx={x} cy={y} r="13" fill="#1a060c" stroke="#ff5c70" strokeWidth="1" />
+            <circle cx={x} cy={y} r="3" fill="#ff3355" />
+            <text x={x} y={y + 25} textAnchor="middle" fill="#e2bcc4" fontSize="10" fontFamily="var(--nx-mono)" letterSpacing="1">
               {name.toUpperCase()}
             </text>
           </g>
@@ -340,13 +340,13 @@ function ConnectCore() {
     <svg viewBox="0 0 420 420" className="nx-connect-art" aria-hidden="true">
       <defs>
         <linearGradient id="nxConnectLine" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#c8ff00" />
-          <stop offset="100%" stopColor="#58e7ff" />
+          <stop offset="0%" stopColor="#ff3355" />
+          <stop offset="100%" stopColor="#ff5c70" />
         </linearGradient>
         <radialGradient id="nxConnectGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#58e7ff" stopOpacity=".5" />
-          <stop offset="55%" stopColor="#1f4dff" stopOpacity=".2" />
-          <stop offset="100%" stopColor="#1f4dff" stopOpacity="0" />
+          <stop offset="0%" stopColor="#ff5c70" stopOpacity=".5" />
+          <stop offset="55%" stopColor="#e11d33" stopOpacity=".2" />
+          <stop offset="100%" stopColor="#e11d33" stopOpacity="0" />
         </radialGradient>
         <filter id="nxConnectBlur">
           <feGaussianBlur stdDeviation="7" />
@@ -359,19 +359,19 @@ function ConnectCore() {
         <ellipse cx="210" cy="210" rx="168" ry="58" strokeWidth=".7" transform="rotate(58 210 210)" />
       </g>
       <g className="nx-cube" fill="none" stroke="url(#nxConnectLine)" strokeWidth="1.15">
-        <polygon points="210,72 330,141 330,279 210,348 90,279 90,141" fill="#1f4dff" fillOpacity=".08" />
+        <polygon points="210,72 330,141 330,279 210,348 90,279 90,141" fill="#e11d33" fillOpacity=".08" />
         <path d="M210 72 210 210 90 279" />
         <path d="M210 210 330 141" />
         <path d="M210 210 330 279" />
         <path d="M210 210 90 141" />
         <path d="M210 210 210 348" />
-        <polygon points="210,108 294,157 294,263 210,312 126,263 126,157" fill="#58e7ff" fillOpacity=".05" />
+        <polygon points="210,108 294,157 294,263 210,312 126,263 126,157" fill="#ff5c70" fillOpacity=".05" />
       </g>
       <g filter="url(#nxConnectBlur)" opacity=".8">
-        <circle cx="210" cy="210" r="26" fill="#58e7ff" />
+        <circle cx="210" cy="210" r="26" fill="#ff5c70" />
       </g>
-      <circle cx="210" cy="210" r="12" fill="#c8ff00" />
-      <circle cx="210" cy="210" r="27" fill="none" stroke="#c8ff00" strokeOpacity=".55" />
+      <circle cx="210" cy="210" r="12" fill="#ff3355" />
+      <circle cx="210" cy="210" r="27" fill="none" stroke="#ff3355" strokeOpacity=".55" />
       {[
         [210, 72],
         [330, 141],
@@ -380,7 +380,7 @@ function ConnectCore() {
         [90, 279],
         [90, 141],
       ].map(([x, y]) => (
-        <circle key={`${x}-${y}`} cx={x} cy={y} r="4" fill="#c8ff00" />
+        <circle key={`${x}-${y}`} cx={x} cy={y} r="4" fill="#ff3355" />
       ))}
     </svg>
   );

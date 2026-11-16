@@ -219,7 +219,7 @@ export default function HunterDashboard() {
             <span className="small-meta">ROLLING 12 HOURS</span>
             <Badge tone="high">Elevated</Badge>
           </div>
-          <Sparkline values={detectionTrend} color="#a78bfa" height={72} />
+          <Sparkline values={detectionTrend} color="#fb7185" height={72} />
           <div className="mt-16">
             <div className="stack-6">
               {severityCounts.map((item) => (
@@ -325,7 +325,7 @@ export default function HunterDashboard() {
               <tbody>
                 {state.intel.slice(0, 5).map((ioc) => (
                   <tr key={ioc.id}>
-                    <td className="mono" style={{ fontSize: 12, color: "#7dd3fc", maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis" }}>{ioc.value}</td>
+                    <td className="mono" style={{ fontSize: 12, color: "#ff9aa8", maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis" }}>{ioc.value}</td>
                     <td><Badge tone="neutral">{ioc.type}</Badge></td>
                     <td>
                       <Badge tone={ioc.verdict === "malicious" ? "critical" : ioc.verdict === "suspicious" ? "high" : "success"}>

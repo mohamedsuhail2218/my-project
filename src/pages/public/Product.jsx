@@ -106,7 +106,7 @@ function MiniEvidence() {
           <div key={name} style={{ padding: "9px 0", borderBottom: "1px solid var(--border-soft)" }}>
             <div className="mono" style={{ fontSize: 12, color: "var(--text-soft)" }}>{name}</div>
             <div className="tiny dim mt-6">{type}</div>
-            <div className="mono mt-6" style={{ fontSize: 10.5, color: "#7dd3fc" }}>{hash}</div>
+            <div className="mono mt-6" style={{ fontSize: 10.5, color: "#ff9aa8" }}>{hash}</div>
           </div>
         ))}
       </div>

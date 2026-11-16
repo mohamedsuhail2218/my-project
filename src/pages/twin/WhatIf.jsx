@@ -289,12 +289,12 @@ export default function WhatIf() {
               </div>
               <div className="compare-row">
                 <span className="k">Likelihood</span>
-                <DualBar before={risk.likelihood} after={projectedRisk.likelihood} tone="#22d3ee" />
+                <DualBar before={risk.likelihood} after={projectedRisk.likelihood} tone="#ff3b52" />
                 <span className="v">{risk.likelihood} → {projectedRisk.likelihood}</span>
               </div>
               <div className="compare-row">
                 <span className="k">Impact</span>
-                <DualBar before={risk.impact} after={projectedRisk.impact} tone="#a78bfa" />
+                <DualBar before={risk.impact} after={projectedRisk.impact} tone="#fb7185" />
                 <span className="v">{risk.impact} → {projectedRisk.impact}</span>
               </div>
               <div className="compare-row">
@@ -310,7 +310,7 @@ export default function WhatIf() {
             </div>
             <div className="compare-legend mt-16">
               <span><i style={{ background: "#3f5876" }} /> Today</span>
-              <span><i style={{ background: "#22d3ee" }} /> Projected twin</span>
+              <span><i style={{ background: "#ff3b52" }} /> Projected twin</span>
               <span style={{ marginLeft: "auto" }} className="small-meta">
                 THE PROJECTION DOES NOT COMMIT UNTIL APPLIED
               </span>

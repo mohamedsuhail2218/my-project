@@ -26,9 +26,9 @@
 }
 
 .scenario-card.active {
-  border-color: rgba(34, 211, 238, 0.45);
-  background: linear-gradient(180deg, rgba(6, 182, 212, 0.08), transparent 60%), #07111d;
-  box-shadow: 0 0 36px -20px rgba(34, 211, 238, 0.65);
+  border-color: rgba(255, 59, 82, 0.45);
+  background: linear-gradient(180deg, rgba(225, 29, 51, 0.08), transparent 60%), #07111d;
+  box-shadow: 0 0 36px -20px rgba(255, 59, 82, 0.65);
 }
 
 .scenario-top {
@@ -56,8 +56,8 @@
 }
 
 .scenario-card.active .scenario-icon {
-  border-color: rgba(34, 211, 238, 0.25);
-  background: rgba(6, 182, 212, 0.08);
+  border-color: rgba(255, 59, 82, 0.25);
+  background: rgba(225, 29, 51, 0.08);
   color: var(--cyan);
 }
 
@@ -135,9 +135,9 @@
   width: 45px;
   height: 45px;
   flex-shrink: 0;
-  border: 1px solid rgba(34, 211, 238, 0.2);
+  border: 1px solid rgba(255, 59, 82, 0.2);
   border-radius: 10px;
-  background: rgba(6, 182, 212, 0.07);
+  background: rgba(225, 29, 51, 0.07);
   color: var(--cyan);
 }
 
@@ -168,8 +168,8 @@
 }
 
 .runner-step.active {
-  border-color: rgba(34, 211, 238, 0.35);
-  background: rgba(6, 182, 212, 0.035);
+  border-color: rgba(255, 59, 82, 0.35);
+  background: rgba(225, 29, 51, 0.035);
 }
 
 .runner-step.blocked {
@@ -272,7 +272,7 @@
 }
 
 .terminal-line.info {
-  color: #7dd3fc;
+  color: #ff9aa8;
 }
 
 .terminal-line.ok {
@@ -509,7 +509,7 @@
 }
 
 .matrix-cell.l2 {
-  background: rgba(59, 130, 246, 0.1);
+  background: rgba(255, 59, 82, 0.1);
 }
 
 .matrix-cell.l3 {
@@ -689,7 +689,7 @@
 }
 
 .healing-step.active .healing-num {
-  border-color: rgba(34, 211, 238, 0.35);
+  border-color: rgba(255, 59, 82, 0.35);
   color: var(--cyan);
 }
 
@@ -738,8 +738,8 @@
 }
 
 .vs-team.blue {
-  border-color: rgba(96, 165, 250, 0.24);
-  background: rgba(59, 130, 246, 0.045);
+  border-color: rgba(255, 143, 158, 0.24);
+  background: rgba(255, 59, 82, 0.045);
 }
 
 .vs-team-label {
@@ -757,7 +757,7 @@
 }
 
 .vs-team.blue .vs-team-label {
-  color: #93c5fd;
+  color: #ffadb9;
 }
 
 .vs-score {
@@ -773,7 +773,7 @@
 }
 
 .vs-team.blue .vs-score {
-  color: #bfdbfe;
+  color: #ffc9d1;
 }
 
 .vs-team-sub {
@@ -839,7 +839,7 @@
 }
 
 .battle-side.blue .side-label {
-  color: #93c5fd;
+  color: #ffadb9;
 }
 
 .battle-side .side-text {
@@ -912,7 +912,7 @@
 .dual-bar .bar-b {
   top: 4px;
   background: var(--cyan);
-  box-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+  box-shadow: 0 0 8px rgba(255, 59, 82, 0.4);
 }
 
 .compare-legend {
@@ -957,8 +957,8 @@
 }
 
 .control-toggle.on {
-  border-color: rgba(34, 211, 238, 0.3);
-  background: rgba(6, 182, 212, 0.045);
+  border-color: rgba(255, 59, 82, 0.3);
+  background: rgba(225, 29, 51, 0.045);
 }
 
 .control-toggle .box {
@@ -974,8 +974,8 @@
 }
 
 .control-toggle.on .box {
-  border-color: rgba(34, 211, 238, 0.5);
-  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(255, 59, 82, 0.5);
+  background: rgba(225, 29, 51, 0.15);
   color: var(--cyan);
 }
 
@@ -1022,7 +1022,7 @@
 }
 
 .sev-marker.low {
-  background: var(--blue);
+  background: var(--green);
 }
 
 .confidence-bar {
@@ -1087,8 +1087,8 @@
 
 .log-upload:hover,
 .log-upload.dragging {
-  border-color: rgba(34, 211, 238, 0.5);
-  background: rgba(6, 182, 212, 0.035);
+  border-color: rgba(255, 59, 82, 0.5);
+  background: rgba(225, 29, 51, 0.035);
 }
 
 .log-upload svg {
@@ -1131,7 +1131,7 @@
   border: 1px solid var(--border-soft);
   border-radius: 8px;
   background: #02070e;
-  color: #93c5fd;
+  color: #ffadb9;
   font-family: var(--mono);
   font-size: 12px;
   line-height: 1.65;
@@ -1165,9 +1165,9 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(167, 139, 250, 0.25);
+  border: 1px solid rgba(251, 113, 133, 0.25);
   border-radius: 9px;
-  background: rgba(139, 92, 246, 0.07);
+  background: rgba(225, 29, 72, 0.07);
   color: var(--violet);
   font-family: var(--display);
   font-size: 13px;
@@ -1258,14 +1258,14 @@
   border: 1px solid var(--border);
   border-radius: 10px;
   background:
-    radial-gradient(400px 200px at 0% 0%, rgba(6, 182, 212, 0.06), transparent 60%),
+    radial-gradient(400px 200px at 0% 0%, rgba(225, 29, 51, 0.06), transparent 60%),
     rgba(3, 9, 18, 0.4);
 }
 
 .result-value {
   font-family: var(--mono);
   font-size: 15px;
-  color: #a5f3fc;
+  color: #ffd2d9;
   word-break: break-all;
 }
 
@@ -1314,7 +1314,7 @@
 }
 
 .pivot:hover {
-  border-color: rgba(34, 211, 238, 0.35);
+  border-color: rgba(255, 59, 82, 0.35);
   color: var(--cyan);
 }
 
@@ -1404,8 +1404,8 @@
 }
 
 .status-step.active {
-  border-color: rgba(34, 211, 238, 0.35);
-  background: rgba(6, 182, 212, 0.08);
+  border-color: rgba(255, 59, 82, 0.35);
+  background: rgba(225, 29, 51, 0.08);
   color: var(--cyan);
 }
 
@@ -1498,12 +1498,12 @@ button.timeline-event:hover {
 
 .timeline-dot.violet {
   background: var(--violet);
-  box-shadow: 0 0 8px rgba(167, 139, 250, 0.5);
+  box-shadow: 0 0 8px rgba(251, 113, 133, 0.5);
 }
 
 .timeline-dot.info {
   background: var(--cyan);
-  box-shadow: 0 0 8px rgba(103, 232, 249, 0.45);
+  box-shadow: 0 0 8px rgba(255, 128, 145, 0.45);
 }
 
 .timeline-dot.neutral {
@@ -1513,6 +1513,7 @@ button.timeline-event:hover {
 .timeline-event-body {
   flex: 1;
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .timeline-event-title {
@@ -1588,7 +1589,7 @@ button.timeline-event:hover {
   background: rgba(2, 7, 14, 0.65);
   font-family: var(--mono);
   font-size: 11.5px;
-  color: #7dd3fc;
+  color: #ff9aa8;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1654,9 +1655,9 @@ button.timeline-event:hover {
   justify-content: center;
   width: 34px;
   height: 34px;
-  border: 1px solid rgba(34, 211, 238, 0.17);
+  border: 1px solid rgba(255, 59, 82, 0.17);
   border-radius: 8px;
-  background: rgba(6, 182, 212, 0.05);
+  background: rgba(225, 29, 51, 0.05);
   color: var(--cyan);
 }
 
@@ -1745,8 +1746,8 @@ button.timeline-event:hover {
 }
 
 .settings-nav button.active {
-  background: rgba(6, 182, 212, 0.09);
-  color: #a5f3fc;
+  background: rgba(225, 29, 51, 0.09);
+  color: #ffd2d9;
 }
 
 .settings-section {
@@ -1818,10 +1819,10 @@ button.timeline-event:hover {
   justify-content: space-between;
   gap: 20px;
   padding: 22px;
-  border: 1px solid rgba(34, 211, 238, 0.25);
+  border: 1px solid rgba(255, 59, 82, 0.25);
   border-radius: 12px;
   background:
-    radial-gradient(600px 300px at 0% 0%, rgba(6, 182, 212, 0.09), transparent 65%),
+    radial-gradient(600px 300px at 0% 0%, rgba(225, 29, 51, 0.09), transparent 65%),
     #07101d;
 }
 
@@ -1896,7 +1897,7 @@ button.timeline-event:hover {
 }
 
 .palette-type:hover {
-  border-color: rgba(34, 211, 238, 0.3);
+  border-color: rgba(255, 59, 82, 0.3);
   color: var(--text-soft);
 }
 
@@ -1932,9 +1933,9 @@ button.timeline-event:hover {
 }
 
 .asset-row.active {
-  border-color: rgba(34, 211, 238, 0.25);
-  background: rgba(6, 182, 212, 0.06);
-  color: #a5f3fc;
+  border-color: rgba(255, 59, 82, 0.25);
+  background: rgba(225, 29, 51, 0.06);
+  color: #ffd2d9;
 }
 
 .asset-row svg {
@@ -1992,7 +1993,7 @@ button.timeline-event:hover {
 .history-row-detail {
   padding: 14px 18px;
   border-bottom: 1px solid var(--border-soft);
-  background: rgba(6, 182, 212, 0.018);
+  background: rgba(225, 29, 51, 0.018);
 }
 
 .mini-stat-row {
@@ -2048,10 +2049,10 @@ button.timeline-event:hover {
   justify-content: space-between;
   gap: 16px;
   padding: 15px 18px;
-  border: 1px solid rgba(34, 211, 238, 0.18);
+  border: 1px solid rgba(255, 59, 82, 0.18);
   border-radius: 10px;
   background:
-    linear-gradient(90deg, rgba(6, 182, 212, 0.07), transparent 55%),
+    linear-gradient(90deg, rgba(225, 29, 51, 0.07), transparent 55%),
     #070e1a;
 }
 

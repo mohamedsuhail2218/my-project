@@ -79,10 +79,10 @@ const TONE_ACCENTS = {
   critical: "rgba(248, 113, 113, 0.18)",
   high: "rgba(251, 146, 60, 0.16)",
   medium: "rgba(251, 191, 36, 0.14)",
-  low: "rgba(96, 165, 250, 0.14)",
+  low: "rgba(52, 211, 153, 0.14)",
   success: "rgba(52, 211, 153, 0.14)",
-  info: "rgba(34, 211, 238, 0.14)",
-  violet: "rgba(167, 139, 250, 0.16)",
+  info: "rgba(255, 59, 82, 0.14)",
+  violet: "rgba(251, 113, 133, 0.16)",
 };
 
 export function StatCard({ label, value, unit, icon, foot, delta, deltaTone, tone, accent }) {
@@ -110,7 +110,7 @@ const RING_COLORS = {
   critical: "#f87171",
   high: "#fb923c",
   medium: "#fbbf24",
-  low: "#60a5fa",
+  low: "#34d399",
   success: "#34d399",
 };
 
@@ -160,7 +160,7 @@ export function ScoreRing({ value = 0, size = 48, tone = "violet" }) {
   const radius = (size - stroke) / 2 - 1;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (Math.min(100, Math.max(0, value)) / 100) * circumference;
-  const colors = { violet: "#a78bfa", cyan: "#22d3ee", red: "#f87171", green: "#34d399", amber: "#fbbf24" };
+  const colors = { violet: "#fb7185", cyan: "#ff3b52", red: "#f87171", green: "#34d399", amber: "#fbbf24" };
   const color = colors[tone] || colors.violet;
   return (
     <div className="score-ring-sm" style={{ width: size, height: size }}>
@@ -193,7 +193,7 @@ export function Progress({ value = 0, tone }) {
   );
 }
 
-export function Sparkline({ values = [], color = "#22d3ee", height = 46 }) {
+export function Sparkline({ values = [], color = "#ff3b52", height = 46 }) {
   const id = useId().replace(/[:]/g, "");
   if (!values.length) return null;
   const max = Math.max(...values, 1);

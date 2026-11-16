@@ -165,7 +165,7 @@ export default function AttackPaths() {
                   display: "flex",
                   width: "100%",
                   textAlign: "left",
-                  background: scenario.id === item.id ? "rgba(6,182,212,.045)" : undefined,
+                  background: scenario.id === item.id ? "rgba(225, 29, 51, .045)" : undefined,
                 }}
               >
                 <span className={`finding-sev-bar ${item.severity}`} />

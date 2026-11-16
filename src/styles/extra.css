@@ -98,7 +98,7 @@
   padding: 11px 13px;
   border: 1px solid var(--border);
   border-radius: 9px;
-  background: rgba(6, 182, 212, 0.035);
+  background: rgba(225, 29, 51, 0.035);
   color: var(--muted);
   font-size: 13px;
   line-height: 1.55;
@@ -203,8 +203,8 @@
   max-width: 40px;
   margin: 0 auto;
   border-radius: 3px 3px 1px 1px;
-  background: linear-gradient(180deg, rgba(34, 211, 238, 0.85), rgba(6, 182, 212, 0.15));
-  box-shadow: 0 0 14px -6px rgba(34, 211, 238, 0.6);
+  background: linear-gradient(180deg, rgba(255, 59, 82, 0.85), rgba(225, 29, 51, 0.15));
+  box-shadow: 0 0 14px -6px rgba(255, 59, 82, 0.6);
   transition: height 350ms ease;
 }
 
@@ -261,14 +261,14 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(700px 280px at 0% 0%, rgba(6, 182, 212, 0.07), transparent 65%),
+    radial-gradient(700px 280px at 0% 0%, rgba(225, 29, 51, 0.07), transparent 65%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 40%),
     #070d19;
 }
 
 .brief-hero.violet {
   background:
-    radial-gradient(700px 280px at 0% 0%, rgba(139, 92, 246, 0.09), transparent 65%),
+    radial-gradient(700px 280px at 0% 0%, rgba(225, 29, 72, 0.09), transparent 65%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 40%),
     #070d19;
 }
@@ -325,7 +325,7 @@
 .report-preview code {
   font-family: var(--mono);
   font-size: 12.5px;
-  color: #7dd3fc;
+  color: #ff9aa8;
 }
 
 .filter-row {
@@ -374,9 +374,9 @@
   justify-content: center;
   width: 22px;
   height: 22px;
-  border: 1px solid rgba(34, 211, 238, 0.25);
+  border: 1px solid rgba(255, 59, 82, 0.25);
   border-radius: 6px;
-  background: rgba(6, 182, 212, 0.06);
+  background: rgba(225, 29, 51, 0.06);
   color: var(--cyan);
   font-family: var(--mono);
   font-size: 11.5px;

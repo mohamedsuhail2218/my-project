@@ -207,7 +207,7 @@ export default function Subscription() {
         </Panel>
 
         <Panel title="Pay by UPI" icon={<Smartphone size={15} />}>
-          <div style={{ padding: 16, border: "1px solid var(--border-soft)", borderRadius: 10, background: "linear-gradient(135deg, rgba(6,182,212,.08), rgba(139,92,246,.05))" }}>
+          <div style={{ padding: 16, border: "1px solid var(--border-soft)", borderRadius: 10, background: "linear-gradient(135deg, rgba(225, 29, 51, .08), rgba(225, 29, 72, .05))" }}>
             <div className="row between">
               <span className="badge info">UPI · MANUAL VERIFICATION</span>
               <Smartphone size={19} className="dim" />

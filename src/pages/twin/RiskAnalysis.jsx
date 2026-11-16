@@ -254,9 +254,9 @@ export default function RiskAnalysis() {
                         className={`matrix-cell${level > 1 ? ` l${level}` : ""}`}
                         onClick={() => setSelectedCell(key)}
                         style={{
-                          border: active ? "1px solid rgba(34,211,238,.55)" : "1px solid transparent",
+                          border: active ? "1px solid rgba(255, 59, 82, .55)" : "1px solid transparent",
                           cursor: "pointer",
-                          background: active ? "rgba(6,182,212,.18)" : undefined,
+                          background: active ? "rgba(225, 29, 51, .18)" : undefined,
                         }}
                         title={`${IMPACT_LABELS[impact]} impact × ${LIKELIHOOD_LABELS[likelihood]} likelihood · ${assets.length} asset(s)`}
                       >

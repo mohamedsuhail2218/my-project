@@ -43,7 +43,7 @@
   width: 36px;
   height: 36px;
   border-radius: 9px;
-  background: radial-gradient(circle at 50% 40%, rgba(6, 182, 212, 0.15), transparent 70%);
+  background: radial-gradient(circle at 50% 40%, rgba(225, 29, 51, 0.15), transparent 70%);
 }
 
 .brand-text {
@@ -70,7 +70,7 @@
   font-size: 11.5px;
   letter-spacing: 0.19em;
   text-transform: uppercase;
-  color: #a78bfa;
+  color: #fb7185;
 }
 
 .brand.compact .brand-sub {
@@ -125,7 +125,7 @@
   height: 620px;
   transform: translateX(-50%);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.09), transparent 65%);
+  background: radial-gradient(circle, rgba(225, 29, 51, 0.09), transparent 65%);
   pointer-events: none;
 }
 
@@ -158,7 +158,7 @@
 
 .hero h1 .accent {
   color: var(--cyan);
-  text-shadow: 0 0 35px rgba(34, 211, 238, 0.28);
+  text-shadow: 0 0 35px rgba(255, 59, 82, 0.28);
 }
 
 .hero-lede {
@@ -214,7 +214,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(800px 340px at 50% -20%, rgba(6, 182, 212, 0.08), transparent 60%),
+    radial-gradient(800px 340px at 50% -20%, rgba(225, 29, 51, 0.08), transparent 60%),
     linear-gradient(180deg, #08101e, #050b15);
   box-shadow: 0 50px 100px -50px rgba(0, 0, 0, 1), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
@@ -375,7 +375,7 @@
 }
 
 .hero-topology .pulse {
-  fill: rgba(34, 211, 238, 0.12);
+  fill: rgba(255, 59, 82, 0.12);
   animation: hero-pulse 3s ease-out infinite;
 }
 
@@ -624,9 +624,9 @@
   justify-content: center;
   width: 38px;
   height: 38px;
-  border: 1px solid rgba(34, 211, 238, 0.17);
+  border: 1px solid rgba(255, 59, 82, 0.17);
   border-radius: 9px;
-  background: rgba(6, 182, 212, 0.07);
+  background: rgba(225, 29, 51, 0.07);
   color: var(--cyan);
 }
 
@@ -862,11 +862,11 @@
 }
 
 .price-card.featured {
-  border-color: rgba(34, 211, 238, 0.4);
+  border-color: rgba(255, 59, 82, 0.4);
   background:
-    radial-gradient(500px 300px at 50% 0%, rgba(6, 182, 212, 0.08), transparent 60%),
+    radial-gradient(500px 300px at 50% 0%, rgba(225, 29, 51, 0.08), transparent 60%),
     linear-gradient(180deg, #081524, #060d18);
-  box-shadow: 0 0 70px -34px rgba(34, 211, 238, 0.55);
+  box-shadow: 0 0 70px -34px rgba(255, 59, 82, 0.55);
 }
 
 .price-flag {
@@ -876,7 +876,7 @@
   padding: 3px 10px;
   border-radius: 999px;
   background: var(--cyan);
-  color: #04141a;
+  color: #170205;
   font-family: var(--mono);
   font-size: 11.5px;
   font-weight: 700;
@@ -1016,8 +1016,8 @@
 }
 
 .product-tabs button.active {
-  background: rgba(6, 182, 212, 0.13);
-  color: #a5f3fc;
+  background: rgba(225, 29, 51, 0.13);
+  color: #ffd2d9;
 }
 
 .product-showcase {
@@ -1243,8 +1243,8 @@
   border-right: 1px solid var(--border-soft);
   overflow: hidden;
   background:
-    radial-gradient(600px 500px at 20% 10%, rgba(6, 182, 212, 0.1), transparent 60%),
-    radial-gradient(500px 400px at 90% 90%, rgba(139, 92, 246, 0.08), transparent 55%);
+    radial-gradient(600px 500px at 20% 10%, rgba(255, 59, 82, 0.18), transparent 62%),
+    radial-gradient(500px 400px at 90% 90%, rgba(225, 29, 72, 0.14), transparent 58%);
 }
 
 .auth-side .brand {
@@ -1312,11 +1312,11 @@
 .auth-card {
   width: min(430px, 100%);
   padding: 30px 32px;
-  border: 1px solid rgba(96, 140, 205, 0.24);
+  border: 1px solid rgba(255, 110, 128, 0.32);
   border-radius: 18px;
   background:
-    radial-gradient(120% 90% at 100% 0%, rgba(34, 211, 238, 0.07), transparent 62%),
-    linear-gradient(180deg, rgba(13, 24, 43, 0.94), rgba(6, 13, 25, 0.96));
+    radial-gradient(120% 90% at 100% 0%, rgba(255, 59, 82, 0.1), transparent 62%),
+    linear-gradient(180deg, rgba(28, 9, 16, 0.94), rgba(13, 5, 9, 0.96));
   box-shadow:
     0 34px 90px -52px rgba(0, 0, 0, 0.95),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
@@ -1393,9 +1393,9 @@
 .auth-demo-note {
   margin-top: 18px;
   padding: 11px 12px;
-  border: 1px solid rgba(96, 140, 205, 0.3);
+  border: 1px solid rgba(255, 110, 128, 0.3);
   border-radius: 8px;
-  background: rgba(15, 32, 56, 0.55);
+  background: rgba(46, 12, 20, 0.55);
   color: var(--muted);
   font-size: 12.5px;
   line-height: 1.55;

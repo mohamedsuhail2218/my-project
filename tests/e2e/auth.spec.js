@@ -33,8 +33,14 @@ test.describe("authentication", () => {
   });
 
   test("sign-in and sign-up forms sit in a clearly visible card", async ({ page }) => {
+    const headings = {
+      signin: "Continue your investigation.",
+      signup: "Build the twin. Run the attack.",
+    };
+
     for (const route of ["signin", "signup"]) {
       await page.goto(`/#/${route}`);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(headings[route]);
       const card = page.locator(".auth-card");
       await expect(card).toBeVisible();
 

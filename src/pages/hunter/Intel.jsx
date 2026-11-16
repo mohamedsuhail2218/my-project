@@ -354,7 +354,7 @@ export default function Intel() {
                 {filtered.map((ioc) => (
                   <tr key={ioc.id} className="clickable" onClick={() => openDrawer(ioc)}>
                     <td>
-                      <div className="mono" style={{ fontSize: 12, color: "#7dd3fc", maxWidth: 270, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={ioc.value}>
+                      <div className="mono" style={{ fontSize: 12, color: "#ff9aa8", maxWidth: 270, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={ioc.value}>
                         {ioc.value}
                       </div>
                       <div className="small-meta mt-6">{ioc.id}</div>
