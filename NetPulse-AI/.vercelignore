@@ -1,0 +1,46 @@
+# Local secrets and runtime state
+backend/.env
+.env
+.env.*
+!.env.example
+!.env.docker.example
+backend/data/
+backend/logs/
+reports/
+tmp/
+temp/
+
+# Local virtual environments and caches
+.venv/
+backend/.venv/
+venv/
+_uv/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+backend/.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Test and developer tooling not needed by the runtime
+backend/tests/
+backend/scripts/
+
+# Node, Playwright and documentation tooling
+frontend/node_modules/
+frontend/test-results/
+frontend/blob-report/
+frontend/e2e/
+frontend/scripts/
+documentation/
+.github/
+
+# Vercel and editor metadata
+.vercel/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

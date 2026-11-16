@@ -1,0 +1,68 @@
+# ---------------------------------------------------------------------------
+# NetPulse AI - repository ignore rules
+# ---------------------------------------------------------------------------
+
+# Secrets and local environment overrides
+.env
+.env.*
+!.env.example
+!.env.docker.example
+backend/.env
+!backend/.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.venv/
+venv/
+backend/.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+!reports/test-runs/coverage.xml
+htmlcov/
+
+# Local databases and runtime state
+backend/data/*.db
+backend/data/*.db-journal
+backend/data/*.sqlite3
+backend/data/*.sqlite3-journal
+backend/logs/
+*.log
+
+# Node / Vite
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Playwright runtime output (reports under reports/ are kept for submission)
+frontend/test-results/
+frontend/blob-report/
+reports/playwright/.cache/
+
+# Vercel local link metadata
+.vercel/
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary working files
+tmp/
+temp/
+*.tmp
+_uv/

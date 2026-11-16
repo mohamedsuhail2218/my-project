@@ -1,0 +1,46 @@
+<testsuites id="" name="" tests="18" failures="0" skipped="0" errors="0" time="51.589125">
+<testsuite name="auth.spec.js" timestamp="2026-11-15T17:54:31.149Z" hostname="chromium" tests="4" failures="0" skipped="0" time="4.969" errors="0">
+<testcase name="Authentication and access control › an anonymous visitor is redirected to the login page" classname="auth.spec.js" time="0.716">
+</testcase>
+<testcase name="Authentication and access control › the login form rejects an incorrect password" classname="auth.spec.js" time="0.698">
+</testcase>
+<testcase name="Authentication and access control › the administrator can sign in and the session survives a reload" classname="auth.spec.js" time="1.793">
+</testcase>
+<testcase name="Authentication and access control › sign out clears the browser session" classname="auth.spec.js" time="1.762">
+</testcase>
+</testsuite>
+<testsuite name="interactions.spec.js" timestamp="2026-11-15T17:54:31.149Z" hostname="chromium" tests="10" failures="0" skipped="0" time="33.765" errors="0">
+<testcase name="Workspace interactions › light theme toggles, persists after reload and can be restored" classname="interactions.spec.js" time="1.811">
+</testcase>
+<testcase name="Workspace interactions › the command palette jumps between modules" classname="interactions.spec.js" time="1.627">
+</testcase>
+<testcase name="Workspace interactions › access point details open, simulated checks run and the dialog closes" classname="interactions.spec.js" time="1.834">
+</testcase>
+<testcase name="Workspace interactions › access point create, edit and delete lifecycle" classname="interactions.spec.js" time="3.323">
+</testcase>
+<testcase name="Workspace interactions › device discovery and the read-only privacy dialog" classname="interactions.spec.js" time="7.661">
+</testcase>
+<testcase name="Workspace interactions › AI detection and rule-based diagnosis can be executed" classname="interactions.spec.js" time="8.181">
+</testcase>
+<testcase name="Workspace interactions › ticket creation, comment and status update" classname="interactions.spec.js" time="3.487">
+</testcase>
+<testcase name="Workspace interactions › PDF reports generate and download from the real backend" classname="interactions.spec.js" time="2.225">
+</testcase>
+<testcase name="Workspace interactions › settings save through the administration form" classname="interactions.spec.js" time="2.092">
+</testcase>
+<testcase name="Workspace interactions › notifications panel opens from the header" classname="interactions.spec.js" time="1.524">
+</testcase>
+</testsuite>
+<testsuite name="navigation.spec.js" timestamp="2026-11-15T17:54:31.149Z" hostname="chromium" tests="2" failures="0" skipped="0" time="7.682" errors="0">
+<testcase name="Workspace navigation › every sidebar module renders its own content without runtime errors" classname="navigation.spec.js" time="5.368">
+</testcase>
+<testcase name="Workspace navigation › deep links load the requested module and unknown paths show the not-found page" classname="navigation.spec.js" time="2.314">
+</testcase>
+</testsuite>
+<testsuite name="responsive.spec.js" timestamp="2026-11-15T17:54:31.149Z" hostname="chromium" tests="2" failures="0" skipped="0" time="3.247" errors="0">
+<testcase name="Responsive layout › mobile navigation opens, navigates and closes" classname="responsive.spec.js" time="1.915">
+</testcase>
+<testcase name="Responsive layout › the dashboard does not overflow the mobile viewport" classname="responsive.spec.js" time="1.332">
+</testcase>
+</testsuite>
+</testsuites>
