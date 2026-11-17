@@ -161,9 +161,11 @@ is SQLite (`node:sqlite`), so there are three realistic options:
 - **Multiple instances can disagree.** Each instance has its own `/tmp`, so a
   session created on one instance may be missing on another. The dashboard reads
   its five live panels sequentially and retries a 401 up to twice, which keeps a
-  single-user session on the same warm instance in practice. A controlled attack
-  applies the events and detections from its own response rather than re-reading
-  the panels, so that follow-up cannot be split across instances. Vercel's
+  single-user session on the same warm instance in practice. If a cold start
+  still routes the initial reads to the wrong instance, the dashboard retries
+  the missing panels once its SSE connection opens. A controlled attack applies
+  the events and detections from its own response rather than re-reading the
+  panels, so that follow-up cannot be split across instances. Vercel's
   `affinity: { mode: "strict" }` is not usable for this public function: the
   edge strips or rejects browser-supplied `x-vercel-affinity-id` headers with
   `FUNCTION_AFFINITY_FORBIDDEN`, and strict mode then makes the function
