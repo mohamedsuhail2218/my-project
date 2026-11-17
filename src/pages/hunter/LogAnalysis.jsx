@@ -35,6 +35,7 @@ import { SAMPLE_LOG_TEXT } from "../../data/mock";
 import { downloadFile, formatDateTime, timeAgo, toCsv } from "../../lib/format";
 import { parseLogText, recordMatches } from "../../lib/hunter";
 import { api } from "../../lib/api";
+import { useEventStream } from "../../lib/useEventStream";
 
 const STATUSES = ["all", "alert", "deny", "allow"];
 
@@ -100,51 +101,63 @@ export default function LogAnalysis() {
   const [training, setTraining] = useState(false);
 
   const loadServer = useCallback(async () => {
+    const failures = [];
+    let telemetry = null;
+    let stats = null;
+    let anomalies = null;
+
+    // Sequential reads avoid cold-starting several Vercel instances, each with
+    // its own ephemeral SQLite database and session table.
     try {
-      const [telemetry, stats, anomalies] = await Promise.all([
-        api.telemetry({ limit: 300 }),
-        api.telemetryStats(),
-        api.anomalies({ limit: 8 }),
-      ]);
-      setServerEvents(telemetry.events.map(toLogShape));
+      telemetry = await api.telemetry({ limit: 300 });
+    } catch (error) {
+      failures.push(error);
+    }
+    try {
+      stats = await api.telemetryStats();
+    } catch (error) {
+      failures.push(error);
+    }
+    try {
+      anomalies = await api.anomalies({ limit: 8 });
+    } catch (error) {
+      failures.push(error);
+    }
+
+    if (telemetry) setServerEvents(telemetry.events.map(toLogShape));
+    if (telemetry || stats) {
       setServerMeta({
         loaded: true,
         error: "",
-        stats,
-        model: telemetry.model || stats.model,
+        stats: stats || telemetry?.stats || null,
+        model: telemetry?.model || stats?.model || null,
       });
-      setTopAnomalies(anomalies.events || []);
-    } catch (error) {
+    } else if (failures.length) {
+      const fatal = failures.find((error) => error?.status !== 401) || failures[0];
       setServerMeta((current) => ({
         ...current,
         loaded: true,
-        error: error?.message || "Server telemetry could not be loaded.",
+        error: fatal?.message || "Server telemetry could not be loaded.",
       }));
     }
+    if (anomalies) setTopAnomalies(anomalies.events || []);
   }, []);
 
   useEffect(() => {
     loadServer();
   }, [loadServer]);
 
-  useEffect(() => {
-    if (!liveTail) {
-      setStreamState("idle");
-      return undefined;
-    }
-
-    let stream;
-    try {
-      stream = new EventSource(api.streamUrl("/telemetry/stream"));
-    } catch {
-      setStreamState("error");
-      return undefined;
-    }
-
-    setStreamState("connecting");
-
-    const onReady = () => setStreamState("open");
-    const onTelemetry = (message) => {
+  const liveTailEnabled = liveTail && serverMeta.loaded;
+  useEventStream({
+    path: liveTailEnabled ? "/telemetry/stream" : "",
+    enabled: liveTailEnabled,
+    onStateChange: setStreamState,
+    onEvent: (message) => {
+      if (message.event === "ready") {
+        setStreamState("open");
+        return;
+      }
+      if (message.event !== "telemetry") return;
       try {
         const payload = JSON.parse(message.data);
         const incoming = (payload.events || []).map(toLogShape);
@@ -153,20 +166,10 @@ export default function LogAnalysis() {
         }
         setStreamState("open");
       } catch {
-        // Ignore a malformed frame; the browser will keep the stream open.
+        // Ignore a malformed frame; the stream stays open.
       }
-    };
-
-    stream.addEventListener("ready", onReady);
-    stream.addEventListener("telemetry", onTelemetry);
-    stream.onerror = () => setStreamState("error");
-
-    return () => {
-      stream.removeEventListener("ready", onReady);
-      stream.removeEventListener("telemetry", onTelemetry);
-      stream.close();
-    };
-  }, [liveTail]);
+    },
+  });
 
   useEffect(() => {
     if (focus && (serverEvents.some((log) => log.id === focus) || state.logs.some((log) => log.id === focus))) {

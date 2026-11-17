@@ -20,6 +20,8 @@ test("controlled attack produces visible detections end to end", async ({ page }
   await signIn(page);
   await page.goto("/#/app/hunter");
   await expect(page.getByText("Live telemetry stream connected.")).toBeVisible();
+  const banner = page.getByText(/event\(s\) stored · \d+ rule detection\(s\)/).first();
+  const initialCount = Number((await banner.textContent()).match(/(\d+) event/)[1]);
 
   const simulated = page.waitForResponse(
     (response) =>
@@ -36,11 +38,22 @@ test("controlled attack produces visible detections end to end", async ({ page }
   expect(payload.note).toContain("No packet");
   expect(payload.detections.length).toBeGreaterThan(0);
 
-  // The success toast proves the click completed; the queue proves the server
-  // detection reached the React surface after the live refresh.
+  // The success toast proves the click completed; the optimistic merge from
+  // the simulation response proves the server detection reached the React
+  // surface without a second, instance-sensitive read.
   await expect(page.getByText("Controlled attack simulated")).toBeVisible();
   await expect(page.getByText(/Port scan from|Brute-force authentication from|beaconing from/i).first()).toBeVisible();
-  await expect(page.getByRole("cell", { name: "203.0.113.88", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: "203.0.113.88", exact: true }).first()
+  ).toBeVisible();
+
+  // The injection response is applied optimistically and then the same events
+  // arrive over SSE. The banner must count each event once, not twice.
+  await expect
+    .poll(async () => Number((await banner.textContent()).match(/(\d+) event/)[1]), {
+      timeout: 10_000,
+    })
+    .toBe(initialCount + payload.injected);
 
   await page.getByRole("link", { name: /All detections/i }).click();
   await expect(page).toHaveURL(/#\/app\/hunter\/detections/);
@@ -51,6 +64,49 @@ test("controlled attack produces visible detections end to end", async ({ page }
   await page.goto("/#/app/hunter/logs?q=203.0.113.88");
   await expect(page.getByText(/events? match the current query/i).first()).toBeVisible();
   await expect(page.getByText(/SYN probe from 203\.0\.113\.88/i).first()).toBeVisible();
+});
+
+test("dashboard recovers when its first reads land on a sessionless instance", async ({ page }) => {
+  await signIn(page);
+
+  let streamOpen = false;
+  let blocked = 0;
+  const panelPaths = new Set([
+    "/api/telemetry",
+    "/api/telemetry/stats",
+    "/api/detections",
+    "/api/connectors",
+    "/api/network/status",
+  ]);
+
+  page.on("response", (response) => {
+    const path = new URL(response.url()).pathname;
+    if (path === "/api/telemetry/stream" && response.status() === 200) streamOpen = true;
+  });
+
+  // Mirror Vercel's split-instance behaviour: every dashboard read fails with
+  // a 401 until the SSE connection has proved which instance holds the session.
+  await page.route("**/api/**", async (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (route.request().method() === "GET" && panelPaths.has(path) && !streamOpen) {
+      blocked += 1;
+      await route.fulfill({
+        status: 401,
+        contentType: "application/json",
+        body: JSON.stringify({ message: "Unauthorized." }),
+      });
+      return;
+    }
+    await route.continue();
+  });
+
+  await page.goto("/#/app/hunter");
+  await expect(page.getByText("Live telemetry stream connected.")).toBeVisible({
+    timeout: 30_000,
+  });
+  await expect(page.getByText(/0\/8 SIEM\/EDR connectors configured/)).toBeVisible();
+  await expect(page.getByText(/Live HUNTER data could not be loaded/)).toHaveCount(0);
+  expect(blocked).toBeGreaterThanOrEqual(5);
 });
 
 test("detection API is reachable from the signed-in session and exposes rule health", async ({

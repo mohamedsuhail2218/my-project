@@ -41,6 +41,7 @@ describe("API health and authentication", () => {
     expect(response.body.version).toBeUndefined();
     expect(response.headers["content-security-policy"]).toContain("default-src 'self'");
     expect(response.headers["cache-control"]).toContain("no-store");
+    expect(response.headers["x-dtcw-instance"]).toMatch(/^[0-9a-f-]{36}$/);
   });
 
   it("rejects invalid credentials without leaking which field failed", async () => {

@@ -493,6 +493,17 @@ recreates the schema and the bootstrap admin and loses all other data. Set
 `SEED_DEMO_USERS=false` and `PUBLIC_ORIGIN=https://<project>.vercel.app`. Full
 steps and serverless limitations are in [`DEPLOY-VERCEL.md`](DEPLOY-VERCEL.md).
 
+The function declares `maxDuration: 300` for the SSE stream. The dashboard reads
+its five live panels sequentially and retries a 401 up to twice, which keeps a
+single-user session on the same warm instance in practice. A controlled attack
+applies the events and detections from its own response instead of re-reading
+the panels, so the follow-up cannot be split across instances. Vercel's strict
+function affinity is not a fix for browser traffic: the edge rejects a
+browser-supplied `x-vercel-affinity-id` with `FUNCTION_AFFINITY_FORBIDDEN`, and
+strict mode makes the function unreachable without an internal service-binding
+call. A recycled instance still loses sessions and data, and a second browser or
+device may land elsewhere.
+
 Connector credentials and a network-flow ingestion token can be added as Vercel
 environment variables, but the Function must be able to reach the vendor over
 outbound HTTPS. SSE subscriber state and the isolation-forest model live in

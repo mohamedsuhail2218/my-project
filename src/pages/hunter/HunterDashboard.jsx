@@ -92,7 +92,7 @@ export default function HunterDashboard() {
     setSimulating(scenario);
     try {
       const result = await api.simulateAttack(scenario);
-      await live.refresh();
+      live.applySimulation(result);
       dispatch({
         type: "PUSH_TOAST",
         toast: {

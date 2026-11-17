@@ -159,16 +159,26 @@ is SQLite (`node:sqlite`), so there are three realistic options:
 - **Cold starts reset the database.** The first request to a new instance
   recreates the schema and the bootstrap Super Admin. All other data is gone.
 - **Multiple instances can disagree.** Each instance has its own `/tmp`, so a
-  session created on one instance may be missing on another. The function is
-  pinned to `sin1` to reduce fan-out, but Vercel can still run concurrent
-  instances. Do not use this deployment for multi-user production work.
+  session created on one instance may be missing on another. The dashboard reads
+  its five live panels sequentially and retries a 401 up to twice, which keeps a
+  single-user session on the same warm instance in practice. A controlled attack
+  applies the events and detections from its own response rather than re-reading
+  the panels, so that follow-up cannot be split across instances. Vercel's
+  `affinity: { mode: "strict" }` is not usable for this public function: the
+  edge strips or rejects browser-supplied `x-vercel-affinity-id` headers with
+  `FUNCTION_AFFINITY_FORBIDDEN`, and strict mode then makes the function
+  unreachable without an internal service-binding call. A recycled instance
+  still loses its sessions and data, and different browsers or devices can still
+  land on different instances. Do not use this deployment for multi-user
+  production work.
 - **Serverless request limits.** Request and response bodies are capped by the
   Vercel plan (about 4.5 MB on Hobby). Workspace imports close to the 4.5 MB
   application limit can be rejected by the platform before Express sees them.
 - **Streaming.** `GET /api/telemetry/stream` is a long-lived SSE endpoint. Vercel
-  Functions are request-scoped and capped by `maxDuration` (60 s here), so the
-  live tail will reconnect rather than staying open indefinitely. Historical
-  telemetry and polling still work.
+  Functions are request-scoped and capped by `maxDuration` (300 s here), so the
+  live tail will reconnect rather than staying open indefinitely. The browser
+  uses a fetch-based SSE reader so it can read the HTTP status and reconnect
+  with a deliberate delay; historical telemetry and polling still work.
 - **In-memory state.** Rate-limit buckets, the login-failure backoff, SSE
   subscriber state and the isolation-forest model live in process memory and
   reset on cold starts. Detection and connector status are persisted in SQLite,

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
 import express from "express";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
@@ -109,6 +110,11 @@ import {
 const isProduction = config.isProduction;
 export const SESSION_COOKIE = isProduction ? "__Host-dtcw_session" : "dtcw_session";
 
+// Each warm function instance gets a random identity for diagnostics. Callers
+// can see when requests were served by different ephemeral databases instead of
+// assuming a single, shared state store.
+const INSTANCE_ID = randomUUID();
+
 function cookieOptions() {
   return {
     httpOnly: true,
@@ -182,6 +188,7 @@ export function createApp({ db = createDatabase(), limiterOverrides = {} } = {})
   );
   app.use((_req, res, next) => {
     res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+    res.setHeader("X-DTCW-Instance", INSTANCE_ID);
     next();
   });
 
@@ -855,6 +862,7 @@ export function createApp({ db = createDatabase(), limiterOverrides = {} } = {})
           events: result.events,
           detections: result.detections,
           stats: detectionStats(db, req.auth.workspaceId),
+          telemetryStats: telemetryStats(db, req.auth.workspaceId),
           automation: proposals,
           note: "Synthetic telemetry only. No packet was sent to any target.",
         });
