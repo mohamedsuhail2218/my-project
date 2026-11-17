@@ -91,6 +91,73 @@ test.describe('Workspace interactions', () => {
     await expect(page.getByRole('row').filter({ hasText: name })).toHaveCount(0)
   })
 
+  // The Wi-Fi association is host hardware, so these two tests stub the
+  // read-only detector endpoint. No access point is registered or probed.
+  test('current Wi-Fi prefills the registration form with the gateway', async ({ page }) => {
+    await page.route('**/api/monitoring/wifi', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          hostname: 'e2e-host',
+          platform: 'Windows 11',
+          available: true,
+          reason: null,
+          interface: 'Wi-Fi',
+          adapter: 'Intel(R) Wi-Fi 6E AX211 160MHz',
+          ssid: 'E2E Wi-Fi',
+          bssid: 'aa:bb:cc:dd:ee:ff',
+          signal_percent: 88,
+          rssi_dbm: -54,
+          band: '5 GHz',
+          channel: 44,
+          receive_rate_mbps: 300,
+          transmit_rate_mbps: 300,
+          gateway: '192.168.50.1',
+          ip_address: '192.168.50.23',
+        }),
+      }),
+    )
+
+    await openModule(page, 'Access Points')
+    await page.getByRole('button', { name: 'Use current Wi-Fi' }).click()
+
+    const dialog = page.getByRole('dialog', { name: 'Register access point' })
+    await expect(dialog).toBeVisible()
+    await expect(dialog.getByText('Connected Wi-Fi: E2E Wi-Fi')).toBeVisible()
+    await expect(dialog.getByLabel('Access point name')).toHaveValue('E2E Wi-Fi')
+    await expect(dialog.getByLabel('Location')).toHaveValue('Connected Wi-Fi (auto-detected)')
+    await expect(dialog.getByLabel('Management IP address')).toHaveValue('192.168.50.1')
+    await expect(dialog.getByLabel('MAC address')).toHaveValue('aa:bb:cc:dd:ee:ff')
+    await expect(dialog.getByLabel('Vendor')).toHaveValue('')
+    await expect(dialog.getByRole('button', { name: 'Register & run live check' })).toBeVisible()
+
+    await dialog.getByRole('button', { name: 'Cancel' }).click()
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+  })
+
+  test('current Wi-Fi explains when the backend is not on a Wi-Fi network', async ({ page }) => {
+    await page.route('**/api/monitoring/wifi', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          hostname: 'cloud-function',
+          platform: 'Linux',
+          available: false,
+          reason:
+            'No connected Wi-Fi interface was detected on the backend host. The cloud deployment cannot reach private Wi-Fi addresses.',
+        }),
+      }),
+    )
+
+    await openModule(page, 'Access Points')
+    await page.getByRole('button', { name: 'Use current Wi-Fi' }).click()
+
+    await expect(toast(page, 'cloud deployment cannot reach private Wi-Fi addresses')).toBeVisible()
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+  })
+
   test('device discovery and the read-only privacy dialog', async ({ page }) => {
     await openModule(page, 'Connected Devices')
     await page.getByRole('button', { name: 'Discover local devices' }).click()

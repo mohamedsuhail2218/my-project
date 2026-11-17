@@ -39,7 +39,7 @@ account, and runs locally on Windows 11.
 | Backend | FastAPI, SQLAlchemy 2, Pydantic 2, JWT, Argon2 |
 | AI | scikit-learn Isolation Forest with robust-z explanations |
 | Database | SQLite (verified local default) · MySQL 8 (deployment schema included) |
-| Testing | 79 Pytest tests · 18 Playwright E2E tests |
+| Testing | 88 Pytest tests · 20 Playwright E2E tests |
 | Reports | 8 report types, generated as PDF by ReportLab |
 | Modules | 10 workspace modules plus login, command palette and responsive shell |
 
@@ -77,7 +77,7 @@ throughout the project report.
 | **Authentication** | JWT login, Argon2 password hashing, session restore, login throttling, role-based access (admin / analyst / viewer). |
 | **Overview** | Live health index, latency and packet-loss trends, AP state, device summary, recent AI findings and alerts. |
 | **Network Monitoring** | Real OS probes with latency, jitter, loss and online state; scheduler status; recent history and network identity information. |
-| **Access Points** | Authorized AP CRUD, simulation labels, availability checks, performance history and an append-only configuration audit trail. |
+| **Access Points** | Authorized AP CRUD, simulation labels, availability checks, performance history and an append-only configuration audit trail. Administrators can read the backend host's current Wi-Fi association to prefill and check the local gateway. |
 | **Connected Devices** | Read-only ARP-cache discovery, SHA-256 identity hashing, masked MAC addresses, approval workflow and observation timeline. |
 | **AI Anomaly Detection** | Isolation Forest detection over persisted observations, severity scoring, robust-z explanations, model metadata and cold-start disclosure. |
 | **Smart Troubleshooting** | Rule-based diagnosis for offline, high-latency, packet-loss and jitter conditions; possible causes, ordered diagnostic steps and safety guardrails. |
@@ -240,7 +240,10 @@ secrets in Vercel; they are not committed to the repository.
 > for durable multi-user data. A managed PostgreSQL/MySQL database and object
 > storage are required before treating this deployment as a persistent
 > production service. Background monitoring, ARP discovery and the Pytest runner
-> are disabled because they need a long-running local host.
+> are disabled because they need a long-running local host. The **Use current
+> Wi-Fi** action is also local-only: the function has no wireless association and
+> cannot reach a private gateway. It returns an explicit unavailable explanation
+> instead of probing anything.
 
 ---
 
@@ -283,15 +286,15 @@ cd backend
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-- **79 tests passed** in the final verification run.
+- **88 tests passed** in the final verification run.
 - Tests use a throw-away SQLite database, disable the scheduler, block live
   probes and prevent recursive test-runner execution.
 - JUnit output: `reports\test-runs\backend-junit.xml`.
 
 Coverage includes authentication and RBAC, dashboard aggregation, monitoring,
-AP CRUD/history, Isolation Forest behaviour, tickets and deduplication, PDF
-reports, ARP parsing and device governance, troubleshooting rules, settings,
-security headers and JUnit parsing.
+AP CRUD/history, Wi-Fi association parsing, Isolation Forest behaviour, tickets
+and deduplication, PDF reports, ARP parsing and device governance,
+troubleshooting rules, settings, security headers and JUnit parsing.
 
 ### Frontend — Playwright
 
@@ -300,14 +303,14 @@ cd frontend
 npm.cmd run test:e2e
 ```
 
-- **18 tests passed** in the final verification run.
+- **20 tests passed** in the final verification run.
 - Uses the installed Chrome channel (`PLAYWRIGHT_CHANNEL=chrome`) and starts or
   reuses both servers.
 - Covers login/redirect/logout, incorrect-password handling, every sidebar
-  module, console errors, AP detail/check/CRUD, device discovery, AI detection,
-  troubleshooting, ticket lifecycle, PDF generation/download, settings save,
-  theme persistence, command palette, notifications, mobile navigation and
-  horizontal overflow.
+  module, console errors, AP detail/check/CRUD, current Wi-Fi prefill and
+  unavailable-cloud messaging, device discovery, AI detection, troubleshooting,
+  ticket lifecycle, PDF generation/download, settings save, theme persistence,
+  command palette, notifications, mobile navigation and horizontal overflow.
 
 ### Everything at once
 
@@ -370,12 +373,12 @@ NetPulse-AI/
 │   │   │                    troubleshooting, tickets, tests, reports, settings)
 │   │   ├── core/            Configuration, database, JWT/Argon2, logging
 │   │   ├── models/          SQLAlchemy domain model (12 tables)
-│   │   ├── monitoring/      OS probes, scheduler, ARP adapter, diagnostics
+│   │   ├── monitoring/      OS probes, scheduler, ARP/Wi-Fi adapters, diagnostics
 │   │   ├── schemas/         Pydantic request/response schemas
 │   │   ├── services/        Monitoring, ticketing, reports, seeding, test runner
 │   │   ├── troubleshooting/ Deterministic rule engine
 │   │   └── main.py          Application entrypoint and static frontend serving
-│   ├── tests/               79 Pytest tests with isolated fixtures
+│   ├── tests/               88 Pytest tests with isolated fixtures
 │   ├── .env.example
 │   └── requirements.txt
 ├── frontend/
@@ -386,7 +389,7 @@ NetPulse-AI/
 │   │   ├── layouts/         Responsive dashboard shell and command palette
 │   │   ├── pages/           Ten workspace modules plus login and 404
 │   │   └── services/        Axios client, token handling, PDF download
-│   ├── e2e/                 18 Playwright tests and credential helper
+│   ├── e2e/                 20 Playwright tests and credential helper
 │   ├── scripts/             Documentation screenshot capture
 │   ├── playwright.config.js
 │   └── package.json
@@ -415,6 +418,11 @@ NetPulse-AI/
   excludes them from live health calculations.
 - **Read-only device discovery.** Only the operating system ARP cache is read.
   There is no packet capture, port scanning or Nmap-style active scan.
+- **Read-only Wi-Fi association.** The Access Points page can read the backend
+  host's *current* SSID, BSSID, signal, band, channel and default gateway through
+  read-only OS commands. It never scans neighbouring networks, retrieves Wi-Fi
+  passwords or stores credentials. The gateway is probed only after an
+  administrator registers it as an authorized AP.
 - **MAC privacy.** Device identity is a SHA-256 hash; only a masked MAC fragment
   is displayed.
 - **Advisory troubleshooting.** The rule engine never modifies router or
@@ -437,12 +445,12 @@ NetPulse-AI/
 | [02 — System architecture](documentation/02-system-architecture.md) | Layered architecture, components, data flow, deployment |
 | [03 — Database design](documentation/03-database-design.md) | ER diagram, data dictionary, normalization, indexes |
 | [04 — UML & process models](documentation/04-uml-and-process-models.md) | Use case, class, sequence, activity, DFD, state models |
-| [05 — Testing & results](documentation/05-testing-and-results.md) | Strategy, 79+18 test evidence, sample test cases, screenshots |
+| [05 — Testing & results](documentation/05-testing-and-results.md) | Strategy, 88+20 test evidence, sample test cases, screenshots |
 | [06 — User manual](documentation/06-user-manual.md) | Installation, module walkthrough, troubleshooting |
 | [07 — Conclusion & future work](documentation/07-conclusion-and-future-work.md) | Achievements, limitations, roadmap |
 | [08 — References](documentation/08-references.md) | Standards, libraries and research references |
 | [Data dictionary](documentation/data-dictionary.generated.md) | Generated column-level dictionary from the SQLAlchemy model |
-| [Test inventory](documentation/test-inventory.generated.md) | Generated list of all 79 backend and 18 browser tests |
+| [Test inventory](documentation/test-inventory.generated.md) | Generated list of all 88 backend and 20 browser tests |
 | [Final-year report](documentation/Final-Year-Project-Report.md) | Consolidated submission-ready report with appendices A-E |
 
 All diagrams use Mermaid or ASCII so they render directly on GitHub and in
@@ -470,6 +478,12 @@ Markdown editors without external tooling.
 7. **Vercel serverless storage** — the public deployment writes SQLite and PDF
    reports under `/tmp`. Both are ephemeral, instance-local and reset on a cold
    start. Use a managed database and object storage for durable data.
+8. **Current Wi-Fi is backend-local** — the public Vercel function has no Wi-Fi
+   association and cannot reach private gateways such as `10.239.39.128`. The
+   **Use current Wi-Fi** flow therefore explains that it is unavailable in the
+   cloud; run the backend on the Wi-Fi-connected computer to register and check
+   that gateway. The separate top-level live probe (`1.1.1.1`) still works in the
+   cloud through the real TCP fallback.
 
 Future work is discussed in
 [`documentation/07-conclusion-and-future-work.md`](documentation/07-conclusion-and-future-work.md).

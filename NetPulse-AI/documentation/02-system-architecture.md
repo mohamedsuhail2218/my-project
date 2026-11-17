@@ -114,7 +114,7 @@ The diagram separates three concerns that are often blurred in student projects:
 | Schemas | `app/schemas/schemas.py` | Pydantic request/response contracts |
 | Auth API | `app/api/auth.py` | Login, session, logout, user listing/creation, throttling |
 | Dashboard API | `app/api/dashboard.py` | Health index, series, alerts and summaries |
-| Monitoring API | `app/api/monitoring.py` | Network info, history, latest, manual run, scheduler state |
+| Monitoring API | `app/api/monitoring.py` | Network info, current Wi-Fi association, history, latest, manual run, scheduler state |
 | Access point API | `app/api/access_points.py` | CRUD, checks, performance, history |
 | Device API | `app/api/devices.py` | Discovery, approval, metadata, activity |
 | Anomaly API | `app/api/anomalies.py` | Detection, event list, model info |
@@ -129,6 +129,7 @@ The diagram separates three concerns that are often blurred in student projects:
 | Test runner | `app/services/test_runner.py` | Fixed pytest command, JUnit parse, persisted results |
 | Seed service | `app/services/seed.py` | Bootstrap admin, default settings, labelled demo APs |
 | Diagnostics | `app/monitoring/diagnostics.py` | ICMP parsing, real TCP fallback, interface info |
+| Wi-Fi detector | `app/monitoring/wifi.py` | Read-only current SSID/BSSID/signal/band/gateway detection |
 | Device discovery | `app/monitoring/devices.py` | ARP parse, subnet filtering, hashing, masking |
 | Scheduler | `app/monitoring/scheduler.py` | Startup and periodic cycles, device/AP refresh |
 | Anomaly service | `app/ai/anomaly.py` | Training, scoring, severity, robust-z explanation |
@@ -717,6 +718,16 @@ Active scanning and packet capture can reveal other users' traffic and may
 violate privacy or institutional policy. The ARP cache provides a defensible,
 read-only inventory of devices the host has already communicated with.
 
+The **Use current Wi-Fi** flow does not weaken this boundary. It reads only the
+operating system's existing association for the backend host (SSID, BSSID,
+signal, band, channel and default gateway) through read-only commands. It does
+not enumerate nearby networks, capture frames or read Wi-Fi credentials. The
+detected gateway is not probed until an administrator registers it as an
+authorized access point, and the endpoint is authenticated. Because the address
+is usually private (for example `10.239.39.128`), the flow is useful only when
+the backend runs on the connected computer; the serverless deployment returns an
+explicit unavailable reason.
+
 ### 2.14.3 Why keep the synthetic baseline?
 
 An Isolation Forest needs training data. Without a baseline, the first live
@@ -733,12 +744,12 @@ automatically switches to real observations.
 | Performance | Indexed queries, 2,000-row dashboard cap, lazy pages, polling intervals | Dashboard test, E2E timings |
 | Security | Argon2, JWT, RBAC, throttle, headers, validation | 7 security tests, 12 auth tests |
 | Reliability | Error handling, offline records, scheduler lock | Monitoring tests, smoke tests |
-| Usability | Dark/light theme, responsive layout, skeletons, toasts, palette | 18 E2E tests, 17 screenshots |
-| Maintainability | Layered modules, shared UI, typed schemas, env config | Code structure, 84% coverage |
+| Usability | Dark/light theme, responsive layout, skeletons, toasts, palette | 20 E2E tests, 17 screenshots |
+| Maintainability | Layered modules, shared UI, typed schemas, env config | Code structure, 82% coverage |
 | Portability | SQLite/MySQL, OS-specific ping commands, env paths | Tested Windows; Linux/macOS commands included |
 | Privacy | ARP only, SHA-256 identity, masked MAC, no raw capture | Device tests, UI privacy notice |
 | Integrity | `data_origin`, simulation exclusion, disclaimers | AP/device/monitoring tests |
-| Testability | Isolated fixtures, no live probes in tests, JUnit import | 79 + 18 passing tests |
+| Testability | Isolated fixtures, no live probes in tests, JUnit import | 88 + 20 passing tests |
 
 ---
 
@@ -758,7 +769,7 @@ NetPulse-AI/
 │   │   │                        settings, test_runner
 │   │   ├── troubleshooting/    rule engine
 │   │   └── main.py
-│   ├── tests/                  79 Pytest tests + isolated conftest
+│   ├── tests/                  88 Pytest tests + isolated conftest
 │   ├── .env.example
 │   └── requirements.txt
 ├── frontend/

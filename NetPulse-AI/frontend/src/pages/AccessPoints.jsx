@@ -71,7 +71,7 @@ function MeasurementSource({ value }) {
   return <Badge tone={value === 'live' ? 'success' : 'plum'}>{value === 'live' ? 'Live' : 'Simulation'}</Badge>
 }
 
-function AccessPointForm({ open, onClose, accessPoint, onSaved }) {
+function AccessPointForm({ open, onClose, accessPoint, initialValues = null, wifiInfo = null, onSaved }) {
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -92,9 +92,9 @@ function AccessPointForm({ open, onClose, accessPoint, onSaved }) {
             is_simulated: accessPoint.is_simulated,
             notes: accessPoint.notes || '',
           }
-        : EMPTY_FORM,
+        : initialValues || EMPTY_FORM,
     )
-  }, [open, accessPoint])
+  }, [open, accessPoint, initialValues])
 
   function update(field, value) {
     setForm((current) => ({ ...current, [field]: value }))
@@ -106,10 +106,11 @@ function AccessPointForm({ open, onClose, accessPoint, onSaved }) {
     setError('')
     const payload = { ...form, mac_address: form.mac_address || null, vendor: form.vendor || null, model: form.model || null, notes: form.notes || null }
     try {
-      if (accessPoint) await api.patch(`/access-points/${accessPoint.id}`, payload)
-      else await api.post('/access-points', payload)
+      const response = accessPoint
+        ? await api.patch(`/access-points/${accessPoint.id}`, payload)
+        : await api.post('/access-points', payload)
       toast(accessPoint ? 'Access point configuration updated' : 'Access point registered', 'success')
-      onSaved()
+      onSaved(response.data, { runCheck: Boolean(wifiInfo) && !accessPoint })
       onClose()
     } catch (err) {
       setError(getErrorMessage(err))
@@ -123,17 +124,37 @@ function AccessPointForm({ open, onClose, accessPoint, onSaved }) {
       open={open}
       onClose={onClose}
       title={accessPoint ? 'Edit access point' : 'Register access point'}
-      subtitle={accessPoint ? 'Only administrators can modify configuration history.' : 'Only register devices you are authorized to monitor.'}
+      subtitle={
+        accessPoint
+          ? 'Only administrators can modify configuration history.'
+          : wifiInfo
+            ? 'Detected from this backend host. A live gateway check runs after registration.'
+            : 'Only register devices you are authorized to monitor.'
+      }
       icon={Router}
       size="lg"
       footer={
         <>
           <Button onClick={onClose} disabled={saving}>Cancel</Button>
-          <Button variant="primary" type="submit" form="access-point-form" loading={saving}>{accessPoint ? 'Save changes' : 'Register device'}</Button>
+          <Button variant="primary" type="submit" form="access-point-form" loading={saving}>
+            {accessPoint ? 'Save changes' : wifiInfo ? 'Register & run live check' : 'Register device'}
+          </Button>
         </>
       }
     >
       {error && <div className="mb-4"><Alert tone="danger">{error}</Alert></div>}
+      {wifiInfo && !accessPoint && (
+        <div className="mb-4">
+          <Alert tone="info" title={`Connected Wi-Fi: ${wifiInfo.ssid}`}>
+            {wifiInfo.interface}
+            {wifiInfo.signal_percent != null ? ` · ${wifiInfo.signal_percent}% signal` : ''}
+            {wifiInfo.band ? ` · ${wifiInfo.band}` : ''}
+            {wifiInfo.channel != null ? ` · channel ${wifiInfo.channel}` : ''}
+            {' · gateway '}<span className="font-mono">{wifiInfo.gateway}</span>.
+            This check runs from the backend host, so it works only while the backend is on this Wi-Fi network.
+          </Alert>
+        </div>
+      )}
       <form id="access-point-form" onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
         <Field label="Access point name" required>
           <input className="input" value={form.name} onChange={(event) => update('name', event.target.value)} placeholder="e.g. Library Floor 2 AP" required maxLength={120} />
@@ -293,6 +314,86 @@ export default function AccessPoints() {
   const [deleting, setDeleting] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [checkingId, setCheckingId] = useState(null)
+  const [wifiDraft, setWifiDraft] = useState(null)
+  const [wifiInfo, setWifiInfo] = useState(null)
+  const [wifiLoading, setWifiLoading] = useState(false)
+
+  function openAdd() {
+    setEditing(null)
+    setWifiDraft(null)
+    setWifiInfo(null)
+    setFormOpen(true)
+  }
+
+  function openEdit(ap) {
+    setEditing(ap)
+    setWifiDraft(null)
+    setWifiInfo(null)
+    setFormOpen(true)
+  }
+
+  function closeForm() {
+    setFormOpen(false)
+    setWifiDraft(null)
+    setWifiInfo(null)
+  }
+
+  function handleSaved(saved, options = {}) {
+    reload()
+    if (options.runCheck && saved?.id) checkNow(saved)
+  }
+
+  async function useCurrentWifi() {
+    setWifiLoading(true)
+    try {
+      const response = await api.get('/monitoring/wifi')
+      const info = response.data
+      if (!info?.available) {
+        toast(
+          info?.reason || 'Wi-Fi details are only available when the backend runs on the connected computer.',
+          'warning',
+          'Wi-Fi access unavailable',
+        )
+        return
+      }
+      const ssid = info.ssid.trim().toLowerCase()
+      const bssid = info.bssid?.trim().toLowerCase() || null
+      const existing = accessPoints.find(
+        (ap) =>
+          !ap.is_simulated &&
+          ap.ip_address === info.gateway &&
+          (ap.name.trim().toLowerCase() === ssid ||
+            (bssid && ap.mac_address && ap.mac_address.trim().toLowerCase() === bssid)),
+      )
+      if (existing) {
+        toast('This Wi-Fi gateway is already registered. Running a live check.', 'info', info.ssid)
+        await checkNow(existing)
+        return
+      }
+      setEditing(null)
+      setWifiDraft({
+        ...EMPTY_FORM,
+        name: info.ssid,
+        location: 'Connected Wi-Fi (auto-detected)',
+        ip_address: info.gateway,
+        mac_address: info.bssid || '',
+        vendor: '',
+        model: '',
+        is_simulated: false,
+        notes: `Detected on ${info.hostname} (${info.platform}) via ${info.interface || 'the Wi-Fi interface'}${
+          info.adapter ? ` (${info.adapter})` : ''
+        }. Signal ${info.signal_percent ?? '—'}%${
+          info.rssi_dbm != null ? ` (${info.rssi_dbm} dBm)` : ''
+        }, ${info.band || 'band unknown'}, channel ${info.channel ?? '—'}, gateway ${info.gateway}. The live check runs from this backend host and only reaches the gateway while it is on the same Wi-Fi network.`,
+      })
+      setWifiInfo(info)
+      setFormOpen(true)
+    } catch (err) {
+      toast(getErrorMessage(err), 'error', 'Wi-Fi detection failed')
+    } finally {
+      setWifiLoading(false)
+    }
+  }
 
   const accessPoints = data || []
   const stats = useMemo(() => ({
@@ -353,7 +454,12 @@ export default function AccessPoints() {
         title="Access points"
         description="Register authorized access points, collect management-plane availability checks and keep a configuration audit trail. Simulated records are clearly labelled."
         actions={
-          hasRole('admin') ? <Button variant="primary" size="sm" icon={Plus} onClick={() => { setEditing(null); setFormOpen(true) }}>Add access point</Button> : null
+          hasRole('admin') ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="secondary" size="sm" icon={Wifi} loading={wifiLoading} onClick={useCurrentWifi}>Use current Wi-Fi</Button>
+              <Button variant="primary" size="sm" icon={Plus} onClick={openAdd}>Add access point</Button>
+            </div>
+          ) : null
         }
       />
 
@@ -421,7 +527,7 @@ export default function AccessPoints() {
                       <div className="flex items-center justify-end gap-1">
                         {hasRole('analyst') && <Button size="sm" variant="secondary" icon={Radar} loading={checkingId === ap.id} onClick={() => checkNow(ap)}>Check</Button>}
                         <Button size="sm" variant="ghost" icon={Eye} onClick={() => setDetailId(ap.id)} aria-label="View details" />
-                        {hasRole('admin') && <Button size="sm" variant="ghost" icon={Pencil} onClick={() => { setEditing(ap); setFormOpen(true) }} aria-label="Edit access point" />}
+                        {hasRole('admin') && <Button size="sm" variant="ghost" icon={Pencil} onClick={() => openEdit(ap)} aria-label="Edit access point" />}
                         {hasRole('admin') && <Button size="sm" variant="ghost" icon={Trash2} onClick={() => setDeleting(ap)} className="text-danger" aria-label="Delete access point" />}
                       </div>
                     </td>
@@ -435,12 +541,19 @@ export default function AccessPoints() {
             icon={Router}
             title={accessPoints.length ? 'No access points match your filters' : 'No access points registered'}
             description={accessPoints.length ? 'Adjust your search or status filter.' : 'Register an authorized access point to monitor availability, or add a clearly-labelled simulation for a classroom demonstration.'}
-            action={hasRole('admin') ? <Button icon={Plus} onClick={() => { setEditing(null); setFormOpen(true) }}>Add access point</Button> : null}
+            action={hasRole('admin') ? <Button icon={Plus} onClick={openAdd}>Add access point</Button> : null}
           />
         )}
       </section>
 
-      <AccessPointForm open={formOpen} onClose={() => setFormOpen(false)} accessPoint={editing} onSaved={reload} />
+      <AccessPointForm
+        open={formOpen}
+        onClose={closeForm}
+        accessPoint={editing}
+        initialValues={wifiDraft}
+        wifiInfo={wifiInfo}
+        onSaved={handleSaved}
+      />
       <AccessPointDetail accessPointId={detailId} onClose={() => setDetailId(null)} />
       <ConfirmModal
         open={Boolean(deleting)}

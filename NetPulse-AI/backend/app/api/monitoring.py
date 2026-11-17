@@ -13,6 +13,7 @@ from app.core.config import settings
 from app.models import NetworkMeasurement
 from app.monitoring.diagnostics import network_info
 from app.monitoring.scheduler import scheduler
+from app.monitoring.wifi import connected_wifi
 from app.schemas.schemas import (
     MeasurementOut,
     MonitoringHistory,
@@ -90,6 +91,12 @@ def run_check(db: DbSession, _: AnalystUser) -> MonitoringRunResponse:
         latency_threshold_ms=float(get_setting(db, "latency_threshold_ms", 150)),
         packet_loss_threshold_pct=float(get_setting(db, "packet_loss_threshold_pct", 5)),
     )
+
+
+@router.get("/wifi")
+def wifi_status(_: CurrentUser) -> dict:
+    """Read-only details of the Wi-Fi network associated with the backend host."""
+    return connected_wifi()
 
 
 @router.get("/scheduler")

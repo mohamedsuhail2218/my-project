@@ -28,7 +28,8 @@ NetPulse AI does **not**:
 
 - change router, access-point, firewall or Wi-Fi configuration;
 - capture packets, URLs, DNS queries or payload content;
-- perform an active network scan or port scan;
+- perform an active network or Wi-Fi scan, or a port scan (it reads only the
+  current Wi-Fi association and the local ARP cache);
 - invent measurements when a probe fails;
 - predict a future outage with certainty.
 
@@ -53,6 +54,7 @@ Three roles are enforced by the backend and reflected in the interface.
 | Create and update tickets, add comments | No | Yes | Yes |
 | Generate PDF reports | No | Yes | Yes |
 | Register, edit and delete access points | No | No | Yes |
+| Detect the current Wi-Fi and prefill its gateway | No | No | Yes |
 | Approve devices and edit device metadata | No | No | Yes |
 | Save settings and create user accounts | No | No | Yes |
 | Run the built-in backend test suite | No | No | Yes |
@@ -495,9 +497,23 @@ availability.
    notice, 24-hour performance and configuration history.
 5. Administrators can select **Add access point**, edit a row, or delete a row
    after confirmation.
+6. Administrators on a Wi-Fi-connected host can select **Use current Wi-Fi**.
+   NetPulse reads the operating system's current association (SSID, BSSID,
+   signal, band, channel and default gateway) and opens the form prefilled with
+   the gateway as the management IP. The submit button becomes **Register & run
+   live check**.
 
 **Registration fields:** name, location, management IP, optional MAC address,
 vendor, model, notes and simulated flag.
+
+**Current Wi-Fi detection:** the backend only reads its own association through
+read-only OS commands. It does not scan neighbouring networks, capture frames or
+retrieve Wi-Fi passwords. If that gateway is already registered as a real AP,
+**Use current Wi-Fi** runs another live check on the existing record instead of
+creating a duplicate. The check is a real ICMP probe (with a labelled TCP
+fallback) from the backend host, so it works only while the backend is on that
+Wi-Fi network. The public Vercel deployment has no wireless association and
+cannot reach private addresses; it shows a clear unavailable message.
 
 **Validation:** duplicate name/IP pairs return `409`; malformed IP or MAC
 addresses return `422`.
@@ -787,6 +803,19 @@ read-only notice and disabled fields. Invalid thresholds return `422`.
 If the check fails, the AP is marked offline and the real error is recorded.
 Use Smart Troubleshooting before changing any configuration.
 
+**Shortcut for the local Wi-Fi gateway:**
+
+1. Sign in as Administrator on the Wi-Fi-connected computer.
+2. Open **Access Points** and select **Use current Wi-Fi**.
+3. Confirm the detected SSID, signal, band, channel and gateway in the banner.
+4. Select **Register & run live check**; the first real measurement appears
+   immediately and the AP moves from **Unknown** to **Online** or **Offline**.
+5. Select **Use current Wi-Fi** again later to run another check against the
+   registered gateway without creating a duplicate.
+
+The same button on the Vercel deployment explains that the cloud function has no
+Wi-Fi association; it never attempts to probe a private address from the cloud.
+
 ### 6.9.3 Investigate an AI anomaly
 
 1. Open **AI Anomaly Detection**.
@@ -855,8 +884,8 @@ cd ..\frontend
 npm.cmd run test:e2e
 ```
 
-The latest verified results are 79 backend tests and 18 Playwright tests, all
-passing, with 84% backend line coverage.
+The latest verified results are 88 backend tests and 20 Playwright tests, all
+passing, with 82% backend line coverage.
 
 ### 6.9.8 Add a team member
 

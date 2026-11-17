@@ -26,16 +26,19 @@ def table(cases: list[ET.Element]) -> list[str]:
 
 
 def main() -> None:
+    backend_root = ET.parse(REPORTS / "backend-junit.xml").getroot()
+    backend_cases = list(backend_root.iter("testcase"))
+    frontend_root = ET.parse(REPORTS / "frontend-junit.xml").getroot()
+    frontend_cases = list(frontend_root.iter("testcase"))
+
     lines = [
         "# Automated Test Inventory",
         "",
         "Generated from the final JUnit XML files in `reports/test-runs/`.",
         "",
-        "## Backend Pytest inventory (79 tests)",
+        f"## Backend Pytest inventory ({len(backend_cases)} tests)",
         "",
     ]
-    backend_root = ET.parse(REPORTS / "backend-junit.xml").getroot()
-    backend_cases = list(backend_root.iter("testcase"))
     groups: dict[str, list[ET.Element]] = {}
     for case in backend_cases:
         groups.setdefault(case.get("classname") or "unknown", []).append(case)
@@ -46,9 +49,7 @@ def main() -> None:
         lines.extend(table(groups[group_name]))
         lines.append("")
 
-    lines.extend(["## Frontend Playwright inventory (18 tests)", ""])
-    frontend_root = ET.parse(REPORTS / "frontend-junit.xml").getroot()
-    frontend_cases = list(frontend_root.iter("testcase"))
+    lines.extend([f"## Frontend Playwright inventory ({len(frontend_cases)} tests)", ""])
     fgroups: dict[str, list[ET.Element]] = {}
     for case in frontend_cases:
         fgroups.setdefault(case.get("classname") or "unknown", []).append(case)

@@ -9,7 +9,7 @@ Testing pursued six objectives:
 | TO1 | Verify authentication, authorization and session handling | 12 auth tests + 4 Playwright auth tests |
 | TO2 | Verify real-data integrity and simulation isolation | Monitoring, dashboard, AP and device tests |
 | TO3 | Verify the AI and rule-based decision logic | Anomaly and troubleshooting tests |
-| TO4 | Verify the operational workflow end to end | 10 Playwright interaction tests |
+| TO4 | Verify the operational workflow end to end | 12 Playwright interaction tests |
 | TO5 | Verify reports, test runner and settings | Report, testing and settings tests |
 | TO6 | Verify the interface is usable and responsive | Playwright navigation/responsive tests, 17 screenshots |
 
@@ -58,16 +58,16 @@ manual exploratory layer.
 
 ```mermaid
 flowchart TB
-    E2E["18 Playwright end-to-end tests<br/>real browser + real backend"]
-    INT["46 API/integration tests<br/>FastAPI TestClient + throw-away SQLite"]
-    UNIT["33 unit/service tests<br/>security, ARP parsing, JUnit, ML helpers"]
+    E2E["20 Playwright end-to-end tests<br/>real browser + real backend"]
+    INT["48 API/integration tests<br/>FastAPI TestClient + throw-away SQLite"]
+    UNIT["40 unit/service tests<br/>security, ARP/Wi-Fi parsing, JUnit, ML helpers"]
     MAN["Manual exploratory review<br/>screenshots, visual layout, PDF inspection"]
 
     MAN --> E2E --> INT --> UNIT
 ```
 
 The split is approximate: several API tests also exercise services and the
-database. The exact 79-test inventory is in
+database. The exact 88-test inventory is in
 [`test-inventory.generated.md`](test-inventory.generated.md).
 
 ### 5.3.1 Backend isolation
@@ -133,21 +133,22 @@ Playwright:
 | `test_tickets.py` | 5 | Manual lifecycle, filters/stats, duplicate suppression + resolution reopen, low-anomaly policy, validation/RBAC |
 | `test_troubleshooting.py` | 4 | Simulated AP refusal, latency/loss/outage escalation, list/latest, invalid AP + RBAC |
 | `test_dashboard.py` | 4 | Overview contract, simulation exclusion, window validation, health calculation |
-| **Total** | **79** | |
+| `test_wifi.py` | 9 | Windows association parsing, frequency/band mapping, fallback payloads, authenticated endpoint |
+| **Total** | **88** | |
 
 ### 5.4.2 Final result
 
 ```text
-79 passed, 1 warning in 4.60s
+88 passed, 1 warning in 4.86s
 ```
 
 The warning is a Starlette deprecation notice about the `httpx` test client
 adapter. It does not affect application behaviour.
 
-JUnit XML reports 79 tests, 0 failures, 0 errors, 0 skipped:
+JUnit XML reports 88 tests, 0 failures, 0 errors, 0 skipped:
 
 ```text
-testsuite name="pytest" errors="0" failures="0" skipped="0" tests="79"
+testsuite name="pytest" errors="0" failures="0" skipped="0" tests="88"
 ```
 
 ### 5.4.3 Coverage
@@ -155,7 +156,7 @@ testsuite name="pytest" errors="0" failures="0" skipped="0" tests="79"
 Coverage was measured with `pytest-cov` against the `app` package:
 
 ```text
-TOTAL   2216 statements   350 missed   84%
+TOTAL   2362 statements   425 missed   82%
 ```
 
 | Area | Coverage | Notes |
@@ -169,7 +170,8 @@ TOTAL   2216 statements   350 missed   84%
 | Access point API | 91% | CRUD, checks, history, performance |
 | Reports service | 96% | All report builders and listing metadata exercised |
 | Main app | 87% | Lifespan, static mount, errors |
-| Monitoring API | 80% | History, latest, scheduler, blocked run |
+| Monitoring API | 81% | History, latest, scheduler, blocked run, Wi-Fi endpoint |
+| Wi-Fi detector | 47% | Parser branches covered; OS command paths exercised manually |
 | Monitoring service | 80% | Probe persistence, AP checks |
 | Seed service | 77% | Admin/settings/demo AP seeding |
 | Ticketing service | 72% | Threshold, anomaly and AP rules |
@@ -178,11 +180,11 @@ TOTAL   2216 statements   350 missed   84%
 | Diagnostics | 41% | OS command execution branches not run in CI-like tests |
 | Scheduler | 40% | Async loop and timing branches not unit-tested |
 
-The lower coverage in diagnostics and the scheduler is expected: the tests
-deliberately avoid live pings and long-running loops. Their core parsing and
-orchestration paths are covered by service tests and the real browser suite,
-while the actual OS command branches were exercised manually during the live
-application run.
+The lower coverage in diagnostics, Wi-Fi detection and the scheduler is
+expected: the tests deliberately avoid live pings, host-specific OS commands and
+long-running loops. Their core parsing and orchestration paths are covered by
+unit/service tests and the real browser suite, while the actual OS command
+branches were exercised manually during the live application run.
 
 Coverage XML: `reports/test-runs/coverage.xml`.
 
@@ -195,18 +197,18 @@ Coverage XML: `reports/test-runs/coverage.xml`.
 | Spec | Tests | Focus |
 |---|---:|---|
 | `auth.spec.js` | 4 | Anonymous redirect, wrong password, admin login + reload persistence, sign out |
-| `interactions.spec.js` | 10 | Theme persistence, command palette, AP detail/check, AP CRUD, device discovery/privacy, AI + troubleshooting, ticket lifecycle, PDF generate/download, settings save, notifications |
+| `interactions.spec.js` | 12 | Theme persistence, command palette, AP detail/check, AP CRUD, current Wi-Fi prefill/unavailable states, device discovery/privacy, AI + troubleshooting, ticket lifecycle, PDF generate/download, settings save, notifications |
 | `navigation.spec.js` | 2 | All ten modules render without console errors; deep links and 404 |
 | `responsive.spec.js` | 2 | Mobile drawer navigation; no horizontal overflow |
-| **Total** | **18** | |
+| **Total** | **20** | |
 
 ### 5.5.2 Final result
 
 ```text
-18 passed (48.9s)
+20 passed (50.6s)
 ```
 
-JUnit XML reports 18 tests, 0 failures.
+JUnit XML reports 20 tests, 0 failures.
 
 ### 5.5.3 What the E2E suite proves
 
@@ -214,6 +216,8 @@ JUnit XML reports 18 tests, 0 failures.
 - Every sidebar module renders its own content, not a placeholder.
 - No console or page errors occur while traversing all modules.
 - Access point CRUD and ticket lifecycle work against the real database.
+- The current Wi-Fi dialog prefills the detected gateway without writing a
+  record, and the cloud-unavailable response is explained without a probe.
 - Device discovery invokes the real ARP adapter and displays the privacy dialog.
 - AI detection and troubleshooting execute real backend services.
 - Report generation writes a real PDF and the download event produces a
@@ -229,15 +233,15 @@ JUnit XML reports 18 tests, 0 failures.
 
 | Suite | Tests | Passed | Failed | Skipped | Duration |
 |---|---:|---:|---:|---:|---:|
-| Backend Pytest | 79 | 79 | 0 | 0 | 2.49 s (JUnit) / 4.60 s with coverage |
-| Frontend Playwright | 18 | 18 | 0 | 0 | 48.91 s |
-| **Total** | **97** | **97** | **0** | **0** | — |
+| Backend Pytest | 88 | 88 | 0 | 0 | 2.52 s (JUnit) / 4.86 s with coverage |
+| Frontend Playwright | 20 | 20 | 0 | 0 | 50.61 s |
+| **Total** | **108** | **108** | **0** | **0** | — |
 
 Additional verification:
 
 | Check | Result |
 |---|---|
-| Backend line coverage | 84% |
+| Backend line coverage | 82% |
 | Built-in test runner | Run `run-20261115-090130-a8cc`, 79 passed, 0 failed |
 | PDF `%PDF-` signature | Verified |
 | Security headers | `nosniff`, `DENY`, `no-referrer`, restrictive Permissions-Policy, `no-store` |
@@ -336,10 +340,10 @@ Testing was not only confirmatory; several real defects were found and corrected
 | D-04 | Sidebar email capitalization | Profile identity rendered incorrectly | CSS transform applied to email | Removed text transform for email | E2E/admin profile check |
 | D-05 | Pytest suite mapping incorrect | Built-in runner grouped tests under wrong suites | `_suite_for()` matched only the first classname segment | Map classname to known suite names, fallback to module | `test_suite_mapping` |
 | D-06 | Playwright strict label conflict | Login test failed on “Password” | Password visibility button also had label “Show password” | Exact label matching in helper/tests | Auth E2E suite |
-| D-07 | Playwright headless shell blocked | All E2E tests failed to launch | Windows Application Control policy blocks bundled shell | Use installed Chrome channel | 18 E2E tests pass |
+| D-07 | Playwright headless shell blocked | All E2E tests failed to launch | Windows Application Control policy blocks bundled shell | Use installed Chrome channel | 20 E2E tests pass |
 | D-08 | Automation screenshot captured entire page | Unreadable giant image | `fullPage: true` for dense pages | Per-page viewport/full-page configuration | Refreshed screenshots |
 | D-09 | Testing report predated final 79-pass run | Report evidence stale | PDF generated before final test run | Regenerate PDFs after final run | Final report set |
-| D-10 | Pytest class mapping test added after runner fix | Regression risk | No direct test for mapping | Added `test_suite_mapping` | 79-test suite |
+| D-10 | Pytest class mapping test added after runner fix | Regression risk | No direct test for mapping | Added `test_suite_mapping` | 88-test suite |
 
 The defect log demonstrates an iterative verification process rather than a
 single “happy path” demonstration.
@@ -454,7 +458,7 @@ remains the main deployment risk and is repeated in the conclusion.
 
 ## 5.12 Chapter summary
 
-The final build passed **97 automated tests** (79 backend + 18 E2E) with **84%
+The final build passed **108 automated tests** (88 backend + 20 E2E) with **82%
 backend line coverage**. Testing found and fixed real UI and test-infrastructure
 defects. The evidence is stored as JUnit XML, coverage XML, a Playwright HTML
 report, PDFs and 17 screenshots. The main unverified area is the MySQL runtime

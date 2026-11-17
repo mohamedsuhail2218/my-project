@@ -91,6 +91,7 @@ Administrator.
 | POST | `/auth/users` | Administrator | Create a user account |
 | GET | `/dashboard/overview` | Any authenticated | Dashboard aggregation |
 | GET | `/monitoring/network-info` | Any authenticated | Host and interface context |
+| GET | `/monitoring/wifi` | Any authenticated | Read-only current Wi-Fi association |
 | GET | `/monitoring/history` | Any authenticated | Live measurement history |
 | GET | `/monitoring/latest` | Any authenticated | Latest live measurement |
 | POST | `/monitoring/run` | Analyst+ | Run a real probe |
@@ -227,8 +228,8 @@ the installed Chrome channel. Paths are relative to the `documentation/` folder.
 - [x] FastAPI backend source
 - [x] MySQL schema, migration and database guide
 - [x] SQLite verified runtime database
-- [x] Pytest suite with 79 passing tests
-- [x] Playwright suite with 18 passing tests
+- [x] Pytest suite with 88 passing tests
+- [x] Playwright suite with 20 passing tests
 - [x] JUnit XML and coverage evidence
 - [x] Built-in test runner with persisted results
 - [x] Eight PDF report types
@@ -254,8 +255,8 @@ the installed Chrome channel. Paths are relative to the `documentation/` folder.
 ## E.3 Final verification statement
 
 The verified build uses SQLite and a local Windows 11 host. The final recorded
-run contains **79 passing backend tests** and **18 passing Playwright tests**,
-with **84% backend line coverage**. MySQL runtime import remains unverified
+run contains **88 passing backend tests** and **20 passing Playwright tests**,
+with **82% backend line coverage**. MySQL runtime import remains unverified
 because MySQL and Docker were unavailable on the development machine. Simulated
 records are labelled and excluded from live health. The application never
 fabricates a live measurement.
