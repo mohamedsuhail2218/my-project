@@ -130,7 +130,7 @@ export default function Overview() {
       )}
 
       <div className="grid gap-4 lg:grid-cols-[300px_1fr]">
-        <section className="panel relative overflow-hidden p-5">
+        <section className="panel purple-band relative overflow-hidden p-5">
           <div className="login-grid pointer-events-none absolute inset-0 opacity-40" />
           <div className="relative flex items-start justify-between">
             <div>

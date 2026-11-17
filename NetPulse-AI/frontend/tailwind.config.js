@@ -5,16 +5,16 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'Segoe UI', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['Segoe UI', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['Cascadia Code', 'SFMono-Regular', 'Consolas', 'monospace'],
+        sans: ['Space Grotesk', 'Inter', 'Segoe UI', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Anton', 'Arial Narrow', 'Impact', 'ui-sans-serif', 'sans-serif'],
+        mono: ['Space Mono', 'Cascadia Code', 'SFMono-Regular', 'Consolas', 'monospace'],
       },
       colors: {
         ink: {
-          950: '#170f11',
-          900: '#1f1417',
-          850: '#27181c',
-          800: '#312026',
+          950: '#050505',
+          900: '#0a0a0a',
+          850: '#111111',
+          800: '#181818',
         },
         wine: {
           50: '#fbf1f3',
@@ -108,8 +108,8 @@ export default {
         neutral: 'rgb(var(--neutral-rgb) / <alpha-value>)',
       },
       boxShadow: {
-        glow: '0 0 0 1px rgba(206,111,132,.22), 0 18px 60px -22px rgba(124,31,58,.48)',
-        card: '0 1px 0 0 rgba(255,246,236,.04), 0 20px 50px -30px rgba(26,15,18,.9)',
+        glow: '0 0 0 1px rgba(204,255,0,.22), 0 18px 60px -24px rgba(204,255,0,.45)',
+        card: '0 1px 0 0 rgba(255,255,255,.03), 0 24px 60px -40px rgba(0,0,0,.95)',
       },
       keyframes: {
         'fade-up': {
@@ -117,9 +117,9 @@ export default {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         'pulse-ring': {
-          '0%': { boxShadow: '0 0 0 0 rgba(206,111,132,.42)' },
-          '70%': { boxShadow: '0 0 0 8px rgba(206,111,132,0)' },
-          '100%': { boxShadow: '0 0 0 0 rgba(206,111,132,0)' },
+          '0%': { boxShadow: '0 0 0 0 rgba(204,255,0,.42)' },
+          '70%': { boxShadow: '0 0 0 8px rgba(204,255,0,0)' },
+          '100%': { boxShadow: '0 0 0 0 rgba(204,255,0,0)' },
         },
         'shimmer': {
           '100%': { transform: 'translateX(100%)' },

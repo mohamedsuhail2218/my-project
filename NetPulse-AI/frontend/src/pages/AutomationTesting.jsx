@@ -216,14 +216,14 @@ export default function AutomationTesting() {
             <SectionHeader icon={Terminal} title="Browser automation" subtitle="Playwright end-to-end suite" />
             <div className="mt-3 space-y-2">
               <p className="text-[10px] leading-relaxed text-muted">Playwright verifies sign-in, protected navigation, responsive layout and core dashboard interactions against the running application.</p>
-              <div className="rounded-lg border border-app bg-ink-950/60 p-2.5 font-mono text-[9px] leading-relaxed text-sand-300">
+              <div className="border border-app bg-black/40 p-2.5 font-mono text-[9px] leading-relaxed text-[var(--accent)]">
                 cd frontend<br />npm run test:e2e
               </div>
               <p className="text-[9px] leading-relaxed text-subtle">Reports are written to <span className="code-chip">reports/playwright-report</span>. Browser tests are intentionally not launchable from the API runner.</p>
             </div>
           </section>
 
-          <section className="rounded-xl border border-app bg-accent/[0.03] p-3.5">
+          <section className="border border-app bg-accent/[0.03] p-3.5">
             <p className="flex items-center gap-2 text-[10px] font-semibold text-app"><Code2 className="h-3.5 w-3.5 text-plum" /> Test coverage</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {['Auth', 'API', 'Monitoring', 'ML', 'Tickets', 'Devices', 'Reports', 'Browser'].map((item) => <span key={item} className="code-chip">{item}</span>)}
@@ -245,7 +245,7 @@ export default function AutomationTesting() {
               <StatusBadge status={selectedTest.status} />
               <span className="text-[10px] text-subtle">Duration {Duration(selectedTest.duration_ms)}</span>
             </div>
-            <div className="rounded-lg border border-app bg-ink-950/60 p-3">
+            <div className="border border-app bg-black/30 p-3">
               <p className="eyebrow mb-1.5">Details</p>
               <pre className="whitespace-pre-wrap break-words text-[10px] leading-relaxed text-muted">{selectedTest.details || 'No failure details were recorded for this test.'}</pre>
             </div>

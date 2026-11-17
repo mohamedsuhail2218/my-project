@@ -9,10 +9,10 @@ const icons = {
   info: Info,
 }
 const tones = {
-  success: 'border-sage-400/30 bg-[#20281a]/95 text-sage-300',
-  error: 'border-rust-400/30 bg-[#2c1815]/95 text-rust-300',
-  warning: 'border-ochre-400/30 bg-[#2b2113]/95 text-ochre-300',
-  info: 'border-wine-400/30 bg-[#2a191e]/95 text-wine-300',
+  success: 'border-[#ccff00]/40 bg-[#101400]/95 text-[#d8ff4d]',
+  error: 'border-[#ff4d6d]/40 bg-[#1a0a0e]/95 text-[#ff8fa3]',
+  warning: 'border-[#ffb020]/40 bg-[#1a1203]/95 text-[#ffd166]',
+  info: 'border-[#a855f7]/40 bg-[#120a1c]/95 text-[#d8b4fe]',
 }
 
 export function ToastProvider({ children }) {
@@ -44,7 +44,7 @@ export function ToastProvider({ children }) {
           return (
             <div
               key={item.id}
-              className={`pointer-events-auto flex animate-fade-up items-start gap-3 rounded-xl border p-3.5 shadow-2xl backdrop-blur ${tones[item.type] || tones.info}`}
+              className={`pointer-events-auto flex animate-fade-up items-start gap-3 border p-3.5 shadow-2xl backdrop-blur ${tones[item.type] || tones.info}`}
               role="status"
             >
               <Icon className="mt-0.5 h-4 w-4 shrink-0" />

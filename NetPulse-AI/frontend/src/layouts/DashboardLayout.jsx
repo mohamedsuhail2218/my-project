@@ -71,7 +71,7 @@ function Sidebar({ open, onClose, monitoringEnabled }) {
   const monitoringActive = monitoringEnabled === true
   return (
     <>
-      {open && <div className="fixed inset-0 z-30 bg-ink-950/70 backdrop-blur-sm lg:hidden" onClick={onClose} aria-hidden="true" />}
+      {open && <div className="fixed inset-0 z-30 bg-black/75 backdrop-blur-sm lg:hidden" onClick={onClose} aria-hidden="true" />}
       <aside
         className={cn(
           'fixed inset-y-0 left-0 z-40 flex w-[252px] flex-col border-r border-app transition-transform duration-200 lg:translate-x-0',
@@ -88,7 +88,7 @@ function Sidebar({ open, onClose, monitoringEnabled }) {
         <nav className="no-scrollbar flex-1 overflow-y-auto px-3 py-4" aria-label="Main navigation">
           {NAV_GROUPS.map((group) => (
             <div key={group.label} className="mb-5">
-              <p className="mb-1.5 px-3 text-[8.5px] font-bold uppercase tracking-[0.19em] text-subtle">{group.label}</p>
+              <p className="mb-1.5 px-3 font-mono text-[8px] font-bold uppercase tracking-[0.22em] text-subtle">{group.label}</p>
               <div className="space-y-0.5">
                 {group.items.map((item) => (
                   <NavLink
@@ -106,7 +106,7 @@ function Sidebar({ open, onClose, monitoringEnabled }) {
             </div>
           ))}
         </nav>
-        <div className="mx-3 mb-3 rounded-xl border border-app bg-accent/[0.03] p-3">
+        <div className="mx-3 mb-3 border border-app bg-accent/[0.035] p-3">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
               {monitoringActive && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-50" />}
@@ -123,12 +123,12 @@ function Sidebar({ open, onClose, monitoringEnabled }) {
           </p>
         </div>
         <div className="flex items-center gap-2.5 border-t border-app px-4 py-3.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-accent/20 bg-accent/10 text-[11px] font-bold text-accent">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center border border-[var(--accent-fill)] bg-[var(--accent-fill)] font-mono text-[10px] font-bold text-[var(--accent-ink)]">
             {(user?.full_name || 'NP').split(' ').map((part) => part[0]).slice(0, 2).join('')}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-[11px] font-semibold text-app">{user?.full_name}</p>
-            <p className="truncate text-[9.5px] text-subtle"><span className="capitalize">{user?.role}</span> · {user?.email}</p>
+            <p className="truncate font-mono text-[8.5px] uppercase tracking-[0.06em] text-subtle"><span className="capitalize">{user?.role}</span> · {user?.email}</p>
           </div>
           <ShieldCheck className="h-3.5 w-3.5 text-success" />
         </div>
@@ -282,26 +282,26 @@ export default function DashboardLayout() {
           <button onClick={() => setSidebarOpen(true)} className="rounded-lg p-2 text-muted transition hover:bg-accent/5 hover:text-app lg:hidden" aria-label="Open navigation">
             <Menu className="h-4.5 w-4.5" />
           </button>
-          <div className="hidden items-center gap-2 text-[10px] text-subtle sm:flex">
+          <div className="hidden items-center gap-2 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-subtle sm:flex">
             <CircleDot className="h-3 w-3 text-accent" />
             <span>Workspace</span>
-            <span>/</span>
-            <span className="font-medium text-muted">{currentPage?.label || 'NetPulse AI'}</span>
+            <span className="text-accent/60">/</span>
+            <span className="text-muted">{currentPage?.label || 'NetPulse AI'}</span>
           </div>
           <div className="flex-1" />
           <button
             onClick={() => setPaletteOpen(true)}
-            className="hidden items-center gap-2 rounded-lg border border-app bg-accent/[0.03] px-2.5 py-1.5 text-[10px] text-subtle transition hover:border-accent/25 hover:text-muted md:flex"
+            className="hidden items-center gap-2 border border-app bg-accent/[0.03] px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.08em] text-subtle transition hover:border-accent/40 hover:text-muted md:flex"
           >
             <Search className="h-3.5 w-3.5" />
             <span>Search workspace</span>
             <span className="code-chip ml-4 inline-flex items-center gap-0.5"><Command className="h-2.5 w-2.5" />K</span>
           </button>
           <div className={cn(
-            'hidden items-center gap-1.5 rounded-md border px-2 py-1 text-[9px] font-medium sm:flex',
+            'hidden items-center gap-1.5 border px-2 py-1 font-mono text-[8.5px] font-bold uppercase tracking-[0.1em] sm:flex',
             dashboard?.monitoring?.enabled === true
-              ? 'border-success/15 bg-success/[0.05] text-success'
-              : 'border-warning/20 bg-warning/[0.06] text-warning',
+              ? 'border-success/25 bg-success/[0.06] text-success'
+              : 'border-warning/25 bg-warning/[0.06] text-warning',
           )}>
             <span className={cn('h-1.5 w-1.5 rounded-full', dashboard?.monitoring?.enabled === true ? 'bg-success animate-pulse-ring' : 'bg-warning')} />
             {dashboard?.monitoring?.enabled === true ? 'Live probes' : dashboard?.monitoring?.enabled === false ? 'Probes paused' : 'Probe status'}
@@ -328,7 +328,7 @@ export default function DashboardLayout() {
               aria-label="Open user menu"
               aria-expanded={userMenuOpen}
             >
-              <div className="flex h-7 w-7 items-center justify-center rounded-full border border-accent/20 bg-accent/10 text-[10px] font-bold text-accent">
+              <div className="flex h-7 w-7 items-center justify-center border border-[var(--accent-fill)] bg-[var(--accent-fill)] font-mono text-[9px] font-bold text-[var(--accent-ink)]">
                 {(user?.full_name || 'NP').split(' ').map((part) => part[0]).slice(0, 2).join('')}
               </div>
               <ChevronDown className="hidden h-3 w-3 text-subtle sm:block" />
@@ -356,7 +356,7 @@ export default function DashboardLayout() {
         <main className="mx-auto w-full max-w-[1600px] px-4 py-5 sm:px-6 sm:py-6">
           <Outlet />
         </main>
-        <footer className="mx-auto flex w-full max-w-[1600px] flex-col items-center justify-between gap-2 px-6 pb-6 pt-2 text-[9px] text-subtle sm:flex-row">
+        <footer className="mx-auto flex w-full max-w-[1600px] flex-col items-center justify-between gap-2 px-6 pb-6 pt-2 font-mono text-[8.5px] uppercase tracking-[0.1em] text-subtle sm:flex-row">
           <span>NetPulse AI · Authorized network monitoring only</span>
           <span className="flex items-center gap-1.5"><Network className="h-3 w-3" /> No fabricated live measurements</span>
         </footer>

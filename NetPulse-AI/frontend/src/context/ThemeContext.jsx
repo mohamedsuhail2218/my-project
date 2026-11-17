@@ -9,7 +9,7 @@ export function ThemeProvider({ children }) {
     const root = document.documentElement
     root.classList.toggle('dark', theme === 'dark')
     localStorage.setItem('netpulse_theme', theme)
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#170f11' : '#f3e9dc')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#060606' : '#f1f0e7')
   }, [theme])
 
   const value = useMemo(

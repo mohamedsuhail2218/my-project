@@ -52,7 +52,7 @@ export function IconButton({ icon: Icon, label, className = '', ...props }) {
       type="button"
       aria-label={label}
       title={label}
-      className={cn('inline-flex h-8 w-8 items-center justify-center rounded-lg border border-app text-muted transition hover:border-accent/30 hover:bg-accent/5 hover:text-accent', className)}
+      className={cn('inline-flex h-8 w-8 items-center justify-center border border-app text-muted transition hover:border-accent/50 hover:bg-accent/5 hover:text-accent', className)}
       {...props}
     >
       <Icon className="h-3.5 w-3.5" />
@@ -63,15 +63,24 @@ export function IconButton({ icon: Icon, label, className = '', ...props }) {
 export function PageHeader({ eyebrow, title, description, actions, children }) {
   return (
     <div className="mb-6 animate-fade-up">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-        <div>
-          {eyebrow && <p className="eyebrow mb-1.5">{eyebrow}</p>}
-          <h1 className="font-display text-[23px] font-bold tracking-[-0.02em] text-app sm:text-[27px]">{title}</h1>
-          {description && <p className="mt-1.5 max-w-3xl text-xs leading-relaxed text-muted">{description}</p>}
+      <div className="panel relative overflow-hidden px-5 py-6 sm:px-7 sm:py-7">
+        <div className="pointer-events-none absolute -right-24 -top-32 h-72 w-72 rounded-full bg-[rgba(168,85,247,0.28)] blur-[80px]" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-[var(--accent)] via-[rgba(204,255,0,0.18)] to-transparent" />
+        <div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+          <div>
+            {eyebrow && (
+              <p className="eyebrow mb-2.5 flex items-center gap-2">
+                <span className="inline-block h-2 w-2 bg-accent" />
+                {eyebrow}
+              </p>
+            )}
+            <h1 className="font-display text-[38px] leading-[0.88] text-app sm:text-[56px]">{title}</h1>
+            {description && <p className="mt-3 max-w-2xl text-[11.5px] leading-relaxed text-muted">{description}</p>}
+          </div>
+          {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
         </div>
-        {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+        {children}
       </div>
-      {children}
     </div>
   )
 }
@@ -81,7 +90,7 @@ export function SectionHeader({ title, subtitle, action, icon: Icon }) {
     <div className="flex items-start justify-between gap-3">
       <div className="flex items-start gap-2.5">
         {Icon && (
-          <span className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10 text-accent">
+          <span className="mt-0.5 flex h-7 w-7 items-center justify-center border border-accent/35 bg-accent/[0.06] text-accent">
             <Icon className="h-3.5 w-3.5" />
           </span>
         )}
@@ -119,10 +128,11 @@ export function StatCard({ label, value, unit, hint, icon: Icon, accent = 'wine'
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (event) => event.key === 'Enter' && onClick() : undefined}
     >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--accent)]/50 to-transparent opacity-60" />
       <div className="flex items-start justify-between gap-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-subtle">{label}</p>
+        <p className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-subtle">{label}</p>
         {Icon && (
-          <span className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', `stat-accent-${accent}`)}>
+          <span className={cn('flex h-8 w-8 shrink-0 items-center justify-center', `stat-accent-${accent}`)}>
             <Icon className="h-4 w-4" />
           </span>
         )}
@@ -130,8 +140,8 @@ export function StatCard({ label, value, unit, hint, icon: Icon, accent = 'wine'
       {loading ? (
         <div className="skeleton mt-3 h-8 w-24" />
       ) : (
-        <div className="mt-2 flex items-baseline gap-1.5">
-          <span className="font-display text-[25px] font-bold tracking-tight text-app">{valueText}</span>
+        <div className="mt-2.5 flex items-baseline gap-1.5">
+          <span className="font-display text-[31px] leading-none text-app">{valueText}</span>
           {unit && <span className="text-[11px] font-medium text-subtle">{unit}</span>}
         </div>
       )}
@@ -152,7 +162,7 @@ export function HealthRing({ value, size = 150, label = 'Network health' }) {
   return (
     <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} viewBox="0 0 128 128" className="-rotate-90">
-        <circle cx="64" cy="64" r={radius} fill="none" stroke="rgba(148,163,184,.13)" strokeWidth="9" />
+        <circle cx="64" cy="64" r={radius} fill="none" stroke="var(--border-strong)" strokeWidth="9" opacity="0.55" />
         <circle
           cx="64"
           cy="64"
@@ -179,15 +189,15 @@ export function HealthRing({ value, size = 150, label = 'Network health' }) {
 export function ProgressBar({ value, tone = 'wine', className = '' }) {
   const safe = Math.max(0, Math.min(100, Number(value) || 0))
   const colors = {
-    wine: 'from-accent to-gold',
-    sage: 'from-success to-sage-600',
-    ochre: 'from-warning to-ochre-600',
-    rust: 'from-danger to-rust-600',
+    wine: 'from-accent to-accent',
+    sage: 'from-success to-success',
+    ochre: 'from-warning to-warning',
+    rust: 'from-danger to-danger',
     plum: 'from-plum to-plum',
-    gold: 'from-gold to-sand-600',
+    gold: 'from-gold to-gold',
   }
   return (
-    <div className={cn('h-1.5 overflow-hidden rounded-full bg-neutral/15', className)}>
+    <div className={cn('h-1.5 overflow-hidden bg-neutral/15', className)}>
       <div className={cn('h-full rounded-full bg-gradient-to-r transition-all duration-700', colors[tone] || colors.wine)} style={{ width: `${safe}%` }} />
     </div>
   )
@@ -196,7 +206,7 @@ export function ProgressBar({ value, tone = 'wine', className = '' }) {
 export function EmptyState({ icon: Icon = Inbox, title, description, action, compact = false }) {
   return (
     <div className={cn('flex flex-col items-center justify-center px-6 text-center', compact ? 'py-8' : 'py-14')}>
-      <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-app bg-accent/[0.03] text-subtle">
+      <div className="mb-3 flex h-11 w-11 items-center justify-center border border-accent/25 bg-accent/[0.04] text-accent">
         <Icon className="h-5 w-5" />
       </div>
       <h3 className="text-sm font-semibold text-app">{title}</h3>
@@ -215,7 +225,7 @@ export function Alert({ tone = 'info', title, children, action, className = '' }
   }
   const Icon = tone === 'danger' || tone === 'warning' ? AlertTriangle : tone === 'success' ? CheckCircle2 : Info
   return (
-    <div className={cn('flex items-start gap-3 rounded-xl border px-3.5 py-3 text-[11px] leading-relaxed', palette[tone], className)}>
+    <div className={cn('flex items-start gap-3 border px-3.5 py-3 text-[11px] leading-relaxed', palette[tone], className)}>
       <Icon className="mt-0.5 h-4 w-4 shrink-0" />
       <div className="flex-1">
         {title && <p className="font-semibold">{title}</p>}
@@ -287,16 +297,16 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-app bg-[var(--panel-solid)] px-5 py-4">
           <div className="flex items-start gap-3">
             {Icon && (
-              <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-accent">
+              <span className="mt-0.5 flex h-8 w-8 items-center justify-center border border-accent/35 bg-accent/[0.06] text-accent">
                 <Icon className="h-4 w-4" />
               </span>
             )}
             <div>
-              <h2 className="text-sm font-semibold text-app">{title}</h2>
+              <h2 className="text-base font-semibold text-app">{title}</h2>
               {subtitle && <p className="mt-0.5 text-[10.5px] text-subtle">{subtitle}</p>}
             </div>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-subtle transition hover:bg-accent/5 hover:text-app" aria-label="Close dialog">
+          <button onClick={onClose} className="p-1.5 text-subtle transition hover:bg-accent/5 hover:text-accent" aria-label="Close dialog">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -372,11 +382,14 @@ export function Toggle({ checked, onChange, label, description, disabled = false
         disabled={disabled}
         onClick={() => onChange(!checked)}
         className={cn(
-          'relative h-5 w-9 shrink-0 rounded-full border transition-colors disabled:opacity-40',
-          checked ? 'border-accent/50 bg-accent/70' : 'border-neutral/30 bg-neutral/20',
+          'relative h-5 w-9 shrink-0 border transition-colors disabled:opacity-40',
+          checked ? 'border-[var(--accent-fill)] bg-[var(--accent-fill)]' : 'border-neutral/30 bg-neutral/20',
         )}
       >
-        <span className={cn('absolute top-0.5 h-3.5 w-3.5 rounded-full bg-white shadow transition-transform', checked ? 'translate-x-[18px]' : 'translate-x-0.5')} />
+        <span className={cn(
+          'absolute top-0.5 h-3.5 w-3.5 shadow transition-transform',
+          checked ? 'translate-x-[18px] bg-[var(--accent-ink)]' : 'translate-x-0.5 bg-white',
+        )} />
       </button>
     </div>
   )
