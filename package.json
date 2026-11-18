@@ -21,8 +21,12 @@
     "ci": "npm run build && npm run test"
   },
   "dependencies": {
+    "@prisma/composer": "0.38.0",
+    "@prisma/composer-prisma-cloud": "0.38.0",
+    "@prisma/orm-postgres": "8.0.0-rc.23",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
+    "effect": "4.0.5",
     "express": "^5.3.0",
     "helmet": "^8.1.0",
     "ipaddr.js": "^2.5.0",
@@ -37,8 +41,16 @@
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
     "cross-env": "^10.1.0",
+    "prisma": "8.0.0-rc.33",
     "supertest": "^7.3.2",
     "vite": "^6.0.7",
     "vitest": "^4.1.12"
+  },
+  "overrides": {
+    "@effect/platform-bun": "4.0.5",
+    "@effect/platform-node": "4.0.5",
+    "@effect/platform-node-shared": "4.0.5",
+    "@effect/vitest": "4.0.5",
+    "effect": "4.0.5"
   }
 }

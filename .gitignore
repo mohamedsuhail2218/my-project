@@ -29,3 +29,5 @@ Thumbs.db
 
 # Vercel CLI link metadata
 .vercel
+.prisma-composer/
+.alchemy/
