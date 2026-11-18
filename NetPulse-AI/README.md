@@ -223,27 +223,38 @@ demo deployment uses:
 | Variable | Value |
 |---|---|
 | `ENVIRONMENT` | `production` |
-| `DATABASE_URL` | `sqlite:////tmp/netpulse.db` |
+| `DATABASE_URL` | Prisma Postgres **pooled** URL (`postgres://…@pooled.db.prisma.io:5432/…?sslmode=require`) |
 | `REPORTS_DIR` | `/tmp/reports` |
 | `MONITORING_ENABLED` | `false` |
 | `MONITOR_ON_STARTUP` | `false` |
 | `DEVICE_DISCOVERY_ENABLED` | `false` |
 | `TEST_RUNNER_ENABLED` | `false` |
 
-`JWT_SECRET_KEY`, `ADMIN_EMAIL` and `ADMIN_PASSWORD` are stored as production
-secrets in Vercel; they are not committed to the repository.
+`JWT_SECRET_KEY`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` and the database URL are
+stored as production secrets in Vercel; they are not committed to the
+repository. Use the **pooled** connection string for application traffic and
+the direct string only for migrations or administration. The application
+normalises both `postgres://` and `postgresql://` URLs to the bundled
+`psycopg2` driver.
 
-> **Serverless storage limitation:** Vercel Functions only allow writes under
-> `/tmp`. The SQLite database and generated PDFs are therefore ephemeral and
-> local to an instance. They are recreated on a cold start and are not shared
-> between concurrent instances. The public demo is suitable for evaluation, not
-> for durable multi-user data. A managed PostgreSQL/MySQL database and object
-> storage are required before treating this deployment as a persistent
-> production service. Background monitoring, ARP discovery and the Pytest runner
-> are disabled because they need a long-running local host. The **Use current
-> Wi-Fi** action is also local-only: the function has no wireless association and
-> cannot reach a private gateway. It returns an explicit unavailable explanation
-> instead of probing anything.
+> **Serverless deployment notes:** the database is a managed Prisma Postgres
+> instance, so accounts, access points, measurements, anomalies, tickets and
+> settings are shared by every function instance and survive cold starts.
+> Startup table creation and first-run seeding run under a PostgreSQL advisory
+> lock, which prevents duplicate administrators when several instances boot at
+> once. PDF reports are still written under `/tmp` and are therefore
+> instance-local; generate and download a report in the same session. Background
+> monitoring, ARP discovery and the Pytest runner are disabled because they need
+> a long-running local host. The **Use current Wi-Fi** action is also local-only:
+> the function has no wireless association and cannot reach a private gateway.
+> It returns an explicit unavailable explanation instead of probing anything.
+
+> **Temporary demo database:** the current production database was created as a
+> temporary Prisma Postgres instance. It is deleted automatically unless it is
+> claimed in the Prisma console. Claim it, or replace `DATABASE_URL` in Vercel
+> with a durable PostgreSQL URL, before the deletion date shown in the Prisma
+> console, then redeploy. Without that step the public demo reverts to failing
+> because its database will no longer exist.
 
 ---
 
@@ -286,7 +297,7 @@ cd backend
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-- **88 tests passed** in the final verification run.
+- **89 tests passed** in the final verification run.
 - Tests use a throw-away SQLite database, disable the scheduler, block live
   probes and prevent recursive test-runner execution.
 - JUnit output: `reports\test-runs\backend-junit.xml`.
@@ -450,7 +461,7 @@ NetPulse-AI/
 | [07 — Conclusion & future work](documentation/07-conclusion-and-future-work.md) | Achievements, limitations, roadmap |
 | [08 — References](documentation/08-references.md) | Standards, libraries and research references |
 | [Data dictionary](documentation/data-dictionary.generated.md) | Generated column-level dictionary from the SQLAlchemy model |
-| [Test inventory](documentation/test-inventory.generated.md) | Generated list of all 88 backend and 20 browser tests |
+| [Test inventory](documentation/test-inventory.generated.md) | Generated list of all 89 backend and 20 browser tests |
 | [Final-year report](documentation/Final-Year-Project-Report.md) | Consolidated submission-ready report with appendices A-E |
 
 All diagrams use Mermaid or ASCII so they render directly on GitHub and in
@@ -475,9 +486,10 @@ Markdown editors without external tooling.
 6. **Playwright portability** — the suite defaults to installed Chrome because
    the bundled headless shell is blocked by this machine's Application Control
    policy. Set `PLAYWRIGHT_CHANNEL=msedge` or install Chromium on other machines.
-7. **Vercel serverless storage** — the public deployment writes SQLite and PDF
-   reports under `/tmp`. Both are ephemeral, instance-local and reset on a cold
-   start. Use a managed database and object storage for durable data.
+7. **Vercel PDF reports are instance-local** — the public deployment uses
+   Prisma Postgres for durable application data, but generated PDFs still live
+   under `/tmp`. Download a report immediately after generating it. Object
+   storage would be required to keep report files indefinitely.
 8. **Current Wi-Fi is backend-local** — the public Vercel function has no Wi-Fi
    association and cannot reach private gateways such as `10.239.39.128`. The
    **Use current Wi-Fi** flow therefore explains that it is unavailable in the

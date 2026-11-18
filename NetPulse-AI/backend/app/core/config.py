@@ -66,6 +66,22 @@ class Settings(BaseSettings):
             raise ValueError(f"environment must be one of {sorted(allowed)}")
         return value
 
+    @field_validator("database_url")
+    @classmethod
+    def normalize_database_url(cls, value: str) -> str:
+        """Accept the bare Postgres URLs issued by hosting providers.
+
+        Managed services commonly expose ``postgres://`` (or ``postgresql://``)
+        URLs, while SQLAlchemy expects an explicit driver. Normalising here keeps
+        the deployment configuration copy-pasteable and avoids a missing-driver
+        failure on the first request.
+        """
+        value = value.strip()
+        for scheme in ("postgres://", "postgresql://"):
+            if value.startswith(scheme):
+                return f"postgresql+psycopg2://{value.removeprefix(scheme)}"
+        return value
+
     @model_validator(mode="after")
     def secure_runtime_defaults(self) -> "Settings":
         if self.database_url.startswith("sqlite:///"):

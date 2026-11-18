@@ -104,7 +104,7 @@ Role-based access control, Argon2 password hashing, JWT sessions, login
 throttling, security headers and an allow-listed test runner address the main
 security concerns of a network-facing student project.
 
-The final verification run executed **88 backend Pytest tests** and **20
+The final verification run executed **89 backend Pytest tests** and **20
 Playwright end-to-end tests**, all passing, with **82% backend line coverage**.
 Seventeen screenshots were captured from the running application. A key design
 principle is that the platform **never fabricates live telemetry**: simulated
@@ -628,7 +628,7 @@ The project delivers:
 4. **Privacy-preserving device visibility** based on the OS ARP cache, hashed
    identities and masked MAC display.
 5. **An integrated incident workflow** from measurement to ticket to report.
-6. **A reproducible verification package** with 88 backend tests, 20 E2E tests,
+6. **A reproducible verification package** with 89 backend tests, 20 E2E tests,
    82% line coverage, JUnit XML, PDFs and 17 screenshots.
 7. **An explicit integrity contract** that separates live observations from
    labelled simulations throughout the database, API and interface.
@@ -3819,7 +3819,7 @@ Playwright:
 The warning is a Starlette deprecation notice about the `httpx` test client
 adapter. It does not affect application behaviour.
 
-JUnit XML reports 88 tests, 0 failures, 0 errors, 0 skipped:
+JUnit XML reports 89 tests, 0 failures, 0 errors, 0 skipped:
 
 ```text
 testsuite name="pytest" errors="0" failures="0" skipped="0" tests="88"
@@ -4132,7 +4132,7 @@ remains the main deployment risk and is repeated in the conclusion.
 
 ## 5.12 Chapter summary
 
-The final build passed **108 automated tests** (88 backend + 20 E2E) with **82%
+The final build passed **109 automated tests** (89 backend + 20 E2E) with **82%
 backend line coverage**. Testing found and fixed real UI and test-infrastructure
 defects. The evidence is stored as JUnit XML, coverage XML, a Playwright HTML
 report, PDFs and 17 screenshots. The main unverified area is the MySQL runtime
@@ -5029,7 +5029,7 @@ cd ..\frontend
 npm.cmd run test:e2e
 ```
 
-The latest verified results are 88 backend tests and 20 Playwright tests, all
+The latest verified results are 89 backend tests and 20 Playwright tests, all
 passing, with 82% backend line coverage.
 
 ### 6.9.8 Add a team member
@@ -5418,7 +5418,7 @@ product decisions that reduce the risk of a demonstration causing real damage.
 
 ### 7.3.5 Reproducible verification
 
-The project ships its evidence: 88 backend tests, 20 browser tests, JUnit XML,
+The project ships its evidence: 89 backend tests, 20 browser tests, JUnit XML,
 coverage XML, a Playwright HTML report, a built-in runner, a generated test
 inventory and 17 screenshots. A reviewer can rerun the commands rather than
 trust a claim in a slide.
@@ -5610,7 +5610,7 @@ The following principles should survive future development:
 NetPulse AI met its ten objectives. It delivers a real, working monitoring and
 diagnostics platform with a coherent data model, a complete operational
 workflow, an explainable machine-learning component and a substantial automated
-verification trail. The final build passed 108 automated tests, produced 82%
+verification trail. The final build passed 109 automated tests, produced 82%
 backend line coverage, generated eight report types, and documented its design
 with architecture, database, UML, DFD, test and user-manual chapters.
 
@@ -5934,31 +5934,31 @@ This inventory is generated from the final JUnit XML files in
 
 Generated from the final JUnit XML files in `reports/test-runs/`.
 
-### Backend Pytest inventory (88 tests)
+### Backend Pytest inventory (89 tests)
 
 ### `test_access_points` — 8 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_seeded_access_points_are_labelled_simulations | PASS | 0.288 |
-| 2 | test_create_update_history_performance_and_delete | PASS | 0.065 |
-| 3 | test_duplicate_access_point_is_rejected | PASS | 0.028 |
-| 4 | test_invalid_ip_and_mac_are_validated | PASS | 0.013 |
-| 5 | test_analyst_and_viewer_cannot_create_access_points | PASS | 0.242 |
-| 6 | test_simulated_check_is_clearly_labelled_and_excluded | PASS | 0.029 |
+| 1 | test_seeded_access_points_are_labelled_simulations | PASS | 0.307 |
+| 2 | test_create_update_history_performance_and_delete | PASS | 0.062 |
+| 3 | test_duplicate_access_point_is_rejected | PASS | 0.027 |
+| 4 | test_invalid_ip_and_mac_are_validated | PASS | 0.012 |
+| 5 | test_analyst_and_viewer_cannot_create_access_points | PASS | 0.244 |
+| 6 | test_simulated_check_is_clearly_labelled_and_excluded | PASS | 0.028 |
 | 7 | test_access_point_search_and_simulation_filter | PASS | 0.016 |
-| 8 | test_missing_access_point_returns_404 | PASS | 0.013 |
+| 8 | test_missing_access_point_returns_404 | PASS | 0.012 |
 
 ### `test_anomaly` — 7 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
 | 1 | test_sample_baseline_is_deterministic_and_labelled | PASS | 0.003 |
-| 2 | test_cold_start_uses_sample_baseline_when_history_is_insufficient | PASS | 0.348 |
-| 3 | test_detection_returns_no_live_data_without_measurements | PASS | 0.297 |
-| 4 | test_extreme_live_measurement_is_detected_and_explained | PASS | 0.739 |
-| 5 | test_offline_measurement_always_gets_critical_explanation | PASS | 0.004 |
-| 6 | test_model_info_and_api_contract | PASS | 0.336 |
+| 2 | test_cold_start_uses_sample_baseline_when_history_is_insufficient | PASS | 0.336 |
+| 3 | test_detection_returns_no_live_data_without_measurements | PASS | 0.300 |
+| 4 | test_extreme_live_measurement_is_detected_and_explained | PASS | 0.735 |
+| 5 | test_offline_measurement_always_gets_critical_explanation | PASS | 0.005 |
+| 6 | test_model_info_and_api_contract | PASS | 0.341 |
 | 7 | test_anomaly_filter_validation | PASS | 0.007 |
 
 ### `test_auth` — 12 tests
@@ -5966,114 +5966,115 @@ Generated from the final JUnit XML files in `reports/test-runs/`.
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
 | 1 | test_health_is_public | PASS | 0.055 |
-| 2 | test_admin_can_log_in | PASS | 0.074 |
+| 2 | test_admin_can_log_in | PASS | 0.075 |
 | 3 | test_wrong_password_is_rejected | PASS | 0.055 |
-| 4 | test_unknown_email_is_rejected_without_leaking_account_state | PASS | 0.054 |
-| 5 | test_me_returns_signed_in_user | PASS | 0.007 |
-| 6 | test_protected_routes_require_a_token | PASS | 0.007 |
-| 7 | test_invalid_token_is_rejected | PASS | 0.004 |
-| 8 | test_admin_creates_viewer_and_duplicate_is_rejected | PASS | 0.064 |
+| 4 | test_unknown_email_is_rejected_without_leaking_account_state | PASS | 0.055 |
+| 5 | test_me_returns_signed_in_user | PASS | 0.008 |
+| 6 | test_protected_routes_require_a_token | PASS | 0.006 |
+| 7 | test_invalid_token_is_rejected | PASS | 0.005 |
+| 8 | test_admin_creates_viewer_and_duplicate_is_rejected | PASS | 0.066 |
 | 9 | test_viewer_cannot_manage_users | PASS | 0.006 |
-| 10 | test_analyst_cannot_manage_users | PASS | 0.006 |
+| 10 | test_analyst_cannot_manage_users | PASS | 0.005 |
 | 11 | test_user_validation_returns_field_errors | PASS | 0.006 |
-| 12 | test_viewer_can_read_dashboard_but_not_change_configuration | PASS | 0.023 |
+| 12 | test_viewer_can_read_dashboard_but_not_change_configuration | PASS | 0.022 |
 
 ### `test_dashboard` — 4 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_dashboard_overview_contract | PASS | 0.010 |
-| 2 | test_dashboard_excludes_simulated_measurements | PASS | 0.017 |
-| 3 | test_dashboard_validates_window | PASS | 0.011 |
+| 1 | test_dashboard_overview_contract | PASS | 0.011 |
+| 2 | test_dashboard_excludes_simulated_measurements | PASS | 0.016 |
+| 3 | test_dashboard_validates_window | PASS | 0.012 |
 | 4 | test_dashboard_calculates_health_from_live_measurements | PASS | 0.013 |
 
 ### `test_devices` — 6 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_arp_parser_filters_scope_and_duplicates | PASS | 0.007 |
+| 1 | test_arp_parser_filters_scope_and_duplicates | PASS | 0.008 |
 | 2 | test_device_list_exposes_privacy_note | PASS | 0.011 |
-| 3 | test_device_update_approval_and_activity | PASS | 0.037 |
+| 3 | test_device_update_approval_and_activity | PASS | 0.038 |
 | 4 | test_discovery_is_mocked_and_duplicates_are_suppressed | PASS | 0.029 |
-| 5 | test_viewer_cannot_discover_or_approve | PASS | 0.014 |
-| 6 | test_device_filtering_by_approval | PASS | 0.019 |
+| 5 | test_viewer_cannot_discover_or_approve | PASS | 0.012 |
+| 6 | test_device_filtering_by_approval | PASS | 0.017 |
 
 ### `test_monitoring` — 8 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
 | 1 | test_network_info_reports_real_host_context | PASS | 0.018 |
-| 2 | test_history_returns_scoped_measurements | PASS | 0.013 |
-| 3 | test_access_point_history_can_include_simulations | PASS | 0.019 |
+| 2 | test_history_returns_scoped_measurements | PASS | 0.012 |
+| 3 | test_access_point_history_can_include_simulations | PASS | 0.022 |
 | 4 | test_live_run_is_blocked_in_test_environment | PASS | 0.007 |
-| 5 | test_monitoring_service_persists_live_probe_and_opens_ticket | PASS | 0.016 |
+| 5 | test_monitoring_service_persists_live_probe_and_opens_ticket | PASS | 0.014 |
 | 6 | test_scheduler_status_endpoint | PASS | 0.007 |
-| 7 | test_latest_measurement_endpoint_returns_live_only | PASS | 0.008 |
+| 7 | test_latest_measurement_endpoint_returns_live_only | PASS | 0.007 |
 | 8 | test_simulated_measurement_is_never_live | PASS | 0.004 |
 
 ### `test_reports` — 7 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_report_types_expose_all_eight_reports | PASS | 0.008 |
-| 2 | test_generate_list_and_download_pdf | PASS | 0.063 |
-| 3 | test_specialised_reports_generate_with_correct_listing_metadata | PASS | 0.118 |
-| 4 | test_invalid_report_requests_are_rejected | PASS | 0.014 |
+| 1 | test_report_types_expose_all_eight_reports | PASS | 0.007 |
+| 2 | test_generate_list_and_download_pdf | PASS | 0.079 |
+| 3 | test_specialised_reports_generate_with_correct_listing_metadata | PASS | 0.124 |
+| 4 | test_invalid_report_requests_are_rejected | PASS | 0.012 |
 | 5 | test_missing_report_returns_404 | PASS | 0.007 |
 | 6 | test_report_path_traversal_is_blocked | PASS | 0.010 |
-| 7 | test_reports_require_authentication | PASS | 0.009 |
+| 7 | test_reports_require_authentication | PASS | 0.010 |
 
-### `test_security` — 7 tests
+### `test_security` — 8 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_password_hash_round_trip | PASS | 0.146 |
+| 1 | test_password_hash_round_trip | PASS | 0.143 |
 | 2 | test_password_hash_rejects_oversized_input | PASS | 0.001 |
 | 3 | test_access_token_contains_required_claims | PASS | 0.001 |
 | 4 | test_token_with_wrong_signature_is_rejected | PASS | 0.001 |
-| 5 | test_role_hierarchy | PASS | 0.001 |
-| 6 | test_production_secret_requirements_are_enforced | PASS | 0.012 |
-| 7 | test_test_environment_has_ephemeral_safe_defaults | PASS | 0.000 |
+| 5 | test_role_hierarchy | PASS | 0.000 |
+| 6 | test_postgres_urls_get_an_explicit_driver | PASS | 0.016 |
+| 7 | test_production_secret_requirements_are_enforced | PASS | 0.012 |
+| 8 | test_test_environment_has_ephemeral_safe_defaults | PASS | 0.001 |
 
 ### `test_settings` — 5 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
 | 1 | test_get_settings_contract | PASS | 0.009 |
-| 2 | test_admin_can_update_and_restore_settings | PASS | 0.039 |
-| 3 | test_invalid_settings_are_rejected | PASS | 0.022 |
-| 4 | test_analyst_cannot_change_settings | PASS | 0.007 |
-| 5 | test_system_status_reports_runtime_and_safety | PASS | 0.100 |
+| 2 | test_admin_can_update_and_restore_settings | PASS | 0.059 |
+| 3 | test_invalid_settings_are_rejected | PASS | 0.018 |
+| 4 | test_analyst_cannot_change_settings | PASS | 0.006 |
+| 5 | test_system_status_reports_runtime_and_safety | PASS | 0.103 |
 
 ### `test_testing` — 6 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_testing_dashboard_contract | PASS | 0.012 |
-| 2 | test_runner_is_forbidden_when_disabled | PASS | 0.015 |
+| 1 | test_testing_dashboard_contract | PASS | 0.011 |
+| 2 | test_runner_is_forbidden_when_disabled | PASS | 0.013 |
 | 3 | test_suite_mapping | PASS | 0.000 |
-| 4 | test_junit_parser_handles_all_statuses | PASS | 0.004 |
-| 5 | test_no_active_run_after_startup | PASS | 0.001 |
+| 4 | test_junit_parser_handles_all_statuses | PASS | 0.003 |
+| 5 | test_no_active_run_after_startup | PASS | 0.002 |
 | 6 | test_missing_run_returns_404 | PASS | 0.009 |
 
 ### `test_tickets` — 5 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_manual_ticket_lifecycle | PASS | 0.059 |
-| 2 | test_ticket_list_filters_and_stats | PASS | 0.044 |
-| 3 | test_duplicate_suppression_and_resolution_reopens_fingerprint | PASS | 0.009 |
+| 1 | test_manual_ticket_lifecycle | PASS | 0.062 |
+| 2 | test_ticket_list_filters_and_stats | PASS | 0.036 |
+| 3 | test_duplicate_suppression_and_resolution_reopens_fingerprint | PASS | 0.008 |
 | 4 | test_automatic_ticket_policy_ignores_low_anomaly | PASS | 0.006 |
-| 5 | test_ticket_validation_and_permissions | PASS | 0.022 |
+| 5 | test_ticket_validation_and_permissions | PASS | 0.020 |
 
 ### `test_troubleshooting` — 4 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_simulated_access_point_cannot_be_diagnosed_as_real | PASS | 0.025 |
-| 2 | test_rules_escalate_latency_loss_and_outage | PASS | 0.051 |
-| 3 | test_recommendation_list_and_latest | PASS | 0.017 |
-| 4 | test_invalid_access_point_and_rbac | PASS | 0.022 |
+| 1 | test_simulated_access_point_cannot_be_diagnosed_as_real | PASS | 0.022 |
+| 2 | test_rules_escalate_latency_loss_and_outage | PASS | 0.045 |
+| 3 | test_recommendation_list_and_latest | PASS | 0.015 |
+| 4 | test_invalid_access_point_and_rbac | PASS | 0.020 |
 
 ### `test_wifi` — 9 tests
 
@@ -6082,12 +6083,12 @@ Generated from the final JUnit XML files in `reports/test-runs/`.
 | 1 | test_parse_windows_interfaces_reads_connected_adapter_only | PASS | 0.001 |
 | 2 | test_parse_windows_interfaces_returns_none_without_association | PASS | 0.001 |
 | 3 | test_parse_netsh_gateway | PASS | 0.002 |
-| 4 | test_band_and_channel_from_frequency | PASS | 0.000 |
+| 4 | test_band_and_channel_from_frequency | PASS | 0.001 |
 | 5 | test_connected_wifi_returns_unavailable_payload | PASS | 0.001 |
 | 6 | test_connected_wifi_reports_association_and_gateway | PASS | 0.001 |
 | 7 | test_connected_wifi_explains_missing_gateway | PASS | 0.001 |
 | 8 | test_wifi_endpoint_requires_authentication | PASS | 0.006 |
-| 9 | test_wifi_endpoint_returns_detector_payload | PASS | 0.011 |
+| 9 | test_wifi_endpoint_returns_detector_payload | PASS | 0.010 |
 
 ### Frontend Playwright inventory (20 tests)
 

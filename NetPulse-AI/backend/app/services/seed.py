@@ -21,9 +21,15 @@ logger = logging.getLogger("netpulse.seed")
 
 
 def seed_database(db: Session) -> None:
+    """Seed first-run rows and commit them as one unit.
+
+    The caller holds the database startup lock, so a concurrent cold start can
+    never observe a half-seeded database or create a duplicate administrator.
+    """
     ensure_default_settings(db)
     admin = _ensure_admin(db)
     _seed_demo_access_points(db, admin)
+    db.commit()
     logger.info("Database seed check complete")
 
 
@@ -49,7 +55,7 @@ def _ensure_admin(db: Session) -> User | None:
         is_active=True,
     )
     db.add(user)
-    db.commit()
+    db.flush()
     db.refresh(user)
     if using_generated_password:
         logger.warning("=" * 72)
@@ -97,5 +103,5 @@ def _seed_demo_access_points(db: Session, admin: User | None) -> None:
         ),
     ]
     db.add_all(samples)
-    db.commit()
+    db.flush()
     logger.info("Seeded %s clearly-labelled simulated access points", len(samples))

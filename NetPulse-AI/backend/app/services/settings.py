@@ -19,11 +19,16 @@ DEFAULT_SETTINGS: dict[str, object] = {
 
 
 def ensure_default_settings(db: Session) -> None:
+    """Stage missing defaults on the caller's transaction.
+
+    Flushing rather than committing lets first-run seeding add settings, the
+    administrator and demo access points atomically under the startup lock.
+    """
     existing = {row.key for row in db.scalars(select(AppSetting)).all()}
     for key, value in DEFAULT_SETTINGS.items():
         if key not in existing:
             db.add(AppSetting(key=key, value=value))
-    db.commit()
+    db.flush()
 
 
 def get_all_settings(db: Session) -> dict[str, object]:

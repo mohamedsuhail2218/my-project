@@ -49,7 +49,7 @@ Role-based access control, Argon2 password hashing, JWT sessions, login
 throttling, security headers and an allow-listed test runner address the main
 security concerns of a network-facing student project.
 
-The final verification run executed **88 backend Pytest tests** and **20
+The final verification run executed **89 backend Pytest tests** and **20
 Playwright end-to-end tests**, all passing, with **82% backend line coverage**.
 Seventeen screenshots were captured from the running application. A key design
 principle is that the platform **never fabricates live telemetry**: simulated
@@ -386,7 +386,7 @@ The project delivers:
 4. **Privacy-preserving device visibility** based on the OS ARP cache, hashed
    identities and masked MAC display.
 5. **An integrated incident workflow** from measurement to ticket to report.
-6. **A reproducible verification package** with 88 backend tests, 20 E2E tests,
+6. **A reproducible verification package** with 89 backend tests, 20 E2E tests,
    82% line coverage, JUnit XML, PDFs and 17 screenshots.
 7. **An explicit integrity contract** that separates live observations from
    labelled simulations throughout the database, API and interface.

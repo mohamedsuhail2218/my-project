@@ -54,6 +54,21 @@ def test_role_hierarchy():
     assert not role_at_least("unknown", "viewer")
 
 
+def test_postgres_urls_get_an_explicit_driver():
+    from app.core.config import Settings
+
+    for scheme in ("postgres://", "postgresql://"):
+        settings = Settings(
+            database_url=f"{scheme}user:pass@pooled.db.prisma.io:5432/postgres?sslmode=require"
+        )
+        assert settings.database_url == (
+            "postgresql+psycopg2://user:pass@pooled.db.prisma.io:5432/postgres?sslmode=require"
+        )
+
+    explicit = Settings(database_url="postgresql+psycopg://user:pass@db.example.com/app")
+    assert explicit.database_url == "postgresql+psycopg://user:pass@db.example.com/app"
+
+
 def test_production_secret_requirements_are_enforced():
     from app.core.config import Settings
 

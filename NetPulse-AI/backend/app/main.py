@@ -27,7 +27,7 @@ from app.api import (
     troubleshooting,
 )
 from app.core.config import PROJECT_DIR, settings
-from app.core.database import SessionLocal, init_db
+from app.core.database import STARTUP_LOCK_KEY, SessionLocal, init_db
 from app.core.logging_config import configure_logging
 from app.monitoring.scheduler import scheduler
 from app.services.seed import seed_database
@@ -38,8 +38,16 @@ logger = logging.getLogger("netpulse.main")
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    init_db()
+    # Cold starts can overlap when a serverless platform scales out. Keep table
+    # creation and first-run seeding in a single transaction and, on Postgres,
+    # take a transaction-scoped advisory lock so only one instance seeds.
     with SessionLocal() as db:
+        if db.get_bind().dialect.name == "postgresql":
+            db.execute(
+                text("SELECT pg_advisory_xact_lock(:key)"),
+                {"key": STARTUP_LOCK_KEY},
+            )
+        init_db(db.connection())
         seed_database(db)
     await scheduler.start()
     logger.info("NetPulse AI started (environment=%s)", settings.environment)

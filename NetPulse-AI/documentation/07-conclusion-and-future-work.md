@@ -91,7 +91,7 @@ product decisions that reduce the risk of a demonstration causing real damage.
 
 ### 7.3.5 Reproducible verification
 
-The project ships its evidence: 88 backend tests, 20 browser tests, JUnit XML,
+The project ships its evidence: 89 backend tests, 20 browser tests, JUnit XML,
 coverage XML, a Playwright HTML report, a built-in runner, a generated test
 inventory and 17 screenshots. A reviewer can rerun the commands rather than
 trust a claim in a slide.
@@ -283,7 +283,7 @@ The following principles should survive future development:
 NetPulse AI met its ten objectives. It delivers a real, working monitoring and
 diagnostics platform with a coherent data model, a complete operational
 workflow, an explainable machine-learning component and a substantial automated
-verification trail. The final build passed 108 automated tests, produced 82%
+verification trail. The final build passed 109 automated tests, produced 82%
 backend line coverage, generated eight report types, and documented its design
 with architecture, database, UML, DFD, test and user-manual chapters.
 

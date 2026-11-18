@@ -145,7 +145,7 @@ Playwright:
 The warning is a Starlette deprecation notice about the `httpx` test client
 adapter. It does not affect application behaviour.
 
-JUnit XML reports 88 tests, 0 failures, 0 errors, 0 skipped:
+JUnit XML reports 89 tests, 0 failures, 0 errors, 0 skipped:
 
 ```text
 testsuite name="pytest" errors="0" failures="0" skipped="0" tests="88"
@@ -458,7 +458,7 @@ remains the main deployment risk and is repeated in the conclusion.
 
 ## 5.12 Chapter summary
 
-The final build passed **108 automated tests** (88 backend + 20 E2E) with **82%
+The final build passed **109 automated tests** (89 backend + 20 E2E) with **82%
 backend line coverage**. Testing found and fixed real UI and test-infrastructure
 defects. The evidence is stored as JUnit XML, coverage XML, a Playwright HTML
 report, PDFs and 17 screenshots. The main unverified area is the MySQL runtime

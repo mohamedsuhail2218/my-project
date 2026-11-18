@@ -884,7 +884,7 @@ cd ..\frontend
 npm.cmd run test:e2e
 ```
 
-The latest verified results are 88 backend tests and 20 Playwright tests, all
+The latest verified results are 89 backend tests and 20 Playwright tests, all
 passing, with 82% backend line coverage.
 
 ### 6.9.8 Add a team member
