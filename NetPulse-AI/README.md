@@ -223,7 +223,7 @@ demo deployment uses:
 | Variable | Value |
 |---|---|
 | `ENVIRONMENT` | `production` |
-| `DATABASE_URL` | Prisma Postgres **pooled** URL (`postgres://…@pooled.db.prisma.io:5432/…?sslmode=require`) |
+| `DATABASE_URL` | Prisma Postgres connection URL (stored as a production secret in Vercel) |
 | `REPORTS_DIR` | `/tmp/reports` |
 | `MONITORING_ENABLED` | `false` |
 | `MONITOR_ON_STARTUP` | `false` |
@@ -249,12 +249,12 @@ normalises both `postgres://` and `postgresql://` URLs to the bundled
 > the function has no wireless association and cannot reach a private gateway.
 > It returns an explicit unavailable explanation instead of probing anything.
 
-> **Temporary demo database:** the current production database was created as a
-> temporary Prisma Postgres instance. It is deleted automatically unless it is
-> claimed in the Prisma console. Claim it, or replace `DATABASE_URL` in Vercel
-> with a durable PostgreSQL URL, before the deletion date shown in the Prisma
-> console, then redeploy. Without that step the public demo reverts to failing
-> because its database will no longer exist.
+> **Production database:** the production database is a managed Prisma
+> Postgres instance in the Prisma workspace. Its connection URL is stored as a
+> Vercel production secret; replace `DATABASE_URL` in Vercel and redeploy if the
+> database is ever recreated. Application accounts, access points, measurements,
+> anomalies, tickets and settings are stored there, so they survive deployments
+> and cold starts.
 
 ---
 
