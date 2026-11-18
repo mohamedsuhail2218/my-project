@@ -31,12 +31,16 @@ backend/scripts/
 
 # Node, Playwright and documentation tooling
 frontend/node_modules/
+frontend/dist/
 frontend/test-results/
 frontend/blob-report/
 frontend/e2e/
 frontend/scripts/
 documentation/
 .github/
+
+# Generated at build time by scripts/prepare-public.mjs
+public/
 
 # Vercel and editor metadata
 .vercel/

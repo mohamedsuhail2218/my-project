@@ -85,7 +85,17 @@ async def security_headers(request: Request, call_next):
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "no-referrer"
     response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
-    response.headers["Cache-Control"] = "no-store" if request.url.path.startswith(settings.api_prefix) else "no-cache"
+    path = request.url.path
+    api_prefix = settings.api_prefix
+    if path == api_prefix or path.startswith(f"{api_prefix}/"):
+        response.headers["Cache-Control"] = "no-store"
+    elif path.startswith("/assets/"):
+        # Vite fingerprints every file name, so these are safe to cache forever.
+        # This also lets the Vercel edge network serve them without invoking the
+        # Python function on every visit.
+        response.headers["Cache-Control"] = "public, max-age=31536000, s-maxage=31536000, immutable"
+    else:
+        response.headers["Cache-Control"] = "no-cache"
     return response
 
 

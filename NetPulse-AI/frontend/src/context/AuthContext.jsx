@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { api, getErrorMessage, TOKEN_KEY, USER_KEY } from '../services/api'
+import { api, getErrorMessage, TOKEN_KEY, USER_KEY, waitForWarmUp } from '../services/api'
 
 const AuthContext = createContext(null)
 const ROLE_LEVEL = { viewer: 10, analyst: 20, admin: 30 }
@@ -61,7 +61,10 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (email, password) => {
     setError('')
     try {
-      const response = await api.post('/auth/login', { email, password })
+      // If the serverless API is still starting, let the warm-up finish first
+      // instead of failing the first sign-in attempt.
+      await waitForWarmUp()
+      const response = await api.post('/auth/login', { email, password }, { netpulseRetry: true })
       const payload = response.data
       localStorage.setItem(TOKEN_KEY, payload.access_token)
       localStorage.setItem(USER_KEY, JSON.stringify(payload.user))

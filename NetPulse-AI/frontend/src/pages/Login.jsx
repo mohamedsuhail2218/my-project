@@ -195,8 +195,17 @@ export default function Login() {
 
               <div className="mt-5 border border-app bg-accent/[0.03] px-3 py-2.5">
                 <p className="text-[9.5px] leading-relaxed text-subtle">
-                  <span className="font-semibold text-muted">First run?</span> The administrator email and password come from
-                  <span className="code-chip mx-1">backend/.env</span>. A random password is printed once in the backend console if none is configured.
+                  {import.meta.env.DEV ? (
+                    <>
+                      <span className="font-semibold text-muted">First run?</span> The administrator email and password come from
+                      <span className="code-chip mx-1">backend/.env</span>. A random password is printed once in the backend console if none is configured.
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-semibold text-muted">Authorized access only.</span> Use the credentials issued by your
+                      NetPulse administrator. Contact them if your access has expired.
+                    </>
+                  )}
                 </p>
               </div>
             </div>

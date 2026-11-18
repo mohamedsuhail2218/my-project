@@ -44,6 +44,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Generated for Vercel's CDN (built from frontend/dist)
+public/
+
 # Playwright runtime output (reports under reports/ are kept for submission)
 frontend/test-results/
 frontend/blob-report/
