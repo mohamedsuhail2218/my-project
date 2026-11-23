@@ -291,6 +291,12 @@ normalises both `postgres://` and `postgresql://` URLs to the bundled
 
 ## Configuration
 
+> **Archive warning:** the submitted `netpulse.ai.zip` includes `backend\.env` so
+> the local demo starts without extra setup. That file contains local-only JWT
+> and administrator credentials. Do not publish the archive, upload it to a
+> public repository or share it outside the assessment. Rotate
+> `JWT_SECRET_KEY` and `ADMIN_PASSWORD` before any public use.
+
 Backend configuration lives in `backend\.env` (ignored by Git). Start from
 `backend\.env.example`.
 
