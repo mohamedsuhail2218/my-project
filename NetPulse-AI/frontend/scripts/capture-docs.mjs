@@ -25,6 +25,10 @@ const PAGES = [
   { file: '11-automation-testing.png', url: '/testing', marker: 'Automation testing', fullPage: false },
   { file: '12-reports.png', url: '/reports', marker: 'Report studio', fullPage: true },
   { file: '13-settings.png', url: '/settings', marker: 'Monitoring thresholds', fullPage: true },
+  { file: '18-predictive-analytics.png', url: '/predictive', marker: 'Failure risk by scope', fullPage: true },
+  { file: '19-root-cause-analysis.png', url: '/root-cause', marker: 'Investigation queue', fullPage: true },
+  { file: '20-cybersecurity-intelligence.png', url: '/security', marker: 'Security findings', fullPage: true },
+  { file: '21-network-optimization.png', url: '/optimization', marker: 'Optimisation advisory', fullPage: true },
 ]
 
 fs.mkdirSync(OUTPUT_DIR, { recursive: true })
@@ -69,7 +73,7 @@ try {
 
   // Access point detail dialog
   await page.goto('/access-points')
-  await page.getByText('Access point inventory').waitFor()
+  await page.getByRole('heading', { name: 'Access point inventory' }).waitFor()
   await page.getByRole('button', { name: 'View details' }).first().click()
   await page.getByText('Registered details').waitFor()
   await settle(page)
@@ -78,7 +82,7 @@ try {
 
   // Manual ticket dialog
   await page.goto('/issues')
-  await page.getByText('Ticket register').waitFor()
+  await page.getByRole('heading', { name: 'Ticket register' }).waitFor()
   await page.getByRole('button', { name: 'New ticket' }).click()
   await page.getByRole('dialog', { name: 'Create issue ticket' }).waitFor()
   await settle(page)
