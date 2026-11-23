@@ -349,9 +349,15 @@ lifetime is 480 minutes (8 hours) and can be changed with
 
 | Group | Modules |
 |---|---|
-| Workspace | Overview, Network Monitoring, Access Points, Connected Devices |
-| Intelligence | AI Anomaly Detection, Smart Troubleshooting, Issue Management |
-| Operations | Automation Testing, Reports, Settings |
+| Command | Overview, Real-Time Monitoring |
+| Intelligence | Predictive Analytics, Root Cause Analysis, Cybersecurity Intelligence |
+| Operations | Network Optimization, Devices & Access Points, Anomalies & Issues |
+| System | Reports & Analytics, Settings |
+
+The primary sidebar contains exactly these ten links. Legacy deep links such as
+`/access-points`, `/troubleshooting`, `/issues` and `/testing` remain available
+through the command palette and direct navigation, so existing bookmarks do not
+break.
 
 On screens narrower than 1024 px, the sidebar becomes a slide-in drawer. Open it
 with the menu button in the header. The current page is shown in the header
@@ -362,9 +368,9 @@ breadcrumb.
 | Control | Purpose |
 |---|---|
 | **Search workspace** / `Ctrl+K` | Opens the command palette |
-| **Live probes** badge | Indicates the live-monitoring feature area |
-| Theme button | Switches between the dark espresso/wine and light beige/white themes |
-| Bell | Opens recent operational alerts |
+| **Live socket** / **Polling** pill | Shows whether real-time updates use WebSocket or the REST fallback |
+| Theme button | Switches between the dark navy/purple and light violet/white themes |
+| Bell | Opens the notification centre for predictions, security findings, RCA, optimisation, anomalies, tickets and devices |
 | Avatar and chevron | Account menu, settings link and **Sign out** |
 
 ### 6.7.3 Command palette
@@ -379,10 +385,12 @@ breadcrumb.
 
 ### 6.7.4 Notifications
 
-The bell shows a dot when recent alerts exist. The panel lists current AI
-anomalies, high-priority open tickets and unrecognized devices. Selecting an
-alert opens the related module. The panel closes when you select outside it or
-press the close layer.
+The bell shows an unread count when new notifications exist. The panel lists
+persisted prediction risks, security findings, root-cause investigations,
+optimisation advice, AI anomalies, high-priority tickets and unrecognised
+devices. Selecting a notification opens the related module, and the panel
+supports mark-as-read and clear-read actions. It closes when you select outside
+it or press the close layer.
 
 ### 6.7.5 Theme
 
@@ -709,10 +717,11 @@ the development data.
 | AI anomaly report | Isolation Forest findings with explanations and severity |
 | Issue management report | Ticket register, priorities, statuses and resolution timestamps |
 | Automated testing report | Latest persisted pytest run, counts and suite details |
+| Intelligence brief | Prediction, security, optimisation and root-cause summaries with states, evidence and disclaimers |
 
 **How to use:**
 
-1. Select one of the eight report cards.
+1. Select one of the nine report cards.
 2. Choose a window: **Last 24 hours**, **Last 7 days**, **Last 30 days** or
    **Last 90 days**.
 3. Select **Generate PDF** (Analyst or Administrator).
@@ -765,6 +774,93 @@ read-only notice and disabled fields. Invalid thresholds return `422`.
   `backend\.env`. They are displayed but cannot be changed through the API, so a
   request cannot redirect monitoring at an unauthorized host.
 - Automatic configuration changes are permanently disabled by design.
+
+### 6.8.11 Predictive analytics
+
+![Predictive analytics](screenshots/18-predictive-analytics.png)
+
+**Purpose:** estimate failure risk over the next 24 hours from persisted live
+measurements.
+
+**What it shows:** per-scope risk (network and each real access point), severity,
+confidence, observation count, weighted features and the primary measured
+driver. The page states the model version and the 72-hour observation window.
+
+**How to use:**
+
+1. Open **Predictive Analytics**.
+2. Confirm the telemetry card shows enough live observations.
+3. Select **Run risk analysis** (Analyst or Administrator).
+4. Expand a risk assessment to inspect availability, packet loss, latency and
+   jitter contributions.
+5. Use **Export CSV** to download the exact persisted estimates.
+
+If there are fewer than eight live observations, the engine returns
+`insufficient_data` and does not invent a score. Simulated access points are
+excluded from the fit.
+
+### 6.8.12 Root cause analysis
+
+![Root cause analysis](screenshots/19-root-cause-analysis.png)
+
+**Purpose:** turn an unhealthy measurement into an explainable hypothesis and a
+safe action plan.
+
+**What it shows:** investigation status, severity, confidence, probable cause,
+the measured evidence used, ranked diagnostic actions and related incident IDs.
+
+**How to use:**
+
+1. Open **Root Cause Analysis**.
+2. Select **Investigate latest** to analyse the most recent live measurement.
+3. Review the evidence values, not just the hypothesis.
+4. Acknowledge or resolve an investigation once the suggested checks are done.
+
+The engine is rule-based and deterministic. It does not execute configuration
+changes and does not claim a root cause when the evidence is incomplete.
+
+### 6.8.13 Cybersecurity intelligence
+
+![Cybersecurity intelligence](screenshots/20-cybersecurity-intelligence.png)
+
+**Purpose:** surface locally observable defensive concerns without offensive
+scanning.
+
+**What it shows:** posture score, open findings, unapproved devices, failed
+sign-ins, evidence, recommended response and coverage limits. Findings are
+derived only from the local ARP neighbour cache, sign-in audit records and AP
+inventory.
+
+**How to use:**
+
+1. Open **Cybersecurity Intelligence**.
+2. Select **Run defensive scan** (Analyst or Administrator).
+3. Review each finding's evidence and recommended response.
+4. Acknowledge or resolve findings after verification.
+
+No port scanning, exploitation, packet capture or automatic blocking is
+performed. An empty register means no local evidence was found; it does not prove
+the network is secure.
+
+### 6.8.14 Network optimization
+
+![Network optimization](screenshots/21-network-optimization.png)
+
+**Purpose:** generate advisory recommendations from measured threshold breaches.
+
+**What it shows:** advisory items by category and severity, measured basis,
+observation counts, suggested actions and advisory confidence.
+
+**How to use:**
+
+1. Open **Network Optimization**.
+2. Select **Run optimisation scan** (Analyst or Administrator).
+3. Review the measured values and suggested actions.
+4. Mark an advisory as planned or dismiss it after review.
+
+Recommendations never change device configuration. Expected gains are shown as
+"not estimated" unless they can be derived from the measured data, so the page
+never fabricates a saving.
 
 ---
 
@@ -884,8 +980,8 @@ cd ..\frontend
 npm.cmd run test:e2e
 ```
 
-The latest verified results are 89 backend tests and 20 Playwright tests, all
-passing, with 82% backend line coverage.
+The latest verified results are 103 backend tests and 21 Playwright tests, all
+passing, with 80% backend line coverage.
 
 ### 6.9.8 Add a team member
 

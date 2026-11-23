@@ -15,7 +15,7 @@ printed or submitted separately. A consolidated report is also provided.
 | 2 | [02-system-architecture.md](02-system-architecture.md) | Architecture, components, data flow, deployment, design decisions |
 | 3 | [03-database-design.md](03-database-design.md) | ER model, data dictionary, normalization, indexes, integrity, sample queries |
 | 4 | [04-uml-and-process-models.md](04-uml-and-process-models.md) | Use case, class, sequence, activity, state, DFD and deployment models |
-| 5 | [05-testing-and-results.md](05-testing-and-results.md) | Strategy, 79 backend + 18 E2E results, 84% coverage, test cases, defects |
+| 5 | [05-testing-and-results.md](05-testing-and-results.md) | Strategy, 103 backend + 21 E2E results, 80% coverage, test cases, defects |
 | 6 | [06-user-manual.md](06-user-manual.md) | Installation, module walkthrough, roles, workflows, error handling |
 | 7 | [07-conclusion-and-future-work.md](07-conclusion-and-future-work.md) | Achievements, limitations, future roadmap |
 | 8 | [08-references.md](08-references.md) | Standards, research and library references |
@@ -31,11 +31,11 @@ submission checklist).
 
 ## Screenshot gallery
 
-The screenshots in this folder were captured from the running application during
-the original monitoring build. The newer intelligence pages are documented in
-[09-autonomous-intelligence.md](09-autonomous-intelligence.md) and can be added to
-the gallery by rerunning `frontend/scripts/capture-docs.mjs` against the current
-build.
+The screenshots in this folder were captured from the running purple/neon build
+with Playwright and the installed Chrome channel. The gallery covers the core
+monitoring modules and the four new intelligence pages (Prediction, Root Cause,
+Cybersecurity and Optimisation). Re-run `frontend/scripts/capture-docs.mjs`
+against a running backend and frontend to refresh all 21 images.
 
 ### 01 — Login
 
@@ -151,6 +151,34 @@ Responsive 390 × 844 layout with stacked cards and charts.
 
 Slide-in mobile navigation drawer with the workspace modules.
 
+### 18 - Predictive analytics
+
+![Predictive analytics](screenshots/18-predictive-analytics.png)
+
+Per-scope failure risk, confidence, weighted features and the primary measured
+driver from the local explainable model.
+
+### 19 - Root cause analysis
+
+![Root cause analysis](screenshots/19-root-cause-analysis.png)
+
+Evidence-backed investigations with probable cause, ranked safe actions,
+confidence and an explicit workflow state.
+
+### 20 - Cybersecurity intelligence
+
+![Cybersecurity intelligence](screenshots/20-cybersecurity-intelligence.png)
+
+Defensive findings from approved local evidence, posture score, coverage limits
+and explicit "no offensive action" guardrails.
+
+### 21 - Network optimization
+
+![Network optimization](screenshots/21-network-optimization.png)
+
+Advisory recommendations tied to measured threshold breaches, with observation
+counts and no fabricated savings.
+
 ## Evidence summary
 
 | Evidence | Result | Location |
@@ -162,7 +190,7 @@ Slide-in mobile navigation drawer with the workspace modules.
 | PDF report generation | `%PDF-` verified for all 9 report types | `reports/*.pdf` |
 | Intelligence CSV exports | Four kinds with status headers and no fabricated rows | `frontend/src/services/api.js` |
 | MySQL DDL | Generated from SQLAlchemy metadata; runtime import **not verified** (MySQL/Docker unavailable) | `database/schema.sql` |
-| Documentation screenshots | 17 images from the core monitoring build; intelligence documented in chapter 09 | `documentation/screenshots/` |
+| Documentation screenshots | 21 images from the current purple build, including four intelligence pages | `documentation/screenshots/` |
 
 > **Honesty note:** The MySQL schema is provided for deployment but was not
 > executed on this machine because neither MySQL nor Docker is installed. The
@@ -213,7 +241,7 @@ npm.cmd run docs:screenshots
 - [x] MySQL schema, migration and database guide
 - [x] Automated test suites and JUnit evidence
 - [x] PDF report generation
-- [x] 17 application screenshots
+- [x] 21 application screenshots
 - [x] Abstract, introduction, objectives and scope
 - [x] Architecture and design chapters
 - [x] Database design, ER model and data dictionary

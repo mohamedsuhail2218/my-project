@@ -72,14 +72,18 @@ account for its core AI, and runs locally on Windows 11.
 
 ![Smart troubleshooting](documentation/screenshots/08-smart-troubleshooting.png)
 
+### Predictive analytics
+
+![Predictive analytics](documentation/screenshots/18-predictive-analytics.png)
+
 ### Mobile layout
 
 <img src="documentation/screenshots/16-mobile-overview.png" alt="Mobile overview" width="360" />
 
-The full 17-image gallery (login, core modules, dialogs, light theme, command
-palette, mobile navigation) is in
+The full 21-image gallery (login, core modules, four intelligence pages, dialogs,
+light theme, command palette and mobile navigation) is in
 [`documentation/screenshots/`](documentation/screenshots/) and is referenced
-throughout the project report. The newer intelligence modules are documented in
+throughout the project report. The intelligence layer is documented in
 [chapter 09](documentation/09-autonomous-intelligence.md).
 
 ---

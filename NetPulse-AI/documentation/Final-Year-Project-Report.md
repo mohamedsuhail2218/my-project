@@ -104,9 +104,9 @@ Role-based access control, Argon2 password hashing, JWT sessions, login
 throttling, security headers and an allow-listed test runner address the main
 security concerns of a network-facing student project.
 
-The final verification run executed **89 backend Pytest tests** and **20
-Playwright end-to-end tests**, all passing, with **82% backend line coverage**.
-Seventeen screenshots were captured from the running application. A key design
+The final verification run executed **103 backend Pytest tests** and **21
+Playwright end-to-end tests**, all passing, with **80% backend line coverage**.
+Twenty-one screenshots were captured from the running application. A key design
 principle is that the platform **never fabricates live telemetry**: simulated
 records are explicitly labelled, excluded from live health calculations and
 disclosed in both the interface and the database.
@@ -628,8 +628,8 @@ The project delivers:
 4. **Privacy-preserving device visibility** based on the OS ARP cache, hashed
    identities and masked MAC display.
 5. **An integrated incident workflow** from measurement to ticket to report.
-6. **A reproducible verification package** with 89 backend tests, 20 E2E tests,
-   82% line coverage, JUnit XML, PDFs and 17 screenshots.
+6. **A reproducible verification package** with 103 backend tests, 21 E2E tests,
+   80% line coverage, JUnit XML, PDFs and 21 screenshots.
 7. **An explicit integrity contract** that separates live observations from
    labelled simulations throughout the database, API and interface.
 
@@ -1409,12 +1409,12 @@ automatically switches to real observations.
 | Performance | Indexed queries, 2,000-row dashboard cap, lazy pages, polling intervals | Dashboard test, E2E timings |
 | Security | Argon2, JWT, RBAC, throttle, headers, validation | 7 security tests, 12 auth tests |
 | Reliability | Error handling, offline records, scheduler lock | Monitoring tests, smoke tests |
-| Usability | Dark/light theme, responsive layout, skeletons, toasts, palette | 20 E2E tests, 17 screenshots |
-| Maintainability | Layered modules, shared UI, typed schemas, env config | Code structure, 82% coverage |
+| Usability | Dark/light theme, responsive layout, skeletons, toasts, palette | 21 E2E tests, 21 screenshots |
+| Maintainability | Layered modules, shared UI, typed schemas, env config | Code structure, 80% coverage |
 | Portability | SQLite/MySQL, OS-specific ping commands, env paths | Tested Windows; Linux/macOS commands included |
 | Privacy | ARP only, SHA-256 identity, masked MAC, no raw capture | Device tests, UI privacy notice |
 | Integrity | `data_origin`, simulation exclusion, disclaimers | AP/device/monitoring tests |
-| Testability | Isolated fixtures, no live probes in tests, JUnit import | 88 + 20 passing tests |
+| Testability | Isolated fixtures, no live probes in tests, JUnit import | 103 + 21 passing tests |
 
 ---
 
@@ -1434,7 +1434,7 @@ NetPulse-AI/
 │   │   │                        settings, test_runner
 │   │   ├── troubleshooting/    rule engine
 │   │   └── main.py
-│   ├── tests/                  88 Pytest tests + isolated conftest
+│   ├── tests/                  103 Pytest tests + isolated conftest
 │   ├── .env.example
 │   └── requirements.txt
 ├── frontend/
@@ -3685,7 +3685,7 @@ Testing pursued six objectives:
 | TO3 | Verify the AI and rule-based decision logic | Anomaly and troubleshooting tests |
 | TO4 | Verify the operational workflow end to end | 12 Playwright interaction tests |
 | TO5 | Verify reports, test runner and settings | Report, testing and settings tests |
-| TO6 | Verify the interface is usable and responsive | Playwright navigation/responsive tests, 17 screenshots |
+| TO6 | Verify the interface is usable and responsive | Playwright navigation/responsive tests, 21 screenshots |
 
 ---
 
@@ -3732,16 +3732,15 @@ manual exploratory layer.
 
 ```mermaid
 flowchart TB
-    E2E["20 Playwright end-to-end tests<br/>real browser + real backend"]
-    INT["48 API/integration tests<br/>FastAPI TestClient + throw-away SQLite"]
-    UNIT["40 unit/service tests<br/>security, ARP/Wi-Fi parsing, JUnit, ML helpers"]
+    E2E["21 Playwright end-to-end tests<br/>real browser + real backend"]
+    BACK["103 backend tests<br/>API, services, security, ML, intelligence"]
     MAN["Manual exploratory review<br/>screenshots, visual layout, PDF inspection"]
 
-    MAN --> E2E --> INT --> UNIT
+    MAN --> E2E --> BACK
 ```
 
-The split is approximate: several API tests also exercise services and the
-database. The exact 88-test inventory is in
+Several backend tests exercise more than one layer. The exact 103-test inventory
+plus the 21 browser tests is in
 [`test-inventory.generated.md`](test-inventory.generated.md).
 
 ### 5.3.1 Backend isolation
@@ -3807,22 +3806,23 @@ Playwright:
 | `test_tickets.py` | 5 | Manual lifecycle, filters/stats, duplicate suppression + resolution reopen, low-anomaly policy, validation/RBAC |
 | `test_troubleshooting.py` | 4 | Simulated AP refusal, latency/loss/outage escalation, list/latest, invalid AP + RBAC |
 | `test_dashboard.py` | 4 | Overview contract, simulation exclusion, window validation, health calculation |
+| `test_intelligence.py` | 14 | Prediction states/weights, RCA evidence, security dedupe, optimisation thresholds, CSV exports, notifications, live status, dashboard roll-up |
 | `test_wifi.py` | 9 | Windows association parsing, frequency/band mapping, fallback payloads, authenticated endpoint |
-| **Total** | **88** | |
+| **Total** | **103** | |
 
 ### 5.4.2 Final result
 
 ```text
-88 passed, 1 warning in 4.86s
+103 passed, 1 warning in 20.51s
 ```
 
 The warning is a Starlette deprecation notice about the `httpx` test client
 adapter. It does not affect application behaviour.
 
-JUnit XML reports 89 tests, 0 failures, 0 errors, 0 skipped:
+JUnit XML reports 103 tests, 0 failures, 0 errors, 0 skipped:
 
 ```text
-testsuite name="pytest" errors="0" failures="0" skipped="0" tests="88"
+testsuite name="pytest" errors="0" failures="0" skipped="0" tests="103"
 ```
 
 ### 5.4.3 Coverage
@@ -3830,7 +3830,7 @@ testsuite name="pytest" errors="0" failures="0" skipped="0" tests="88"
 Coverage was measured with `pytest-cov` against the `app` package:
 
 ```text
-TOTAL   2362 statements   425 missed   82%
+TOTAL   3416 statements   684 missed   80%
 ```
 
 | Area | Coverage | Notes |
@@ -3839,20 +3839,27 @@ TOTAL   2362 statements   425 missed   82%
 | Schemas | 97% | Validation paths exercised |
 | Settings API/service | 97–100% | Contract and update paths |
 | Anomaly service | 93% | Training, cold start, detection, explanation |
-| Auth API | 93% | Login, RBAC, user creation |
-| Dashboard | 94% | Aggregation, simulation exclusion, health |
+| Auth API | 90% | Login, RBAC, audit, user creation |
+| Dashboard | 96% | Aggregation, simulation exclusion, health, intelligence roll-up |
 | Access point API | 91% | CRUD, checks, history, performance |
 | Reports service | 96% | All report builders and listing metadata exercised |
-| Main app | 87% | Lifespan, static mount, errors |
-| Monitoring API | 81% | History, latest, scheduler, blocked run, Wi-Fi endpoint |
+| Main app | 84% | Lifespan, static mount, routers, errors |
+| Monitoring API | 77% | History, latest, scheduler, blocked run, Wi-Fi endpoint |
 | Wi-Fi detector | 47% | Parser branches covered; OS command paths exercised manually |
-| Monitoring service | 80% | Probe persistence, AP checks |
-| Seed service | 77% | Admin/settings/demo AP seeding |
+| Monitoring service | 69% | Probe persistence, AP checks, traffic sampling |
+| Seed service | 78% | Admin/settings/demo AP seeding |
 | Ticketing service | 72% | Threshold, anomaly and AP rules |
 | Device discovery | 71% | ARP parsing and discovery logic |
 | Test runner | 50% | Subprocess execution intentionally disabled in tests |
 | Diagnostics | 41% | OS command execution branches not run in CI-like tests |
-| Scheduler | 40% | Async loop and timing branches not unit-tested |
+| Scheduler | 39% | Async loop and timing branches not unit-tested |
+| Prediction engine | 89% | Insufficient-data state, weighted scoring, explanations |
+| Root-cause engine | 70% | Evidence gates, rule ranking, workflow |
+| Security scanner | 83% | Local evidence sources, dedupe, posture score |
+| Optimisation engine | 77% | Threshold advisories and confidence |
+| Intelligence API | 65% | Feed, run, action and CSV endpoints |
+| Notifications API | 71% | Unread count, mark-read and clear-read |
+| Live API | 48% | WebSocket hub and REST fallback (serverless paths unexercised) |
 
 The lower coverage in diagnostics, Wi-Fi detection and the scheduler is
 expected: the tests deliberately avoid live pings, host-specific OS commands and
@@ -3872,17 +3879,17 @@ Coverage XML: `reports/test-runs/coverage.xml`.
 |---|---:|---|
 | `auth.spec.js` | 4 | Anonymous redirect, wrong password, admin login + reload persistence, sign out |
 | `interactions.spec.js` | 12 | Theme persistence, command palette, AP detail/check, AP CRUD, current Wi-Fi prefill/unavailable states, device discovery/privacy, AI + troubleshooting, ticket lifecycle, PDF generate/download, settings save, notifications |
-| `navigation.spec.js` | 2 | All ten modules render without console errors; deep links and 404 |
+| `navigation.spec.js` | 3 | All ten modules render without console errors; legacy deep links; command-palette access; 404 |
 | `responsive.spec.js` | 2 | Mobile drawer navigation; no horizontal overflow |
-| **Total** | **20** | |
+| **Total** | **21** | |
 
 ### 5.5.2 Final result
 
 ```text
-20 passed (50.6s)
+21 passed (62.1s)
 ```
 
-JUnit XML reports 20 tests, 0 failures.
+JUnit XML reports 21 tests, 0 failures.
 
 ### 5.5.3 What the E2E suite proves
 
@@ -3907,20 +3914,20 @@ JUnit XML reports 20 tests, 0 failures.
 
 | Suite | Tests | Passed | Failed | Skipped | Duration |
 |---|---:|---:|---:|---:|---:|
-| Backend Pytest | 88 | 88 | 0 | 0 | 2.52 s (JUnit) / 4.86 s with coverage |
-| Frontend Playwright | 20 | 20 | 0 | 0 | 50.61 s |
-| **Total** | **108** | **108** | **0** | **0** | — |
+| Backend Pytest | 103 | 103 | 0 | 0 | 20.51 s (JUnit) |
+| Frontend Playwright | 21 | 21 | 0 | 0 | 62.05 s |
+| **Total** | **124** | **124** | **0** | **0** | — |
 
 Additional verification:
 
 | Check | Result |
 |---|---|
-| Backend line coverage | 82% |
-| Built-in test runner | Run `run-20261115-090130-a8cc`, 79 passed, 0 failed |
+| Backend line coverage | 80% |
+| Built-in test runner | 103 tests imported from the final JUnit evidence |
 | PDF `%PDF-` signature | Verified |
 | Security headers | `nosniff`, `DENY`, `no-referrer`, restrictive Permissions-Policy, `no-store` |
 | MySQL DDL | Generated and reviewed; runtime import not executed |
-| Documentation screenshots | 17 captured from the running build |
+| Documentation screenshots | 21 captured from the current purple build |
 | Responsive overflow | No horizontal overflow at 390 px |
 | Console errors during module traversal | None |
 
@@ -4014,10 +4021,10 @@ Testing was not only confirmatory; several real defects were found and corrected
 | D-04 | Sidebar email capitalization | Profile identity rendered incorrectly | CSS transform applied to email | Removed text transform for email | E2E/admin profile check |
 | D-05 | Pytest suite mapping incorrect | Built-in runner grouped tests under wrong suites | `_suite_for()` matched only the first classname segment | Map classname to known suite names, fallback to module | `test_suite_mapping` |
 | D-06 | Playwright strict label conflict | Login test failed on “Password” | Password visibility button also had label “Show password” | Exact label matching in helper/tests | Auth E2E suite |
-| D-07 | Playwright headless shell blocked | All E2E tests failed to launch | Windows Application Control policy blocks bundled shell | Use installed Chrome channel | 20 E2E tests pass |
+| D-07 | Playwright headless shell blocked | All E2E tests failed to launch | Windows Application Control policy blocks bundled shell | Use installed Chrome channel | 21 E2E tests pass |
 | D-08 | Automation screenshot captured entire page | Unreadable giant image | `fullPage: true` for dense pages | Per-page viewport/full-page configuration | Refreshed screenshots |
-| D-09 | Testing report predated final 79-pass run | Report evidence stale | PDF generated before final test run | Regenerate PDFs after final run | Final report set |
-| D-10 | Pytest class mapping test added after runner fix | Regression risk | No direct test for mapping | Added `test_suite_mapping` | 88-test suite |
+| D-09 | Testing report predated final 103-pass run | Report evidence stale | PDF generated before final test run | Regenerate PDFs after final run | Final report set |
+| D-10 | Pytest class mapping test added after runner fix | Regression risk | No direct test for mapping | Added `test_suite_mapping` | 103-test suite |
 
 The defect log demonstrates an iterative verification process rather than a
 single “happy path” demonstration.
@@ -4069,7 +4076,7 @@ future-work chapter.
 | Built-in runner JUnit | `reports/test-runs/run-20261115-090130-a8cc-junit.xml` |
 | Test inventory | `documentation/test-inventory.generated.md` |
 | PDF reports | `reports/*.pdf` |
-| Screenshots | `documentation/screenshots/01…17` |
+| Screenshots | `documentation/screenshots/01-21` |
 
 Relevant screenshots:
 
@@ -4132,10 +4139,10 @@ remains the main deployment risk and is repeated in the conclusion.
 
 ## 5.12 Chapter summary
 
-The final build passed **109 automated tests** (89 backend + 20 E2E) with **82%
+The final build passed **124 automated tests** (103 backend + 21 E2E) with **80%
 backend line coverage**. Testing found and fixed real UI and test-infrastructure
 defects. The evidence is stored as JUnit XML, coverage XML, a Playwright HTML
-report, PDFs and 17 screenshots. The main unverified area is the MySQL runtime
+report, PDFs and 21 screenshots. The main unverified area is the MySQL runtime
 import, which is explicitly marked as deployment-only rather than presented as
 tested.
 
@@ -4494,9 +4501,15 @@ lifetime is 480 minutes (8 hours) and can be changed with
 
 | Group | Modules |
 |---|---|
-| Workspace | Overview, Network Monitoring, Access Points, Connected Devices |
-| Intelligence | AI Anomaly Detection, Smart Troubleshooting, Issue Management |
-| Operations | Automation Testing, Reports, Settings |
+| Command | Overview, Real-Time Monitoring |
+| Intelligence | Predictive Analytics, Root Cause Analysis, Cybersecurity Intelligence |
+| Operations | Network Optimization, Devices & Access Points, Anomalies & Issues |
+| System | Reports & Analytics, Settings |
+
+The primary sidebar contains exactly these ten links. Legacy deep links such as
+`/access-points`, `/troubleshooting`, `/issues` and `/testing` remain available
+through the command palette and direct navigation, so existing bookmarks do not
+break.
 
 On screens narrower than 1024 px, the sidebar becomes a slide-in drawer. Open it
 with the menu button in the header. The current page is shown in the header
@@ -4507,9 +4520,9 @@ breadcrumb.
 | Control | Purpose |
 |---|---|
 | **Search workspace** / `Ctrl+K` | Opens the command palette |
-| **Live probes** badge | Indicates the live-monitoring feature area |
-| Theme button | Switches between the dark espresso/wine and light beige/white themes |
-| Bell | Opens recent operational alerts |
+| **Live socket** / **Polling** pill | Shows whether real-time updates use WebSocket or the REST fallback |
+| Theme button | Switches between the dark navy/purple and light violet/white themes |
+| Bell | Opens the notification centre for predictions, security findings, RCA, optimisation, anomalies, tickets and devices |
 | Avatar and chevron | Account menu, settings link and **Sign out** |
 
 ### 6.7.3 Command palette
@@ -4524,10 +4537,12 @@ breadcrumb.
 
 ### 6.7.4 Notifications
 
-The bell shows a dot when recent alerts exist. The panel lists current AI
-anomalies, high-priority open tickets and unrecognized devices. Selecting an
-alert opens the related module. The panel closes when you select outside it or
-press the close layer.
+The bell shows an unread count when new notifications exist. The panel lists
+persisted prediction risks, security findings, root-cause investigations,
+optimisation advice, AI anomalies, high-priority tickets and unrecognised
+devices. Selecting a notification opens the related module, and the panel
+supports mark-as-read and clear-read actions. It closes when you select outside
+it or press the close layer.
 
 ### 6.7.5 Theme
 
@@ -4854,10 +4869,11 @@ the development data.
 | AI anomaly report | Isolation Forest findings with explanations and severity |
 | Issue management report | Ticket register, priorities, statuses and resolution timestamps |
 | Automated testing report | Latest persisted pytest run, counts and suite details |
+| Intelligence brief | Prediction, security, optimisation and root-cause summaries with states, evidence and disclaimers |
 
 **How to use:**
 
-1. Select one of the eight report cards.
+1. Select one of the nine report cards.
 2. Choose a window: **Last 24 hours**, **Last 7 days**, **Last 30 days** or
    **Last 90 days**.
 3. Select **Generate PDF** (Analyst or Administrator).
@@ -4910,6 +4926,93 @@ read-only notice and disabled fields. Invalid thresholds return `422`.
   `backend\.env`. They are displayed but cannot be changed through the API, so a
   request cannot redirect monitoring at an unauthorized host.
 - Automatic configuration changes are permanently disabled by design.
+
+### 6.8.11 Predictive analytics
+
+![Predictive analytics](screenshots/18-predictive-analytics.png)
+
+**Purpose:** estimate failure risk over the next 24 hours from persisted live
+measurements.
+
+**What it shows:** per-scope risk (network and each real access point), severity,
+confidence, observation count, weighted features and the primary measured
+driver. The page states the model version and the 72-hour observation window.
+
+**How to use:**
+
+1. Open **Predictive Analytics**.
+2. Confirm the telemetry card shows enough live observations.
+3. Select **Run risk analysis** (Analyst or Administrator).
+4. Expand a risk assessment to inspect availability, packet loss, latency and
+   jitter contributions.
+5. Use **Export CSV** to download the exact persisted estimates.
+
+If there are fewer than eight live observations, the engine returns
+`insufficient_data` and does not invent a score. Simulated access points are
+excluded from the fit.
+
+### 6.8.12 Root cause analysis
+
+![Root cause analysis](screenshots/19-root-cause-analysis.png)
+
+**Purpose:** turn an unhealthy measurement into an explainable hypothesis and a
+safe action plan.
+
+**What it shows:** investigation status, severity, confidence, probable cause,
+the measured evidence used, ranked diagnostic actions and related incident IDs.
+
+**How to use:**
+
+1. Open **Root Cause Analysis**.
+2. Select **Investigate latest** to analyse the most recent live measurement.
+3. Review the evidence values, not just the hypothesis.
+4. Acknowledge or resolve an investigation once the suggested checks are done.
+
+The engine is rule-based and deterministic. It does not execute configuration
+changes and does not claim a root cause when the evidence is incomplete.
+
+### 6.8.13 Cybersecurity intelligence
+
+![Cybersecurity intelligence](screenshots/20-cybersecurity-intelligence.png)
+
+**Purpose:** surface locally observable defensive concerns without offensive
+scanning.
+
+**What it shows:** posture score, open findings, unapproved devices, failed
+sign-ins, evidence, recommended response and coverage limits. Findings are
+derived only from the local ARP neighbour cache, sign-in audit records and AP
+inventory.
+
+**How to use:**
+
+1. Open **Cybersecurity Intelligence**.
+2. Select **Run defensive scan** (Analyst or Administrator).
+3. Review each finding's evidence and recommended response.
+4. Acknowledge or resolve findings after verification.
+
+No port scanning, exploitation, packet capture or automatic blocking is
+performed. An empty register means no local evidence was found; it does not prove
+the network is secure.
+
+### 6.8.14 Network optimization
+
+![Network optimization](screenshots/21-network-optimization.png)
+
+**Purpose:** generate advisory recommendations from measured threshold breaches.
+
+**What it shows:** advisory items by category and severity, measured basis,
+observation counts, suggested actions and advisory confidence.
+
+**How to use:**
+
+1. Open **Network Optimization**.
+2. Select **Run optimisation scan** (Analyst or Administrator).
+3. Review the measured values and suggested actions.
+4. Mark an advisory as planned or dismiss it after review.
+
+Recommendations never change device configuration. Expected gains are shown as
+"not estimated" unless they can be derived from the measured data, so the page
+never fabricates a saving.
 
 ---
 
@@ -5029,8 +5132,8 @@ cd ..\frontend
 npm.cmd run test:e2e
 ```
 
-The latest verified results are 89 backend tests and 20 Playwright tests, all
-passing, with 82% backend line coverage.
+The latest verified results are 103 backend tests and 21 Playwright tests, all
+passing, with 80% backend line coverage.
 
 ### 6.9.8 Add a team member
 
@@ -5353,7 +5456,7 @@ attainment.
 
 | ID | Objective | Evidence | Status |
 |---|---|---|---|
-| O1 | Build a complete full-stack application | React SPA with login and ten modules; FastAPI API; shared authentication; responsive shell; verified in 20 Playwright tests | Achieved |
+| O1 | Build a complete full-stack application | React SPA with login and ten modules; FastAPI API; shared authentication; responsive shell; verified in 21 Playwright tests | Achieved |
 | O2 | Collect real network measurements | OS ICMP probes persist latency, loss and jitter; failures are stored as real failures; simulation is separated by `data_origin`; 8 monitoring tests | Achieved |
 | O3 | Detect anomalies with machine learning | Isolation Forest over live observations; robust-z explanation; severity; model provenance; cold-start disclosure; 7 anomaly tests | Achieved |
 | O4 | Provide rule-based troubleshooting | Deterministic rules for outage, latency, loss, simulation and insufficient data; causes, ordered steps, related tickets and safety note; 4 tests | Achieved |
@@ -5361,8 +5464,8 @@ attainment.
 | O6 | Provide privacy-preserving device visibility | Read-only ARP-cache discovery, SHA-256 identity, masked MAC, approval workflow and observation history; 6 tests | Achieved |
 | O7 | Automate incident management | Deduplicated automatic tickets, manual tickets, priorities, three workflow statuses, comments and statistics; 5 tests | Achieved |
 | O8 | Generate analytical reports | Eight PDF types generated from stored data, report library, secure download and path-traversal protection; 7 tests | Achieved |
-| O9 | Verify the implementation | 88 Pytest tests, 20 Playwright tests, 82% backend line coverage, JUnit XML, HTML report and built-in runner evidence | Achieved |
-| O10 | Document the project professionally | Eight chapters, architecture and UML/DFD models, generated data dictionary, test inventory, 17 screenshots and consolidated report | Achieved |
+| O9 | Verify the implementation | 103 Pytest tests, 21 Playwright tests, 80% backend line coverage, JUnit XML, HTML report and built-in runner evidence | Achieved |
+| O10 | Document the project professionally | Nine chapters, architecture and UML/DFD models, generated data dictionary, test inventory, 21 screenshots and consolidated report | Achieved |
 
 ### 7.2.1 Non-functional outcomes
 
@@ -5418,9 +5521,9 @@ product decisions that reduce the risk of a demonstration causing real damage.
 
 ### 7.3.5 Reproducible verification
 
-The project ships its evidence: 89 backend tests, 20 browser tests, JUnit XML,
+The project ships its evidence: 103 backend tests, 21 browser tests, JUnit XML,
 coverage XML, a Playwright HTML report, a built-in runner, a generated test
-inventory and 17 screenshots. A reviewer can rerun the commands rather than
+inventory and 21 screenshots. A reviewer can rerun the commands rather than
 trust a claim in a slide.
 
 ---
@@ -5610,7 +5713,7 @@ The following principles should survive future development:
 NetPulse AI met its ten objectives. It delivers a real, working monitoring and
 diagnostics platform with a coherent data model, a complete operational
 workflow, an explainable machine-learning component and a substantial automated
-verification trail. The final build passed 109 automated tests, produced 82%
+verification trail. The final build passed 124 automated tests, produced 80%
 backend line coverage, generated eight report types, and documented its design
 with architecture, database, UML, DFD, test and user-manual chapters.
 
@@ -5843,6 +5946,28 @@ Administrator.
 | GET | `/monitoring/latest` | Any authenticated | Latest live measurement |
 | POST | `/monitoring/run` | Analyst+ | Run a real probe |
 | GET | `/monitoring/scheduler` | Any authenticated | Scheduler state |
+| GET | `/monitoring/traffic` | Any authenticated | Host-interface traffic samples |
+| GET | `/intelligence/predictions` | Any authenticated | Persisted failure-risk assessments |
+| POST | `/intelligence/predictions/run` | Analyst+ | Run the local risk model |
+| GET | `/intelligence/root-cause` | Any authenticated | Persisted investigations |
+| POST | `/intelligence/root-cause/run` | Analyst+ | Investigate the latest measurement |
+| PATCH | `/intelligence/root-cause/<built-in function id>` | Analyst+ | Acknowledge or resolve an investigation |
+| GET | `/intelligence/security` | Any authenticated | Persisted defensive findings |
+| POST | `/intelligence/security/scan` | Analyst+ | Run the local defensive scan |
+| PATCH | `/intelligence/security/<built-in function id>` | Analyst+ | Acknowledge or resolve a finding |
+| GET | `/intelligence/optimization` | Any authenticated | Persisted optimisation advice |
+| POST | `/intelligence/optimization/scan` | Analyst+ | Run the optimisation engine |
+| PATCH | `/intelligence/optimization/<built-in function id>` | Analyst+ | Mark planned or dismiss advice |
+| GET | `/intelligence/summary` | Any authenticated | Cross-engine roll-up |
+| GET | `/intelligence/export.csv` | Any authenticated | CSV export with status header |
+| GET | `/notifications` | Any authenticated | Notification centre |
+| GET | `/notifications/unread-count` | Any authenticated | Unread count |
+| POST | `/notifications/<built-in function id>/read` | Any authenticated | Mark one notification read |
+| POST | `/notifications/read-all` | Any authenticated | Mark all notifications read |
+| DELETE | `/notifications/read` | Any authenticated | Clear read notifications |
+| GET | `/live/status` | Any authenticated | Transport capabilities |
+| GET | `/live/snapshot` | Any authenticated | Current live snapshot |
+| WS | `/live/ws` | Authenticated token | Real-time WebSocket stream |
 | GET | `/access-points` | Any authenticated | List and search APs |
 | GET | `/access-points/{access_point_id}` | Any authenticated | AP detail and history |
 | POST | `/access-points` | Administrator | Register an AP |
@@ -5934,203 +6059,223 @@ This inventory is generated from the final JUnit XML files in
 
 Generated from the final JUnit XML files in `reports/test-runs/`.
 
-### Backend Pytest inventory (89 tests)
+### Backend Pytest inventory (103 tests)
 
 ### `test_access_points` — 8 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_seeded_access_points_are_labelled_simulations | PASS | 0.307 |
-| 2 | test_create_update_history_performance_and_delete | PASS | 0.062 |
-| 3 | test_duplicate_access_point_is_rejected | PASS | 0.027 |
-| 4 | test_invalid_ip_and_mac_are_validated | PASS | 0.012 |
-| 5 | test_analyst_and_viewer_cannot_create_access_points | PASS | 0.244 |
-| 6 | test_simulated_check_is_clearly_labelled_and_excluded | PASS | 0.028 |
-| 7 | test_access_point_search_and_simulation_filter | PASS | 0.016 |
-| 8 | test_missing_access_point_returns_404 | PASS | 0.012 |
+| 1 | test_seeded_access_points_are_labelled_simulations | PASS | 1.053 |
+| 2 | test_create_update_history_performance_and_delete | PASS | 0.219 |
+| 3 | test_duplicate_access_point_is_rejected | PASS | 0.101 |
+| 4 | test_invalid_ip_and_mac_are_validated | PASS | 0.040 |
+| 5 | test_analyst_and_viewer_cannot_create_access_points | PASS | 0.774 |
+| 6 | test_simulated_check_is_clearly_labelled_and_excluded | PASS | 0.119 |
+| 7 | test_access_point_search_and_simulation_filter | PASS | 0.052 |
+| 8 | test_missing_access_point_returns_404 | PASS | 0.041 |
 
 ### `test_anomaly` — 7 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_sample_baseline_is_deterministic_and_labelled | PASS | 0.003 |
-| 2 | test_cold_start_uses_sample_baseline_when_history_is_insufficient | PASS | 0.336 |
-| 3 | test_detection_returns_no_live_data_without_measurements | PASS | 0.300 |
-| 4 | test_extreme_live_measurement_is_detected_and_explained | PASS | 0.735 |
-| 5 | test_offline_measurement_always_gets_critical_explanation | PASS | 0.005 |
-| 6 | test_model_info_and_api_contract | PASS | 0.341 |
-| 7 | test_anomaly_filter_validation | PASS | 0.007 |
+| 1 | test_sample_baseline_is_deterministic_and_labelled | PASS | 0.014 |
+| 2 | test_cold_start_uses_sample_baseline_when_history_is_insufficient | PASS | 1.298 |
+| 3 | test_detection_returns_no_live_data_without_measurements | PASS | 1.275 |
+| 4 | test_extreme_live_measurement_is_detected_and_explained | PASS | 3.022 |
+| 5 | test_offline_measurement_always_gets_critical_explanation | PASS | 0.012 |
+| 6 | test_model_info_and_api_contract | PASS | 1.157 |
+| 7 | test_anomaly_filter_validation | PASS | 0.016 |
 
 ### `test_auth` — 12 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_health_is_public | PASS | 0.055 |
-| 2 | test_admin_can_log_in | PASS | 0.075 |
-| 3 | test_wrong_password_is_rejected | PASS | 0.055 |
-| 4 | test_unknown_email_is_rejected_without_leaking_account_state | PASS | 0.055 |
-| 5 | test_me_returns_signed_in_user | PASS | 0.008 |
-| 6 | test_protected_routes_require_a_token | PASS | 0.006 |
-| 7 | test_invalid_token_is_rejected | PASS | 0.005 |
-| 8 | test_admin_creates_viewer_and_duplicate_is_rejected | PASS | 0.066 |
-| 9 | test_viewer_cannot_manage_users | PASS | 0.006 |
-| 10 | test_analyst_cannot_manage_users | PASS | 0.005 |
-| 11 | test_user_validation_returns_field_errors | PASS | 0.006 |
-| 12 | test_viewer_can_read_dashboard_but_not_change_configuration | PASS | 0.022 |
+| 1 | test_health_is_public | PASS | 0.400 |
+| 2 | test_admin_can_log_in | PASS | 0.213 |
+| 3 | test_wrong_password_is_rejected | PASS | 0.186 |
+| 4 | test_unknown_email_is_rejected_without_leaking_account_state | PASS | 0.189 |
+| 5 | test_me_returns_signed_in_user | PASS | 0.027 |
+| 6 | test_protected_routes_require_a_token | PASS | 0.023 |
+| 7 | test_invalid_token_is_rejected | PASS | 0.016 |
+| 8 | test_admin_creates_viewer_and_duplicate_is_rejected | PASS | 0.227 |
+| 9 | test_viewer_cannot_manage_users | PASS | 0.020 |
+| 10 | test_analyst_cannot_manage_users | PASS | 0.018 |
+| 11 | test_user_validation_returns_field_errors | PASS | 0.018 |
+| 12 | test_viewer_can_read_dashboard_but_not_change_configuration | PASS | 0.418 |
 
 ### `test_dashboard` — 4 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_dashboard_overview_contract | PASS | 0.011 |
-| 2 | test_dashboard_excludes_simulated_measurements | PASS | 0.016 |
-| 3 | test_dashboard_validates_window | PASS | 0.012 |
-| 4 | test_dashboard_calculates_health_from_live_measurements | PASS | 0.013 |
+| 1 | test_dashboard_overview_contract | PASS | 0.051 |
+| 2 | test_dashboard_excludes_simulated_measurements | PASS | 0.093 |
+| 3 | test_dashboard_validates_window | PASS | 0.039 |
+| 4 | test_dashboard_calculates_health_from_live_measurements | PASS | 0.081 |
 
 ### `test_devices` — 6 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_arp_parser_filters_scope_and_duplicates | PASS | 0.008 |
-| 2 | test_device_list_exposes_privacy_note | PASS | 0.011 |
-| 3 | test_device_update_approval_and_activity | PASS | 0.038 |
-| 4 | test_discovery_is_mocked_and_duplicates_are_suppressed | PASS | 0.029 |
-| 5 | test_viewer_cannot_discover_or_approve | PASS | 0.012 |
-| 6 | test_device_filtering_by_approval | PASS | 0.017 |
+| 1 | test_arp_parser_filters_scope_and_duplicates | PASS | 0.023 |
+| 2 | test_device_list_exposes_privacy_note | PASS | 0.032 |
+| 3 | test_device_update_approval_and_activity | PASS | 0.140 |
+| 4 | test_discovery_is_mocked_and_duplicates_are_suppressed | PASS | 0.102 |
+| 5 | test_viewer_cannot_discover_or_approve | PASS | 0.043 |
+| 6 | test_device_filtering_by_approval | PASS | 0.056 |
+
+### `test_intelligence` — 14 tests
+
+| # | Test | Result | Time (s) |
+|---|---|---|---:|
+| 1 | test_prediction_engine_reports_insufficient_data_instead_of_inventing_risk | PASS | 0.115 |
+| 2 | test_prediction_engine_scores_only_live_measurements_and_explains_weights | PASS | 0.145 |
+| 3 | test_prediction_feed_distinguishes_not_run_from_insufficient_data | PASS | 0.092 |
+| 4 | test_root_cause_requires_evidence_and_creates_explainable_investigation | PASS | 0.122 |
+| 5 | test_root_cause_reports_clear_state_for_healthy_measurement | PASS | 0.130 |
+| 6 | test_security_scan_uses_local_evidence_and_deduplicates_findings | PASS | 0.213 |
+| 7 | test_optimization_refuses_advice_without_enough_live_telemetry | PASS | 0.096 |
+| 8 | test_optimization_builds_advisory_from_measured_threshold_breaches | PASS | 0.139 |
+| 9 | test_intelligence_endpoints_return_explicit_state_envelopes | PASS | 0.132 |
+| 10 | test_viewer_cannot_run_intelligence_engines | PASS | 0.058 |
+| 11 | test_intelligence_csv_exports_are_real_files | PASS | 0.115 |
+| 12 | test_notification_centre_contract | PASS | 0.048 |
+| 13 | test_live_status_documents_polling_fallback | PASS | 0.056 |
+| 14 | test_dashboard_exposes_intelligence_rollup | PASS | 0.038 |
 
 ### `test_monitoring` — 8 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_network_info_reports_real_host_context | PASS | 0.018 |
-| 2 | test_history_returns_scoped_measurements | PASS | 0.012 |
-| 3 | test_access_point_history_can_include_simulations | PASS | 0.022 |
-| 4 | test_live_run_is_blocked_in_test_environment | PASS | 0.007 |
-| 5 | test_monitoring_service_persists_live_probe_and_opens_ticket | PASS | 0.014 |
-| 6 | test_scheduler_status_endpoint | PASS | 0.007 |
-| 7 | test_latest_measurement_endpoint_returns_live_only | PASS | 0.007 |
-| 8 | test_simulated_measurement_is_never_live | PASS | 0.004 |
+| 1 | test_network_info_reports_real_host_context | PASS | 0.047 |
+| 2 | test_history_returns_scoped_measurements | PASS | 0.048 |
+| 3 | test_access_point_history_can_include_simulations | PASS | 0.054 |
+| 4 | test_live_run_is_blocked_in_test_environment | PASS | 0.018 |
+| 5 | test_monitoring_service_persists_live_probe_and_opens_ticket | PASS | 0.087 |
+| 6 | test_scheduler_status_endpoint | PASS | 0.021 |
+| 7 | test_latest_measurement_endpoint_returns_live_only | PASS | 0.022 |
+| 8 | test_simulated_measurement_is_never_live | PASS | 0.011 |
 
 ### `test_reports` — 7 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_report_types_expose_all_eight_reports | PASS | 0.007 |
-| 2 | test_generate_list_and_download_pdf | PASS | 0.079 |
-| 3 | test_specialised_reports_generate_with_correct_listing_metadata | PASS | 0.124 |
-| 4 | test_invalid_report_requests_are_rejected | PASS | 0.012 |
-| 5 | test_missing_report_returns_404 | PASS | 0.007 |
-| 6 | test_report_path_traversal_is_blocked | PASS | 0.010 |
-| 7 | test_reports_require_authentication | PASS | 0.010 |
+| 1 | test_report_types_expose_all_reports | PASS | 0.021 |
+| 2 | test_generate_list_and_download_pdf | PASS | 0.253 |
+| 3 | test_specialised_reports_generate_with_correct_listing_metadata | PASS | 0.540 |
+| 4 | test_invalid_report_requests_are_rejected | PASS | 0.039 |
+| 5 | test_missing_report_returns_404 | PASS | 0.024 |
+| 6 | test_report_path_traversal_is_blocked | PASS | 0.049 |
+| 7 | test_reports_require_authentication | PASS | 0.033 |
 
 ### `test_security` — 8 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_password_hash_round_trip | PASS | 0.143 |
-| 2 | test_password_hash_rejects_oversized_input | PASS | 0.001 |
-| 3 | test_access_token_contains_required_claims | PASS | 0.001 |
-| 4 | test_token_with_wrong_signature_is_rejected | PASS | 0.001 |
-| 5 | test_role_hierarchy | PASS | 0.000 |
-| 6 | test_postgres_urls_get_an_explicit_driver | PASS | 0.016 |
-| 7 | test_production_secret_requirements_are_enforced | PASS | 0.012 |
-| 8 | test_test_environment_has_ephemeral_safe_defaults | PASS | 0.001 |
+| 1 | test_password_hash_round_trip | PASS | 0.458 |
+| 2 | test_password_hash_rejects_oversized_input | PASS | 0.002 |
+| 3 | test_access_token_contains_required_claims | PASS | 0.003 |
+| 4 | test_token_with_wrong_signature_is_rejected | PASS | 0.002 |
+| 5 | test_role_hierarchy | PASS | 0.002 |
+| 6 | test_postgres_urls_get_an_explicit_driver | PASS | 0.080 |
+| 7 | test_production_secret_requirements_are_enforced | PASS | 0.055 |
+| 8 | test_test_environment_has_ephemeral_safe_defaults | PASS | 0.004 |
 
 ### `test_settings` — 5 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_get_settings_contract | PASS | 0.009 |
-| 2 | test_admin_can_update_and_restore_settings | PASS | 0.059 |
-| 3 | test_invalid_settings_are_rejected | PASS | 0.018 |
-| 4 | test_analyst_cannot_change_settings | PASS | 0.006 |
-| 5 | test_system_status_reports_runtime_and_safety | PASS | 0.103 |
+| 1 | test_get_settings_contract | PASS | 0.034 |
+| 2 | test_admin_can_update_and_restore_settings | PASS | 0.111 |
+| 3 | test_invalid_settings_are_rejected | PASS | 0.035 |
+| 4 | test_analyst_cannot_change_settings | PASS | 0.012 |
+| 5 | test_system_status_reports_runtime_and_safety | PASS | 0.014 |
 
 ### `test_testing` — 6 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_testing_dashboard_contract | PASS | 0.011 |
-| 2 | test_runner_is_forbidden_when_disabled | PASS | 0.013 |
-| 3 | test_suite_mapping | PASS | 0.000 |
-| 4 | test_junit_parser_handles_all_statuses | PASS | 0.003 |
-| 5 | test_no_active_run_after_startup | PASS | 0.002 |
-| 6 | test_missing_run_returns_404 | PASS | 0.009 |
+| 1 | test_testing_dashboard_contract | PASS | 0.018 |
+| 2 | test_runner_is_forbidden_when_disabled | PASS | 0.028 |
+| 3 | test_suite_mapping | PASS | 0.002 |
+| 4 | test_junit_parser_handles_all_statuses | PASS | 0.012 |
+| 5 | test_no_active_run_after_startup | PASS | 0.005 |
+| 6 | test_missing_run_returns_404 | PASS | 0.021 |
 
 ### `test_tickets` — 5 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_manual_ticket_lifecycle | PASS | 0.062 |
-| 2 | test_ticket_list_filters_and_stats | PASS | 0.036 |
-| 3 | test_duplicate_suppression_and_resolution_reopens_fingerprint | PASS | 0.008 |
-| 4 | test_automatic_ticket_policy_ignores_low_anomaly | PASS | 0.006 |
-| 5 | test_ticket_validation_and_permissions | PASS | 0.020 |
+| 1 | test_manual_ticket_lifecycle | PASS | 0.139 |
+| 2 | test_ticket_list_filters_and_stats | PASS | 0.083 |
+| 3 | test_duplicate_suppression_and_resolution_reopens_fingerprint | PASS | 0.025 |
+| 4 | test_automatic_ticket_policy_ignores_low_anomaly | PASS | 0.023 |
+| 5 | test_ticket_validation_and_permissions | PASS | 0.043 |
 
 ### `test_troubleshooting` — 4 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_simulated_access_point_cannot_be_diagnosed_as_real | PASS | 0.022 |
-| 2 | test_rules_escalate_latency_loss_and_outage | PASS | 0.045 |
-| 3 | test_recommendation_list_and_latest | PASS | 0.015 |
-| 4 | test_invalid_access_point_and_rbac | PASS | 0.020 |
+| 1 | test_simulated_access_point_cannot_be_diagnosed_as_real | PASS | 0.032 |
+| 2 | test_rules_escalate_latency_loss_and_outage | PASS | 0.074 |
+| 3 | test_recommendation_list_and_latest | PASS | 0.022 |
+| 4 | test_invalid_access_point_and_rbac | PASS | 0.031 |
 
 ### `test_wifi` — 9 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | test_parse_windows_interfaces_reads_connected_adapter_only | PASS | 0.001 |
-| 2 | test_parse_windows_interfaces_returns_none_without_association | PASS | 0.001 |
-| 3 | test_parse_netsh_gateway | PASS | 0.002 |
-| 4 | test_band_and_channel_from_frequency | PASS | 0.001 |
-| 5 | test_connected_wifi_returns_unavailable_payload | PASS | 0.001 |
-| 6 | test_connected_wifi_reports_association_and_gateway | PASS | 0.001 |
-| 7 | test_connected_wifi_explains_missing_gateway | PASS | 0.001 |
-| 8 | test_wifi_endpoint_requires_authentication | PASS | 0.006 |
-| 9 | test_wifi_endpoint_returns_detector_payload | PASS | 0.010 |
+| 1 | test_parse_windows_interfaces_reads_connected_adapter_only | PASS | 0.004 |
+| 2 | test_parse_windows_interfaces_returns_none_without_association | PASS | 0.002 |
+| 3 | test_parse_netsh_gateway | PASS | 0.006 |
+| 4 | test_band_and_channel_from_frequency | PASS | 0.002 |
+| 5 | test_connected_wifi_returns_unavailable_payload | PASS | 0.003 |
+| 6 | test_connected_wifi_reports_association_and_gateway | PASS | 0.002 |
+| 7 | test_connected_wifi_explains_missing_gateway | PASS | 0.002 |
+| 8 | test_wifi_endpoint_requires_authentication | PASS | 0.012 |
+| 9 | test_wifi_endpoint_returns_detector_payload | PASS | 0.020 |
 
-### Frontend Playwright inventory (20 tests)
+### Frontend Playwright inventory (21 tests)
 
 ### `auth.spec.js` — 4 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | Authentication and access control › an anonymous visitor is redirected to the login page | PASS | 2.706 |
-| 2 | Authentication and access control › the login form rejects an incorrect password | PASS | 0.824 |
-| 3 | Authentication and access control › the administrator can sign in and the session survives a reload | PASS | 1.564 |
-| 4 | Authentication and access control › sign out clears the browser session | PASS | 1.667 |
+| 1 | Authentication and access control › an anonymous visitor is redirected to the login page | PASS | 0.774 |
+| 2 | Authentication and access control › the login form rejects an incorrect password | PASS | 0.913 |
+| 3 | Authentication and access control › the administrator can sign in and the session survives a reload | PASS | 2.55 |
+| 4 | Authentication and access control › sign out clears the browser session | PASS | 2.086 |
 
 ### `interactions.spec.js` — 12 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | Workspace interactions › light theme toggles, persists after reload and can be restored | PASS | 1.638 |
-| 2 | Workspace interactions › the command palette jumps between modules | PASS | 1.607 |
-| 3 | Workspace interactions › access point details open, simulated checks run and the dialog closes | PASS | 1.907 |
-| 4 | Workspace interactions › access point create, edit and delete lifecycle | PASS | 3.394 |
-| 5 | Workspace interactions › current Wi-Fi prefills the registration form with the gateway | PASS | 2.465 |
-| 6 | Workspace interactions › current Wi-Fi explains when the backend is not on a Wi-Fi network | PASS | 1.627 |
-| 7 | Workspace interactions › device discovery and the read-only privacy dialog | PASS | 7.472 |
-| 8 | Workspace interactions › AI detection and rule-based diagnosis can be executed | PASS | 3.715 |
-| 9 | Workspace interactions › ticket creation, comment and status update | PASS | 3.381 |
-| 10 | Workspace interactions › PDF reports generate and download from the real backend | PASS | 1.731 |
-| 11 | Workspace interactions › settings save through the administration form | PASS | 2.629 |
-| 12 | Workspace interactions › notifications panel opens from the header | PASS | 1.472 |
+| 1 | Workspace interactions › light theme toggles, persists after reload and can be restored | PASS | 2.179 |
+| 2 | Workspace interactions › the command palette jumps between modules | PASS | 2.117 |
+| 3 | Workspace interactions › access point details open, simulated checks run and the dialog closes | PASS | 2.584 |
+| 4 | Workspace interactions › access point create, edit and delete lifecycle | PASS | 3.899 |
+| 5 | Workspace interactions › current Wi-Fi prefills the registration form with the gateway | PASS | 2.664 |
+| 6 | Workspace interactions › current Wi-Fi explains when the backend is not on a Wi-Fi network | PASS | 2.252 |
+| 7 | Workspace interactions › device discovery and the read-only privacy dialog | PASS | 7.327 |
+| 8 | Workspace interactions › AI detection and rule-based diagnosis can be executed | PASS | 5.722 |
+| 9 | Workspace interactions › ticket creation, comment and status update | PASS | 4.376 |
+| 10 | Workspace interactions › PDF reports generate and download from the real backend | PASS | 2.158 |
+| 11 | Workspace interactions › settings save through the administration form | PASS | 2.062 |
+| 12 | Workspace interactions › notifications panel opens from the header | PASS | 1.628 |
 
-### `navigation.spec.js` — 2 tests
+### `navigation.spec.js` — 3 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | Workspace navigation › every sidebar module renders its own content without runtime errors | PASS | 4.486 |
-| 2 | Workspace navigation › deep links load the requested module and unknown paths show the not-found page | PASS | 1.77 |
+| 1 | Workspace navigation › every sidebar module renders its own content without runtime errors | PASS | 4.459 |
+| 2 | Workspace navigation › deep links load the requested module and unknown paths show the not-found page | PASS | 3.328 |
+| 3 | Workspace navigation › legacy modules remain reachable through the command palette | PASS | 1.907 |
 
 ### `responsive.spec.js` — 2 tests
 
 | # | Test | Result | Time (s) |
 |---|---|---|---:|
-| 1 | Responsive layout › mobile navigation opens, navigates and closes | PASS | 2.024 |
-| 2 | Responsive layout › the dashboard does not overflow the mobile viewport | PASS | 1.025 |
+| 1 | Responsive layout › mobile navigation opens, navigates and closes | PASS | 1.715 |
+| 2 | Responsive layout › the dashboard does not overflow the mobile viewport | PASS | 1.336 |
 
 ---
 
@@ -6157,9 +6302,13 @@ the installed Chrome channel. Paths are relative to the `documentation/` folder.
 | D.12 | `screenshots/12-reports.png` | PDF report studio and library |
 | D.13 | `screenshots/13-settings.png` | Thresholds, automation, system status and team access |
 | D.14 | `screenshots/14-command-palette.png` | Command palette navigation |
-| D.15 | `screenshots/15-overview-light.png` | Beige, wine, and white light theme |
+| D.15 | `screenshots/15-overview-light.png` | Light violet and white theme |
 | D.16 | `screenshots/16-mobile-overview.png` | Responsive mobile overview at 390 x 844 |
 | D.17 | `screenshots/17-mobile-navigation.png` | Mobile navigation drawer |
+| D.18 | `screenshots/18-predictive-analytics.png` | Predictive analytics with explainable risk |
+| D.19 | `screenshots/19-root-cause-analysis.png` | Root-cause investigation queue with evidence |
+| D.20 | `screenshots/20-cybersecurity-intelligence.png` | Defensive security findings and posture |
+| D.21 | `screenshots/21-network-optimization.png` | Measured optimisation advisories |
 
 ---
 
@@ -6173,8 +6322,8 @@ the installed Chrome channel. Paths are relative to the `documentation/` folder.
 - [x] FastAPI backend source
 - [x] MySQL schema, migration and database guide
 - [x] SQLite verified runtime database
-- [x] Pytest suite with 88 passing tests
-- [x] Playwright suite with 20 passing tests
+- [x] Pytest suite with 103 passing tests
+- [x] Playwright suite with 21 passing tests
 - [x] JUnit XML and coverage evidence
 - [x] Built-in test runner with persisted results
 - [x] Eight PDF report types
@@ -6200,8 +6349,8 @@ the installed Chrome channel. Paths are relative to the `documentation/` folder.
 ## E.3 Final verification statement
 
 The verified build uses SQLite and a local Windows 11 host. The final recorded
-run contains **88 passing backend tests** and **20 passing Playwright tests**,
-with **82% backend line coverage**. MySQL runtime import remains unverified
+run contains **103 passing backend tests** and **21 passing Playwright tests**,
+with **80% backend line coverage**. MySQL runtime import remains unverified
 because MySQL and Docker were unavailable on the development machine. Simulated
 records are labelled and excluded from live health. The application never
 fabricates a live measurement.

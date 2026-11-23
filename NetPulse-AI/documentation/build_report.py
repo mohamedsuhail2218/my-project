@@ -96,6 +96,28 @@ Administrator.
 | GET | `/monitoring/latest` | Any authenticated | Latest live measurement |
 | POST | `/monitoring/run` | Analyst+ | Run a real probe |
 | GET | `/monitoring/scheduler` | Any authenticated | Scheduler state |
+| GET | `/monitoring/traffic` | Any authenticated | Host-interface traffic samples |
+| GET | `/intelligence/predictions` | Any authenticated | Persisted failure-risk assessments |
+| POST | `/intelligence/predictions/run` | Analyst+ | Run the local risk model |
+| GET | `/intelligence/root-cause` | Any authenticated | Persisted investigations |
+| POST | `/intelligence/root-cause/run` | Analyst+ | Investigate the latest measurement |
+| PATCH | `/intelligence/root-cause/{id}` | Analyst+ | Acknowledge or resolve an investigation |
+| GET | `/intelligence/security` | Any authenticated | Persisted defensive findings |
+| POST | `/intelligence/security/scan` | Analyst+ | Run the local defensive scan |
+| PATCH | `/intelligence/security/{id}` | Analyst+ | Acknowledge or resolve a finding |
+| GET | `/intelligence/optimization` | Any authenticated | Persisted optimisation advice |
+| POST | `/intelligence/optimization/scan` | Analyst+ | Run the optimisation engine |
+| PATCH | `/intelligence/optimization/{id}` | Analyst+ | Mark planned or dismiss advice |
+| GET | `/intelligence/summary` | Any authenticated | Cross-engine roll-up |
+| GET | `/intelligence/export.csv` | Any authenticated | CSV export with status header |
+| GET | `/notifications` | Any authenticated | Notification centre |
+| GET | `/notifications/unread-count` | Any authenticated | Unread count |
+| POST | `/notifications/{id}/read` | Any authenticated | Mark one notification read |
+| POST | `/notifications/read-all` | Any authenticated | Mark all notifications read |
+| DELETE | `/notifications/read` | Any authenticated | Clear read notifications |
+| GET | `/live/status` | Any authenticated | Transport capabilities |
+| GET | `/live/snapshot` | Any authenticated | Current live snapshot |
+| WS | `/live/ws` | Authenticated token | Real-time WebSocket stream |
 | GET | `/access-points` | Any authenticated | List and search APs |
 | GET | `/access-points/{{access_point_id}}` | Any authenticated | AP detail and history |
 | POST | `/access-points` | Administrator | Register an AP |
@@ -212,9 +234,13 @@ the installed Chrome channel. Paths are relative to the `documentation/` folder.
 | D.12 | `screenshots/12-reports.png` | PDF report studio and library |
 | D.13 | `screenshots/13-settings.png` | Thresholds, automation, system status and team access |
 | D.14 | `screenshots/14-command-palette.png` | Command palette navigation |
-| D.15 | `screenshots/15-overview-light.png` | Beige, wine, and white light theme |
+| D.15 | `screenshots/15-overview-light.png` | Light violet and white theme |
 | D.16 | `screenshots/16-mobile-overview.png` | Responsive mobile overview at 390 x 844 |
 | D.17 | `screenshots/17-mobile-navigation.png` | Mobile navigation drawer |
+| D.18 | `screenshots/18-predictive-analytics.png` | Predictive analytics with explainable risk |
+| D.19 | `screenshots/19-root-cause-analysis.png` | Root-cause investigation queue with evidence |
+| D.20 | `screenshots/20-cybersecurity-intelligence.png` | Defensive security findings and posture |
+| D.21 | `screenshots/21-network-optimization.png` | Measured optimisation advisories |
 
 ---
 
@@ -228,8 +254,8 @@ the installed Chrome channel. Paths are relative to the `documentation/` folder.
 - [x] FastAPI backend source
 - [x] MySQL schema, migration and database guide
 - [x] SQLite verified runtime database
-- [x] Pytest suite with 88 passing tests
-- [x] Playwright suite with 20 passing tests
+- [x] Pytest suite with 103 passing tests
+- [x] Playwright suite with 21 passing tests
 - [x] JUnit XML and coverage evidence
 - [x] Built-in test runner with persisted results
 - [x] Eight PDF report types
@@ -255,8 +281,8 @@ the installed Chrome channel. Paths are relative to the `documentation/` folder.
 ## E.3 Final verification statement
 
 The verified build uses SQLite and a local Windows 11 host. The final recorded
-run contains **88 passing backend tests** and **20 passing Playwright tests**,
-with **82% backend line coverage**. MySQL runtime import remains unverified
+run contains **103 passing backend tests** and **21 passing Playwright tests**,
+with **80% backend line coverage**. MySQL runtime import remains unverified
 because MySQL and Docker were unavailable on the development machine. Simulated
 records are labelled and excluded from live health. The application never
 fabricates a live measurement.
