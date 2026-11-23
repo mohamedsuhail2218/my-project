@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { login, openModule, toast } from './helpers'
+import { login, openLegacyModule, openModule, toast } from './helpers'
 
 test.beforeEach(async ({ page }) => {
   await login(page)
@@ -36,8 +36,8 @@ test.describe('Workspace interactions', () => {
   })
 
   test('access point details open, simulated checks run and the dialog closes', async ({ page }) => {
-    await openModule(page, 'Access Points')
-    await expect(page.getByText('Access point inventory')).toBeVisible()
+    await openLegacyModule(page, '/access-points', 'Access points')
+    await expect(page.getByRole('heading', { name: 'Access point inventory' })).toBeVisible()
 
     const simulatedRow = page.getByRole('row').filter({ hasText: '[DEMO]' }).first()
     await expect(simulatedRow).toBeVisible()
@@ -59,7 +59,7 @@ test.describe('Workspace interactions', () => {
     const name = `E2E Lab AP ${suffix}`
     const ip = `192.0.2.${(Number(suffix) % 200) + 10}`
 
-    await openModule(page, 'Access Points')
+    await openLegacyModule(page, '/access-points', 'Access points')
     await page.getByRole('button', { name: 'Add access point' }).click()
 
     const createDialog = page.getByRole('dialog', { name: 'Register access point' })
@@ -119,7 +119,7 @@ test.describe('Workspace interactions', () => {
       }),
     )
 
-    await openModule(page, 'Access Points')
+    await openLegacyModule(page, '/access-points', 'Access points')
     await page.getByRole('button', { name: 'Use current Wi-Fi' }).click()
 
     const dialog = page.getByRole('dialog', { name: 'Register access point' })
@@ -151,7 +151,7 @@ test.describe('Workspace interactions', () => {
       }),
     )
 
-    await openModule(page, 'Access Points')
+    await openLegacyModule(page, '/access-points', 'Access points')
     await page.getByRole('button', { name: 'Use current Wi-Fi' }).click()
 
     await expect(toast(page, 'cloud deployment cannot reach private Wi-Fi addresses')).toBeVisible()
@@ -159,7 +159,7 @@ test.describe('Workspace interactions', () => {
   })
 
   test('device discovery and the read-only privacy dialog', async ({ page }) => {
-    await openModule(page, 'Connected Devices')
+    await openModule(page, 'Devices & Access Points', 'Connected devices')
     await page.getByRole('button', { name: 'Discover local devices' }).click()
     await expect(toast(page, 'Local ARP observation')).toBeVisible()
     await expect(page.getByText(/No active Nmap-style scans/)).toBeVisible()
@@ -181,12 +181,12 @@ test.describe('Workspace interactions', () => {
   })
 
   test('AI detection and rule-based diagnosis can be executed', async ({ page }) => {
-    await openModule(page, 'AI Anomaly Detection')
+    await openModule(page, 'Anomalies & Issues', 'AI anomaly detection')
     await page.getByRole('button', { name: 'Run detection' }).click()
     await expect(toast(page, 'Anomaly detection complete')).toBeVisible()
     await expect(page.getByText('Detected anomalies')).toBeVisible()
 
-    await openModule(page, 'Smart Troubleshooting')
+    await openLegacyModule(page, '/troubleshooting', 'Smart troubleshooting')
     await page.getByRole('button', { name: 'Run diagnosis' }).click()
     await expect(toast(page, 'Rule-based diagnosis completed')).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Possible causes' })).toBeVisible()
@@ -196,7 +196,7 @@ test.describe('Workspace interactions', () => {
 
   test('ticket creation, comment and status update', async ({ page }) => {
     const title = `E2E verification ${Date.now()}`
-    await openModule(page, 'Issue Management')
+    await openLegacyModule(page, '/issues', 'Issue management')
     await page.getByRole('button', { name: 'New ticket' }).click()
 
     const createDialog = page.getByRole('dialog', { name: 'Create issue ticket' })
@@ -225,7 +225,7 @@ test.describe('Workspace interactions', () => {
   })
 
   test('PDF reports generate and download from the real backend', async ({ page }) => {
-    await openModule(page, 'Reports')
+    await openModule(page, 'Reports & Analytics', 'Reports')
     await page.getByRole('button', { name: 'Generate PDF' }).click()
     await expect(toast(page, 'generated')).toBeVisible()
     await expect(page.getByRole('button', { name: /^Download / }).first()).toBeVisible()
@@ -247,9 +247,10 @@ test.describe('Workspace interactions', () => {
 
   test('notifications panel opens from the header', async ({ page }) => {
     await page.getByRole('button', { name: 'Open notifications' }).click()
-    await expect(page.getByText('Network alerts')).toBeVisible()
-    await expect(page.getByText(/Anomalies, tickets and new devices/)).toBeVisible()
+    const dialog = page.getByRole('dialog', { name: 'Notification center' })
+    await expect(dialog).toBeVisible()
+    await expect(dialog.getByText('Predictions, security findings, RCA and optimisation')).toBeVisible()
     await page.getByRole('button', { name: 'Close notifications' }).click()
-    await expect(page.getByText('Network alerts')).toHaveCount(0)
+    await expect(dialog).toHaveCount(0)
   })
 })

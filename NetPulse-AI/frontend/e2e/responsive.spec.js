@@ -12,9 +12,9 @@ test.describe('Responsive layout', () => {
 
     await page.getByRole('button', { name: 'Open navigation' }).click()
     await expect(navigation).toBeInViewport()
-    await page.getByRole('link', { name: 'Issue Management', exact: true }).click()
+    await page.getByRole('link', { name: 'Anomalies & Issues', exact: true }).click()
 
-    await expect(page.getByRole('heading', { level: 1, name: 'Issue management' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'AI anomaly detection' })).toBeVisible()
     await expect(navigation).not.toBeInViewport()
   })
 

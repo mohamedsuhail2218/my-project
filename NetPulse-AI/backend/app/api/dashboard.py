@@ -11,6 +11,7 @@ from sqlalchemy import func, select
 from app.ai.anomaly import anomaly_window_summary
 from app.api.deps import CurrentUser, DbSession
 from app.core.config import settings
+from app.intelligence.rollup import intelligence_overview
 from app.models import (
     AccessPoint,
     AnomalyEvent,
@@ -184,6 +185,7 @@ def overview(
         "series": series,
         "recent_alerts": alerts[:10],
         "anomaly_breakdown": anomaly_summary,
+        "intelligence": intelligence_overview(db),
         "ticket_breakdown": {
             "open": sum(1 for t in open_tickets if t.status == "Open"),
             "in_progress": sum(1 for t in open_tickets if t.status == "In Progress"),

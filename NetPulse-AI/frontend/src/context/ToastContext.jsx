@@ -9,7 +9,7 @@ const icons = {
   info: Info,
 }
 const tones = {
-  success: 'border-[#ccff00]/40 bg-[#101400]/95 text-[#d8ff4d]',
+  success: 'border-[#34d399]/40 bg-[#061a12]/95 text-[#6ee7b7]',
   error: 'border-[#ff4d6d]/40 bg-[#1a0a0e]/95 text-[#ff8fa3]',
   warning: 'border-[#ffb020]/40 bg-[#1a1203]/95 text-[#ffd166]',
   info: 'border-[#a855f7]/40 bg-[#120a1c]/95 text-[#d8b4fe]',

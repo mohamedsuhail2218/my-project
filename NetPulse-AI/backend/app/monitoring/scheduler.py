@@ -11,6 +11,9 @@ from sqlalchemy import select
 from app.ai.anomaly import detect_anomalies
 from app.core.config import settings
 from app.core.database import SessionLocal
+from app.intelligence.optimization import generate_recommendations
+from app.intelligence.prediction import generate_predictions
+from app.intelligence.security import run_security_scan
 from app.models import AccessPoint
 from app.monitoring.devices import discover_devices
 from app.services.monitoring import check_access_point, run_network_check
@@ -26,6 +29,7 @@ class MonitoringScheduler:
         self.last_cycle_at: datetime | None = None
         self.last_device_scan_at: datetime | None = None
         self.last_ap_scan_at: datetime | None = None
+        self.last_intelligence_at: datetime | None = None
         self.last_error: str | None = None
 
     async def start(self) -> None:
@@ -95,6 +99,9 @@ class MonitoringScheduler:
         check_aps = initial or self.last_ap_scan_at is None or (
             now - self.last_ap_scan_at >= timedelta(minutes=5)
         )
+        check_intelligence = initial or self.last_intelligence_at is None or (
+            now - self.last_intelligence_at >= timedelta(minutes=15)
+        )
         if check_devices and settings.device_discovery_enabled:
             try:
                 await asyncio.to_thread(self._run_device_discovery)
@@ -107,6 +114,12 @@ class MonitoringScheduler:
                 self.last_ap_scan_at = now
             except Exception:
                 logger.exception("Access point availability cycle failed")
+        if check_intelligence:
+            try:
+                await asyncio.to_thread(self._run_intelligence)
+                self.last_intelligence_at = now
+            except Exception:
+                logger.exception("Intelligence cycle failed")
 
     @staticmethod
     def _run_device_discovery() -> None:
@@ -122,6 +135,15 @@ class MonitoringScheduler:
             ).all()
             for ap in access_points:
                 check_access_point(db, ap)
+
+    @staticmethod
+    def _run_intelligence() -> None:
+        """Autonomous refresh of risk, security and optimisation findings."""
+        with SessionLocal() as db:
+            run_security_scan(db)
+            generate_recommendations(db)
+            generate_predictions(db)
+            logger.info("Autonomous intelligence cycle completed")
 
 
 scheduler = MonitoringScheduler()

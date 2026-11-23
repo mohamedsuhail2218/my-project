@@ -38,7 +38,7 @@ import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { useApi } from '../hooks/useApi'
 import { formatBytes, formatDateTime, formatNumber, relativeTime } from '../lib/utils'
-import { api, downloadPdf, getErrorMessage } from '../services/api'
+import { api, downloadCsv, downloadPdf, getErrorMessage } from '../services/api'
 
 const REPORT_OPTIONS = [
   { type: 'executive', title: 'Executive report', description: 'Network snapshot, recent probes, AP inventory, AI events and tickets.', icon: FileBarChart, accent: 'wine' },
@@ -49,6 +49,7 @@ const REPORT_OPTIONS = [
   { type: 'anomalies', title: 'AI anomaly report', description: 'Isolation Forest findings with explanations and severity.', icon: Bot, accent: 'plum' },
   { type: 'issues', title: 'Issue management report', description: 'Ticket register, priorities, statuses and resolution timestamps.', icon: Ticket, accent: 'rust' },
   { type: 'testing', title: 'Automated testing report', description: 'Latest pytest run, pass/fail counts and suite details.', icon: FileCheck2, accent: 'sage' },
+  { type: 'intelligence', title: 'Intelligence brief', description: 'Failure risk, root causes, defensive findings and optimisation advice.', icon: Radar, accent: 'rust' },
 ]
 
 const RANGES = [
@@ -65,6 +66,7 @@ export default function Reports() {
   const [hours, setHours] = useState(168)
   const [generating, setGenerating] = useState(false)
   const [downloading, setDownloading] = useState('')
+  const [exporting, setExporting] = useState('')
   const [error, setError] = useState('')
   const reports = useApi('/reports', { pollMs: 60000 })
   const dashboard = useApi('/dashboard/overview', { params: { hours: 24 }, pollMs: 60000 })
@@ -98,6 +100,18 @@ export default function Reports() {
       toast(getErrorMessage(err), 'error', 'Download failed')
     } finally {
       setDownloading('')
+    }
+  }
+
+  async function exportIntelligence(kind, label) {
+    setExporting(kind)
+    try {
+      await downloadCsv(`/intelligence/export.csv?kind=${kind}`, `netpulse-${kind}.csv`)
+      toast(`${label} exported as CSV`, 'success')
+    } catch (err) {
+      toast(getErrorMessage(err), 'error', 'Export failed')
+    } finally {
+      setExporting('')
     }
   }
 
@@ -183,6 +197,39 @@ export default function Reports() {
           </div>
         </section>
       </div>
+
+      <section className="panel p-4">
+        <SectionHeader
+          icon={Download}
+          title="Intelligence CSV exports"
+          subtitle="Download persisted engine output for spreadsheets and audits"
+        />
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            { kind: 'predictions', label: 'Failure risk', hint: 'Scores, weights and features', icon: Activity },
+            { kind: 'root-cause', label: 'Root cause', hint: 'Investigations and evidence', icon: Radar },
+            { kind: 'security', label: 'Security findings', hint: 'Defensive observations', icon: ShieldCheck },
+            { kind: 'optimization', label: 'Optimisation advice', hint: 'Advisory actions and evidence', icon: Sparkles },
+          ].map((item) => (
+            <button
+              key={item.kind}
+              onClick={() => exportIntelligence(item.kind, item.label)}
+              disabled={exporting === item.kind}
+              className="flex items-center gap-3 rounded-xl border border-app bg-accent/[0.02] p-3 text-left transition hover:border-accent/25 hover:bg-accent/[0.04] disabled:opacity-50"
+            >
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-accent/30 bg-accent/[0.06] text-accent">
+                {exporting === item.kind ? <Loader2 className="h-4 w-4 animate-spin" /> : <item.icon className="h-4 w-4" />}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[10.5px] font-semibold text-app">{item.label}</span>
+                <span className="mt-0.5 block text-[9px] text-subtle">{item.hint}</span>
+              </span>
+              <Download className="h-3.5 w-3.5 shrink-0 text-subtle" />
+            </button>
+          ))}
+        </div>
+        <InfoNote className="mt-3">CSV files contain only persisted engine output. If an engine reported insufficient data, the export still carries headers and the response status records that state — no rows are invented.</InfoNote>
+      </section>
 
       <div className="grid gap-3 sm:grid-cols-3">
         {[

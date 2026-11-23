@@ -6,15 +6,81 @@ import logging
 import random
 from datetime import datetime, timezone
 
+import psutil
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.models import AccessPoint, NetworkMeasurement
+from app.models import AccessPoint, NetworkMeasurement, TrafficSample
 from app.monitoring.diagnostics import perform_diagnostic, result_as_dict
 from app.services.ticketing import evaluate_access_point_ticket, evaluate_measurement_ticket
 
 logger = logging.getLogger("netpulse.monitoring")
+
+
+def record_traffic_sample(db: Session) -> TrafficSample | None:
+    """Persist host interface throughput derived from real OS counters.
+
+    These are host-level counters, not per-access-point figures. The sample is
+    labelled ``live`` and the API states the measurement scope explicitly.
+    """
+    counters = psutil.net_io_counters()
+    if counters is None:
+        return None
+    previous = db.scalar(
+        select(TrafficSample)
+        .where(TrafficSample.data_origin == "live")
+        .order_by(TrafficSample.recorded_at.desc())
+        .limit(1)
+    )
+    now = datetime.now(timezone.utc)
+    bytes_per_sec = None
+    packets_per_sec = None
+    utilization = None
+    if previous is not None and previous.recorded_at is not None:
+        recorded = previous.recorded_at
+        if recorded.tzinfo is None:
+            recorded = recorded.replace(tzinfo=timezone.utc)
+        elapsed = (now - recorded).total_seconds()
+        if 0 < elapsed <= 900:
+            sent = counters.bytes_sent - int(previous.bytes_sent or 0)
+            received = counters.bytes_recv - int(previous.bytes_recv or 0)
+            sent_packets = counters.packets_sent - int(previous.packets_sent or counters.packets_sent)
+            received_packets = counters.packets_recv - int(
+                previous.packets_recv or counters.packets_recv
+            )
+            if sent >= 0 and received >= 0:
+                bytes_per_sec = round((sent + received) / elapsed, 2)
+                packets_per_sec = round((sent_packets + received_packets) / elapsed, 2)
+    speed_mbps = None
+    try:
+        speeds = [
+            stats.speed
+            for stats in psutil.net_if_stats().values()
+            if stats.isup and stats.speed and stats.speed > 0
+        ]
+        speed_mbps = float(max(speeds)) if speeds else None
+    except Exception:
+        speed_mbps = None
+    if bytes_per_sec is not None and speed_mbps:
+        utilization = round(bytes_per_sec * 8 / (speed_mbps * 1_000_000) * 100, 3)
+    sample = TrafficSample(
+        recorded_at=now,
+        bytes_sent=counters.bytes_sent,
+        bytes_recv=counters.bytes_recv,
+        packets_sent=counters.packets_sent,
+        packets_recv=counters.packets_recv,
+        bytes_per_sec=bytes_per_sec,
+        packets_per_sec=packets_per_sec,
+        utilization_pct=utilization,
+        link_speed_mbps=speed_mbps,
+        data_origin="live",
+    )
+    db.add(sample)
+    db.commit()
+    db.refresh(sample)
+    return sample
+
 
 
 def record_measurement(
@@ -45,6 +111,10 @@ def run_network_check(db: Session, target: str | None = None) -> NetworkMeasurem
     """Execute a real network probe and persist the observation."""
     diagnostic = perform_diagnostic(target)
     measurement = record_measurement(db, diagnostic, data_origin="live")
+    try:
+        record_traffic_sample(db)
+    except Exception:
+        logger.debug("Traffic sample could not be recorded", exc_info=True)
     evaluate_measurement_ticket(db, measurement)
     logger.info(
         "Live measurement stored: online=%s latency=%sms loss=%s%% target=%s",

@@ -120,11 +120,9 @@ export function getErrorMessage(error) {
   return `Request failed (${error.response.status})`
 }
 
-export async function downloadPdf(filename) {
-  const response = await api.get(`/reports/download/${encodeURIComponent(filename)}`, {
-    responseType: 'blob',
-  })
-  const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
+async function saveBlob(response, filename) {
+  const type = response.headers?.['content-type'] || 'application/octet-stream'
+  const url = window.URL.createObjectURL(new Blob([response.data], { type }))
   const link = document.createElement('a')
   link.href = url
   link.download = filename
@@ -132,4 +130,17 @@ export async function downloadPdf(filename) {
   link.click()
   link.remove()
   window.URL.revokeObjectURL(url)
+}
+
+export async function downloadPdf(filename) {
+  const response = await api.get(`/reports/download/${encodeURIComponent(filename)}`, {
+    responseType: 'blob',
+  })
+  await saveBlob(response, filename)
+}
+
+/** Export a real intelligence feed as CSV. */
+export async function downloadCsv(path, filename) {
+  const response = await api.get(path, { responseType: 'blob' })
+  await saveBlob(response, filename)
 }

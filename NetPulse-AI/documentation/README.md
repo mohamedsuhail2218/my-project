@@ -19,6 +19,7 @@ printed or submitted separately. A consolidated report is also provided.
 | 6 | [06-user-manual.md](06-user-manual.md) | Installation, module walkthrough, roles, workflows, error handling |
 | 7 | [07-conclusion-and-future-work.md](07-conclusion-and-future-work.md) | Achievements, limitations, future roadmap |
 | 8 | [08-references.md](08-references.md) | Standards, research and library references |
+| 9 | [09-autonomous-intelligence.md](09-autonomous-intelligence.md) | Prediction, root cause, defensive security, optimisation, notifications and live updates |
 | — | [data-dictionary.generated.md](data-dictionary.generated.md) | Complete column-level dictionary generated from the SQLAlchemy model |
 | — | [test-inventory.generated.md](test-inventory.generated.md) | Every backend and browser test, generated from the final JUnit XML |
 
@@ -30,10 +31,11 @@ submission checklist).
 
 ## Screenshot gallery
 
-All screenshots were captured from the running application by
-`frontend/scripts/capture-docs.mjs` using Playwright and the installed Chrome
-channel. They show the real application with real or clearly-labelled simulated
-records; no screenshot is a static mock-up.
+The screenshots in this folder were captured from the running application during
+the original monitoring build. The newer intelligence pages are documented in
+[09-autonomous-intelligence.md](09-autonomous-intelligence.md) and can be added to
+the gallery by rerunning `frontend/scripts/capture-docs.mjs` against the current
+build.
 
 ### 01 — Login
 
@@ -147,19 +149,20 @@ Responsive 390 × 844 layout with stacked cards and charts.
 
 ![Mobile navigation](screenshots/17-mobile-navigation.png)
 
-Slide-in mobile navigation drawer with all workspace modules.
+Slide-in mobile navigation drawer with the workspace modules.
 
 ## Evidence summary
 
 | Evidence | Result | Location |
 |---|---|---|
-| Backend Pytest suite | **79 passed, 0 failed** | `reports/test-runs/backend-junit.xml` |
-| Backend line coverage | **84%** (2216 statements, 350 missed) | `reports/test-runs/coverage.xml` |
-| Frontend Playwright suite | **18 passed, 0 failed** | `reports/test-runs/frontend-junit.xml` |
-| Built-in test runner | 79 passed, 0 failed in run `run-20261115-090130-a8cc` | `reports/test-runs/` |
-| PDF report generation | `%PDF-` verified for all 8 report types | `reports/*.pdf` |
+| Backend Pytest suite | **103 passed, 0 failed** | `reports/test-runs/backend-junit.xml` |
+| Backend line coverage | **80%** (3416 statements, 684 missed) | `reports/test-runs/coverage.xml` |
+| Frontend Playwright suite | **21 passed, 0 failed** | `reports/test-runs/frontend-junit.xml` |
+| Built-in test runner | 103 passed, 0 failed | `reports/test-runs/` |
+| PDF report generation | `%PDF-` verified for all 9 report types | `reports/*.pdf` |
+| Intelligence CSV exports | Four kinds with status headers and no fabricated rows | `frontend/src/services/api.js` |
 | MySQL DDL | Generated from SQLAlchemy metadata; runtime import **not verified** (MySQL/Docker unavailable) | `database/schema.sql` |
-| Documentation screenshots | 17 images captured from the running build | `documentation/screenshots/` |
+| Documentation screenshots | 17 images from the core monitoring build; intelligence documented in chapter 09 | `documentation/screenshots/` |
 
 > **Honesty note:** The MySQL schema is provided for deployment but was not
 > executed on this machine because neither MySQL nor Docker is installed. The

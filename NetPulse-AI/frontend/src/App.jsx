@@ -8,6 +8,10 @@ import DashboardLayout from './layouts/DashboardLayout'
 const Login = lazy(() => import('./pages/Login'))
 const Overview = lazy(() => import('./pages/Overview'))
 const NetworkMonitoring = lazy(() => import('./pages/NetworkMonitoring'))
+const PredictiveAnalytics = lazy(() => import('./pages/PredictiveAnalytics'))
+const RootCauseAnalysis = lazy(() => import('./pages/RootCauseAnalysis'))
+const Cybersecurity = lazy(() => import('./pages/Cybersecurity'))
+const NetworkOptimization = lazy(() => import('./pages/NetworkOptimization'))
 const AccessPoints = lazy(() => import('./pages/AccessPoints'))
 const Devices = lazy(() => import('./pages/Devices'))
 const Anomalies = lazy(() => import('./pages/Anomalies'))
@@ -46,6 +50,10 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Overview />} />
             <Route path="/monitoring" element={<NetworkMonitoring />} />
+            <Route path="/predictive" element={<PredictiveAnalytics />} />
+            <Route path="/root-cause" element={<RootCauseAnalysis />} />
+            <Route path="/security" element={<Cybersecurity />} />
+            <Route path="/optimization" element={<NetworkOptimization />} />
             <Route path="/access-points" element={<AccessPoints />} />
             <Route path="/devices" element={<Devices />} />
             <Route path="/anomalies" element={<Anomalies />} />

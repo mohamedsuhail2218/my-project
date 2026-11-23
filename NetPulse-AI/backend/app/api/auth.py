@@ -16,7 +16,7 @@ from app.core.security import (
     verify_dummy_password,
     verify_password,
 )
-from app.models import User
+from app.models import LoginAttempt, User
 from app.schemas.schemas import (
     CreateUserRequest,
     LoginRequest,
@@ -56,6 +56,23 @@ def _clear_failures(key: str) -> None:
         _FAILED_LOGINS.pop(key, None)
 
 
+def _audit_attempt(
+    db, request: Request, email: str, *, success: bool, reason: str | None = None
+) -> None:
+    """Persist a minimal sign-in audit row without ever storing the password."""
+    try:
+        db.add(
+            LoginAttempt(
+                email=email,
+                ip_address=request.client.host if request.client else "unknown",
+                success=success,
+            )
+        )
+        db.commit()
+    except Exception:
+        db.rollback()
+
+
 @router.post("/login", response_model=TokenResponse)
 def login(payload: LoginRequest, request: Request, db: DbSession) -> TokenResponse:
     email = payload.email.lower().strip()
@@ -70,16 +87,19 @@ def login(payload: LoginRequest, request: Request, db: DbSession) -> TokenRespon
     if user is None:
         verify_dummy_password(payload.password)
         _record_failure(throttle_key)
+        _audit_attempt(db, request, email, success=False)
         raise HTTPException(status_code=401, detail="Invalid email or password")
     if not verify_password(payload.password, user.password_hash):
         _record_failure(throttle_key)
+        _audit_attempt(db, request, email, success=False)
         raise HTTPException(status_code=401, detail="Invalid email or password")
     if not user.is_active:
+        _audit_attempt(db, request, email, success=False)
         raise HTTPException(status_code=403, detail="This account is disabled")
 
     _clear_failures(throttle_key)
     user.last_login_at = datetime.now(timezone.utc)
-    db.commit()
+    _audit_attempt(db, request, email, success=True)
     db.refresh(user)
     token, expires_at = create_access_token(
         str(user.id), user.role, {"email": user.email, "name": user.full_name}

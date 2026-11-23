@@ -66,7 +66,7 @@ export default function Login() {
     <div className="relative min-h-screen overflow-hidden bg-app">
       <div className="login-grid pointer-events-none absolute inset-0 opacity-60" />
       <div className="pointer-events-none absolute -right-44 -top-44 h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle_at_36%_36%,rgba(168,85,247,0.52),rgba(88,28,135,0.18)_46%,transparent_70%)] blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-40 -left-32 h-[440px] w-[440px] rounded-full bg-[rgba(204,255,0,0.08)] blur-[120px]" />
+      <div className="pointer-events-none absolute -bottom-40 -left-32 h-[440px] w-[440px] rounded-full bg-[rgba(34,211,238,0.09)] blur-[120px]" />
       <div className="absolute inset-x-0 top-0 h-0.5 bg-[var(--accent-fill)]" />
 
       <button
@@ -84,7 +84,7 @@ export default function Login() {
           <div className="mt-14 max-w-2xl">
             <div className="mb-6 flex items-center gap-3 font-mono text-[9.5px] font-bold uppercase tracking-[0.24em] text-accent">
               <span className="h-2 w-2 bg-[var(--accent-fill)]" />
-              Network intelligence · Authorized probes
+              Network intelligence · Autonomous defense
             </div>
             <h1 className="text-[clamp(64px,7.4vw,108px)] leading-[0.84] text-app">
               Read the
@@ -92,8 +92,9 @@ export default function Login() {
               <span className="text-accent">pulse.</span>
             </h1>
             <p className="mt-7 max-w-lg text-[13px] leading-7 text-muted">
-              NetPulse AI turns authorized Wi-Fi observations into live diagnostics, explainable machine-learning anomalies,
-              guided troubleshooting and accountable issue workflows.
+              NetPulse AI is an autonomous network intelligence and cybersecurity platform: real-time telemetry,
+              predictive failure risk, explainable root-cause analysis, defensive security findings and accountable
+              optimisation workflows.
             </p>
           </div>
 

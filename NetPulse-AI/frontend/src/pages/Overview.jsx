@@ -10,13 +10,17 @@ import {
   Clock3,
   Cpu,
   Gauge,
+  GitBranch,
   Info,
   Radar,
   RefreshCw,
   Router,
+  ShieldAlert,
   ShieldCheck,
   Smartphone,
+  Sparkles,
   Ticket,
+  TrendingUp,
   Wifi,
   WifiOff,
   Zap,
@@ -50,6 +54,7 @@ import {
   cn,
 } from '../components/ui'
 import { useAuth } from '../context/AuthContext'
+import { useLive } from '../context/LiveContext'
 import { useToast } from '../context/ToastContext'
 import { useApi } from '../hooks/useApi'
 import { formatNumber, formatShortDate, formatTime, parseApiDate, relativeTime } from '../lib/utils'
@@ -65,6 +70,7 @@ export default function Overview() {
   const { hasRole } = useAuth()
   const { toast } = useToast()
   const navigate = useNavigate()
+  const live = useLive()
   const [running, setRunning] = useState(false)
   const { data, loading, error, reload, refreshing, lastUpdated } = useApi('/dashboard/overview', {
     params: { hours: 24 },
@@ -97,12 +103,79 @@ export default function Overview() {
   const anomalies = data?.anomaly_breakdown || {}
   const tickets = data?.ticket_breakdown || {}
   const monitoring = data?.monitoring || {}
+  const intelligence = data?.intelligence || {}
   const online = latest?.is_online
   const health = summary.network_health_pct
   const lastCycle = parseApiDate(monitoring.last_cycle_at)
   const freshnessPct = lastCycle
     ? Math.max(0, Math.min(100, 100 - ((Date.now() - lastCycle.getTime()) / 1000 / Math.max(monitoring.interval_seconds || 60, 1)) * 100))
     : 0
+
+  const liveLabel =
+    live.transport === 'websocket'
+      ? 'Live socket'
+      : live.transport === 'polling'
+        ? 'Live polling'
+        : live.transport === 'connecting'
+          ? 'Connecting'
+          : 'Feed offline'
+  const liveTone =
+    live.transport === 'websocket'
+      ? 'bg-[var(--cyan)]'
+      : live.transport === 'polling'
+        ? 'bg-success'
+        : live.transport === 'connecting'
+          ? 'bg-warning'
+          : 'bg-danger'
+
+  const intelligenceCards = [
+    {
+      to: '/predictive',
+      label: 'Failure risk',
+      value: intelligence.prediction?.highest_risk != null ? formatNumber(intelligence.prediction.highest_risk, 0) : null,
+      unit: intelligence.prediction?.highest_risk != null ? '/ 100' : '',
+      hint: intelligence.prediction?.estimated
+        ? `${intelligence.prediction.at_risk} scope(s) at risk · ${intelligence.prediction.estimated} assessed`
+        : 'No risk estimate yet — needs live telemetry',
+      badge: intelligence.prediction?.stale
+        ? { tone: 'warning', label: 'Stale' }
+        : intelligence.prediction?.highest_risk != null
+          ? { tone: ALERT_TONES[intelligence.prediction.highest_severity] || 'neutral', label: intelligence.prediction.highest_severity }
+          : { tone: 'neutral', label: 'Insufficient data' },
+      icon: TrendingUp,
+      accent: 'rust',
+    },
+    {
+      to: '/root-cause',
+      label: 'Root cause',
+      value: intelligence.root_cause?.open ?? 0,
+      unit: 'open',
+      hint: `${intelligence.root_cause?.high ?? 0} high or critical hypothesis(es)`,
+      badge: intelligence.root_cause?.open ? { tone: 'warning', label: 'Investigate' } : { tone: 'success', label: 'Clear' },
+      icon: GitBranch,
+      accent: 'ochre',
+    },
+    {
+      to: '/security',
+      label: 'Security findings',
+      value: intelligence.security?.open ?? 0,
+      unit: 'open',
+      hint: `${intelligence.security?.unapproved_devices ?? 0} unapproved device(s) · ${intelligence.security?.high ?? 0} high`,
+      badge: intelligence.security?.open ? { tone: 'danger', label: 'Review' } : { tone: 'success', label: 'No open findings' },
+      icon: ShieldAlert,
+      accent: 'wine',
+    },
+    {
+      to: '/optimization',
+      label: 'Optimisation advice',
+      value: intelligence.optimization?.open ?? 0,
+      unit: 'advisory',
+      hint: `${intelligence.optimization?.high ?? 0} high-priority recommendation(s)`,
+      badge: intelligence.optimization?.open ? { tone: 'info', label: 'Advisory' } : { tone: 'success', label: 'None open' },
+      icon: Sparkles,
+      accent: 'sage',
+    },
+  ]
 
   return (
     <div className="space-y-5">
@@ -227,6 +300,56 @@ export default function Overview() {
         <StatCard label="AI anomalies" value={summary.anomalies ?? 0} hint={`${anomalies.Critical || 0} critical in window`} icon={Bot} accent="plum" onClick={() => navigate('/anomalies')} />
         <StatCard label="Device governance" value={`${summary.known_devices ?? 0}/${(summary.known_devices || 0) + (summary.unknown_devices || 0)}`} hint={`${summary.unknown_devices || 0} unrecognized`} icon={Smartphone} accent="rust" onClick={() => navigate('/devices')} />
       </div>
+
+      <section className="panel overflow-hidden">
+        <div className="flex flex-col justify-between gap-3 border-b border-app p-4 sm:flex-row sm:items-center">
+          <SectionHeader
+            icon={Sparkles}
+            title="Autonomous intelligence"
+            subtitle="Prediction, root cause, defensive security and optimisation roll-up"
+          />
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 font-mono text-[8.5px] font-bold uppercase tracking-[0.1em] text-subtle">
+              <span className={cn('h-1.5 w-1.5 rounded-full', liveTone, live.transport !== 'offline' && 'animate-pulse')} />
+              {liveLabel}
+              {live.lastMessageAt ? ` · ${relativeTime(live.lastMessageAt)}` : ''}
+            </span>
+            {live.snapshot?.measurement?.latency_ms != null && (
+              <Badge tone="neutral">{formatNumber(live.snapshot.measurement.latency_ms)} ms latest</Badge>
+            )}
+            <Link to="/predictive" className="inline-flex items-center gap-1 text-[9.5px] font-semibold uppercase tracking-[0.08em] text-accent hover:underline">
+              Intelligence command <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        </div>
+        <div className="grid divide-y divide-[var(--border)] sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
+          {intelligenceCards.map((card) => (
+            <Link
+              key={card.to}
+              to={card.to}
+              className="group flex flex-col gap-2 p-4 transition hover:bg-accent/[0.03]"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-mono text-[8.5px] font-bold uppercase tracking-[0.14em] text-subtle">{card.label}</p>
+                  <div className="mt-1.5 flex items-baseline gap-1.5">
+                    <span className="font-display text-[27px] leading-none text-app">{card.value ?? '—'}</span>
+                    {card.unit && <span className="text-[10px] font-medium text-subtle">{card.unit}</span>}
+                  </div>
+                </div>
+                <span className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', `stat-accent-${card.accent}`)}>
+                  <card.icon className="h-4 w-4" />
+                </span>
+              </div>
+              <p className="min-h-[26px] text-[9.5px] leading-relaxed text-subtle">{card.hint}</p>
+              <div className="flex items-center justify-between gap-2">
+                <Badge tone={card.badge.tone}>{card.badge.label}</Badge>
+                <ArrowUpRight className="h-3.5 w-3.5 text-subtle transition group-hover:text-accent" />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <div className="grid gap-4 xl:grid-cols-[1.45fr_.85fr]">
         <section className="panel">

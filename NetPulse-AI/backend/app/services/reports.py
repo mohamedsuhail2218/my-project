@@ -32,6 +32,10 @@ from app.models import (
     AutomatedTestResult,
     IssueTicket,
     NetworkMeasurement,
+    OptimizationRecommendation,
+    PredictionResult,
+    RootCauseInvestigation,
+    SecurityEvent,
 )
 
 logger = logging.getLogger("netpulse.reports")
@@ -45,6 +49,7 @@ REPORT_TITLES = {
     "anomalies": "AI Anomaly Detection Report",
     "issues": "Issue Management Report",
     "testing": "Automated Testing Report",
+    "intelligence": "Autonomous Intelligence Brief",
 }
 REPORT_TYPES = set(REPORT_TITLES)
 WINE = colors.HexColor("#6B1E31")
@@ -218,6 +223,28 @@ def _scope_data(db: Session, hours: int) -> dict:
         test_results = db.scalars(
             select(AutomatedTestResult).where(AutomatedTestResult.run_id == latest_run.run_id)
         ).all()
+    predictions = db.scalars(
+        select(PredictionResult)
+        .where(PredictionResult.is_active.is_(True))
+        .order_by(PredictionResult.risk_score.desc())
+        .limit(40)
+    ).all()
+    security_events = db.scalars(
+        select(SecurityEvent)
+        .order_by(SecurityEvent.detected_at.desc())
+        .limit(50)
+    ).all()
+    recommendations = db.scalars(
+        select(OptimizationRecommendation)
+        .where(OptimizationRecommendation.status != "Dismissed")
+        .order_by(OptimizationRecommendation.updated_at.desc())
+        .limit(50)
+    ).all()
+    investigations = db.scalars(
+        select(RootCauseInvestigation)
+        .order_by(RootCauseInvestigation.generated_at.desc())
+        .limit(50)
+    ).all()
     return {
         "cutoff": cutoff,
         "measurements": measurements,
@@ -225,6 +252,10 @@ def _scope_data(db: Session, hours: int) -> dict:
         "anomalies": anomalies,
         "tickets": tickets,
         "test_results": test_results,
+        "predictions": predictions,
+        "security_events": security_events,
+        "recommendations": recommendations,
+        "investigations": investigations,
         "stats": _measurement_stats(measurements),
     }
 
@@ -288,6 +319,7 @@ def _build_executive(story, data, hours):
             ),
         ]
     )
+    _build_intelligence(story, data)
 
 
 def _build_measurement_report(story, data, metric: str):
@@ -466,6 +498,95 @@ def _build_testing(story, data):
     )
 
 
+def _build_intelligence(story, data):
+    ap_names = {ap.id: ap.name for ap in data["access_points"]}
+    predictions = data["predictions"]
+    investigations = data["investigations"]
+    security_events = data["security_events"]
+    recommendations = data["recommendations"]
+    open_security = [e for e in security_events if e.status in {"Open", "Acknowledged"}]
+    open_rca = [i for i in investigations if i.status in {"Open", "Acknowledged"}]
+    advisory = [r for r in recommendations if r.status == "Advisory"]
+    highest = predictions[0] if predictions else None
+
+    story.extend(
+        [
+            Paragraph("Autonomous intelligence summary", STYLES["h1"]),
+            _summary_table(
+                [
+                    ("Highest failure risk", f"{highest.risk_score:.1f}/100 ({highest.severity})" if highest else "No estimate"),
+                    ("Scopes at risk (risk >= 50)", str(sum(1 for p in predictions if p.risk_score >= 50))),
+                    ("Open root-cause investigations", str(len(open_rca))),
+                    ("Open security findings", str(len(open_security))),
+                    ("Unapproved devices in findings", str(sum(1 for e in open_security if e.event_type == "unapproved_device"))),
+                    ("Advisory optimisation items", str(len(advisory))),
+                ]
+            ),
+            Spacer(1, 4 * mm),
+            Paragraph("Failure-risk estimates", STYLES["h1"]),
+            _table(
+                ["Scope", "Risk", "Severity", "Confidence", "Horizon", "Points", "Predicted"],
+                [
+                    [
+                        "Network-wide" if p.scope == "network" else ap_names.get(p.access_point_id, f"AP #{p.access_point_id}"),
+                        f"{p.risk_score:.1f}/100",
+                        p.severity,
+                        f"{p.confidence * 100:.0f}%",
+                        f"{p.horizon_hours}h",
+                        str(p.data_points),
+                        _iso(p.predicted_at),
+                    ]
+                    for p in predictions[:20]
+                ]
+                or [["No active prediction", "—", "—", "—", "—", "—", "Insufficient telemetry or analysis not run"]],
+                [33 * mm, 22 * mm, 18 * mm, 20 * mm, 16 * mm, 15 * mm, 40 * mm],
+            ),
+            Paragraph("Root-cause investigations", STYLES["h1"]),
+            _table(
+                ["Generated", "Severity", "Status", "Problem", "Probable cause"],
+                [
+                    [_iso(i.generated_at), i.severity, i.status, i.problem[:150], i.probable_cause[:260]]
+                    for i in investigations[:15]
+                ]
+                or [["No investigations", "—", "—", "—", "—"]],
+                [26 * mm, 16 * mm, 18 * mm, 52 * mm, 62 * mm],
+            ),
+            Paragraph("Defensive security findings", STYLES["h1"]),
+            _table(
+                ["Detected", "Severity", "Status", "Type", "Finding"],
+                [
+                    [_iso(e.detected_at), e.severity, e.status, e.event_type, f"{e.title}: {e.description[:240]}"]
+                    for e in security_events[:15]
+                ]
+                or [["No findings", "—", "—", "—", "No locally observable security findings"]],
+                [26 * mm, 16 * mm, 18 * mm, 34 * mm, 80 * mm],
+            ),
+            Paragraph("Optimisation advisory", STYLES["h1"]),
+            _table(
+                ["Category", "Severity", "Status", "Recommendation", "Evidence"],
+                [
+                    [
+                        r.category.replace("_", " ").title(),
+                        r.severity,
+                        r.status,
+                        r.title,
+                        "; ".join((r.actions or [])[:2])[:260],
+                    ]
+                    for r in recommendations[:15]
+                ]
+                or [["No advice", "—", "—", "No advisory recommendations", "Insufficient telemetry or analysis not run"]],
+                [24 * mm, 16 * mm, 18 * mm, 45 * mm, 71 * mm],
+            ),
+            Paragraph(
+                "Risk scores and recommendations are statistical estimates computed from persisted live "
+                "measurements. An empty table means the engine reported insufficient data or has not run; "
+                "no values are fabricated. Findings are advisory and no configuration is changed automatically.",
+                STYLES["note"],
+            ),
+        ]
+    )
+
+
 def generate_pdf_report(db: Session, report_type: str, hours: int = 168) -> dict:
     if report_type not in REPORT_TITLES:
         raise ValueError("Unknown report type")
@@ -513,6 +634,8 @@ def generate_pdf_report(db: Session, report_type: str, hours: int = 168) -> dict
         _build_issues(story, data)
     elif report_type == "testing":
         _build_testing(story, data)
+    elif report_type == "intelligence":
+        _build_intelligence(story, data)
 
     # Ensure the final story never ends in a dangling page break.
     while story and isinstance(story[-1], PageBreak):

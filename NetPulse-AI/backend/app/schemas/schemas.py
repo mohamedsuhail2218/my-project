@@ -341,7 +341,7 @@ class ReportOut(BaseModel):
 class ReportGenerateRequest(BaseModel):
     report_type: Literal[
         "executive", "uptime", "latency", "packet_loss", "access_points",
-        "anomalies", "issues", "testing"
+        "anomalies", "issues", "testing", "intelligence"
     ]
     hours: int = Field(default=168, ge=1, le=2160)
 

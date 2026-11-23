@@ -19,7 +19,10 @@ from app.api import (
     auth,
     dashboard,
     devices,
+    intelligence,
+    live,
     monitoring,
+    notifications,
     reports,
     settings as settings_api,
     tests as tests_api,
@@ -136,6 +139,9 @@ app.include_router(tickets.router, prefix=prefix)
 app.include_router(tests_api.router, prefix=prefix)
 app.include_router(reports.router, prefix=prefix)
 app.include_router(settings_api.router, prefix=prefix)
+app.include_router(intelligence.router, prefix=prefix)
+app.include_router(notifications.router, prefix=prefix)
+app.include_router(live.router, prefix=prefix)
 
 
 @app.get(f"{prefix}/health", tags=["System"])

@@ -65,7 +65,7 @@ export function PageHeader({ eyebrow, title, description, actions, children }) {
     <div className="mb-6 animate-fade-up">
       <div className="panel relative overflow-hidden px-5 py-6 sm:px-7 sm:py-7">
         <div className="pointer-events-none absolute -right-24 -top-32 h-72 w-72 rounded-full bg-[rgba(168,85,247,0.28)] blur-[80px]" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-[var(--accent)] via-[rgba(204,255,0,0.18)] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-[var(--accent)] via-[rgba(34,211,238,0.26)] to-transparent" />
         <div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
             {eyebrow && (

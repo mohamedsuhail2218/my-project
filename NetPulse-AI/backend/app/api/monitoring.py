@@ -10,7 +10,8 @@ from sqlalchemy import select
 from app.ai.anomaly import detect_anomalies
 from app.api.deps import AnalystUser, CurrentUser, DbSession
 from app.core.config import settings
-from app.models import NetworkMeasurement
+from app.intelligence.common import iso
+from app.models import NetworkMeasurement, TrafficSample
 from app.monitoring.diagnostics import network_info
 from app.monitoring.scheduler import scheduler
 from app.monitoring.wifi import connected_wifi
@@ -93,6 +94,51 @@ def run_check(db: DbSession, _: AnalystUser) -> MonitoringRunResponse:
     )
 
 
+@router.get("/traffic")
+def traffic_history(
+    db: DbSession,
+    _: CurrentUser,
+    hours: int = Query(default=24, ge=1, le=720),
+    limit: int = Query(default=500, ge=1, le=5000),
+) -> dict:
+    """Real host-interface throughput samples (not per-access-point traffic)."""
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+    rows = list(
+        reversed(
+            db.scalars(
+                select(TrafficSample)
+                .where(
+                    TrafficSample.data_origin == "live",
+                    TrafficSample.recorded_at >= cutoff,
+                )
+                .order_by(TrafficSample.recorded_at.desc())
+                .limit(limit)
+            ).all()
+        )
+    )
+    samples = [
+        {
+            "id": row.id,
+            "recorded_at": iso(row.recorded_at),
+            "bytes_per_sec": row.bytes_per_sec,
+            "packets_per_sec": row.packets_per_sec,
+            "utilization_pct": row.utilization_pct,
+            "link_speed_mbps": row.link_speed_mbps,
+        }
+        for row in rows
+    ]
+    return {
+        "samples": samples,
+        "latest": samples[-1] if samples else None,
+        "hours": hours,
+        "scope": "Host network interface counters",
+        "note": (
+            "Throughput is measured from the monitoring host's operating-system counters. "
+            "It does not represent per-client or per-access-point usage."
+        ),
+    }
+
+
 @router.get("/wifi")
 def wifi_status(_: CurrentUser) -> dict:
     """Read-only details of the Wi-Fi network associated with the backend host."""
@@ -108,6 +154,11 @@ def scheduler_status(_: CurrentUser) -> dict:
         "last_cycle_at": scheduler.last_cycle_at.isoformat() if scheduler.last_cycle_at else None,
         "last_device_scan_at": (
             scheduler.last_device_scan_at.isoformat() if scheduler.last_device_scan_at else None
+        ),
+        "last_intelligence_at": (
+            scheduler.last_intelligence_at.isoformat()
+            if scheduler.last_intelligence_at
+            else None
         ),
         "last_error": scheduler.last_error,
         "note": "Background checks run only while the FastAPI process is running.",

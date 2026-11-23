@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   AlertTriangle,
   Bot,
@@ -151,7 +152,10 @@ export default function Anomalies() {
         title="AI anomaly detection"
         description="Isolation Forest evaluates real latency, packet-loss and jitter observations for statistical outliers. Every finding includes an explanation and detection timestamp."
         actions={
-          hasRole('analyst') ? <Button variant="primary" size="sm" icon={ScanSearch} loading={detecting} onClick={detect}>Run detection</Button> : null
+          <div className="flex flex-wrap gap-2">
+            <Link to="/issues" className="btn-secondary btn-sm"><ShieldAlert className="h-3.5 w-3.5" /> Issue register</Link>
+            {hasRole('analyst') ? <Button variant="primary" size="sm" icon={ScanSearch} loading={detecting} onClick={detect}>Run detection</Button> : null}
+          </div>
         }
       />
 

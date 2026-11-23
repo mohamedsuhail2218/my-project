@@ -72,3 +72,17 @@ export async function openModule(page, linkName, headingName = linkName) {
     page.getByRole('heading', { level: 1, name: headingName }),
   ).toBeVisible()
 }
+
+/**
+ * Open a legacy module by URL.
+ *
+ * The sidebar now exposes ten task-focused modules. Deep functionality such as
+ * the access-point inventory and issue register remains available from the
+ * command palette and by direct link, so these tests keep exercising it.
+ */
+export async function openLegacyModule(page, path, headingName) {
+  await page.goto(path)
+  await expect(
+    page.getByRole('heading', { level: 1, name: headingName }),
+  ).toBeVisible()
+}

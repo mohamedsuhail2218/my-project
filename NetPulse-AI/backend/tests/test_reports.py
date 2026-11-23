@@ -9,11 +9,11 @@ import pytest
 from app.services.reports import REPORT_TITLES, resolve_report_path
 
 
-def test_report_types_expose_all_eight_reports(client, admin_headers):
+def test_report_types_expose_all_reports(client, admin_headers):
     response = client.get("/api/reports/types", headers=admin_headers)
     assert response.status_code == 200
     types = response.json()
-    assert len(types) == 8
+    assert len(types) == len(REPORT_TITLES)
     assert {item["type"] for item in types} == set(REPORT_TITLES)
 
 
@@ -44,7 +44,7 @@ def test_generate_list_and_download_pdf(client, admin_headers):
 
 
 def test_specialised_reports_generate_with_correct_listing_metadata(client, admin_headers):
-    for report_type in ("anomalies", "testing", "access_points", "packet_loss"):
+    for report_type in ("anomalies", "testing", "access_points", "packet_loss", "intelligence"):
         response = client.post(
             "/api/reports/generate",
             headers=admin_headers,
